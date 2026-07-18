@@ -1,4 +1,4 @@
-const API_BASE_URL = "http://localhost:5000/api";
+const API_BASE_URL = "53e9219cf2a50c3276b8e9764a46015c";
 
 // Initialize system states
 document.addEventListener("DOMContentLoaded", () => {
