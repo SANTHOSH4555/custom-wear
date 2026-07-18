@@ -858,6 +858,45 @@
       "payment_method": "UPI",
       "id": "ORD-24D41F79",
       "created_at": "2026-07-18T17:44:26.470083"
+    },
+    "ORD-33626945": {
+      "user_id": "c6a7713e-57cf-4e9f-913e-01708f2ac3e3",
+      "user_name": "Order Tester",
+      "user_email": "order.tester@customwear.io",
+      "items": [
+        {
+          "product_id": "cw-m-3-4th-oversized-t-shirts",
+          "name": "Test Tee",
+          "price": 320,
+          "quantity": 2,
+          "size": "L",
+          "color": "White",
+          "print_style": "plain"
+        }
+      ],
+      "shipping_address": {
+        "name": "Order Tester",
+        "phone": "9999999999",
+        "email": "order.tester@customwear.io",
+        "address": "123 Verification Street",
+        "city": "Salem",
+        "district": "Salem",
+        "state": "Tamil Nadu",
+        "pin": "636001"
+      },
+      "coupon_code": null,
+      "pricing": {
+        "subtotal": 840.0,
+        "discount": 0.0,
+        "gst": 0.0,
+        "shipping": 50.0,
+        "grand_total": 890.0
+      },
+      "status": "Ordered",
+      "payment_status": "Paid",
+      "payment_method": "UPI",
+      "id": "ORD-33626945",
+      "created_at": "2026-07-18T19:28:15.089776"
     }
   },
   "cart": {
