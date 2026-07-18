@@ -1,0 +1,330 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap');
+
+:root {
+  --font-heading: 'Outfit', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  
+  --primary-light: #2563eb;
+  --primary-dark: #3b82f6;
+  --bg-dark-glow: radial-gradient(circle at 50% 50%, #0f172a 0%, #020617 100%);
+  --glass-border: rgba(255, 255, 255, 0.05);
+  --glass-bg: rgba(10, 15, 30, 0.65);
+  --glass-bg-light: rgba(255, 255, 255, 0.75);
+  --glass-border-light: rgba(0, 0, 0, 0.06);
+}
+
+body {
+  font-family: var(--font-body);
+  overflow-x: hidden;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+}
+
+/* Glassmorphism Styles */
+.glass-nav {
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.light .glass-nav {
+  background: var(--glass-bg-light);
+  border-bottom: 1px solid var(--glass-border-light);
+}
+
+.glass-card {
+  background: rgba(15, 23, 42, 0.45);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.4);
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s, border-color 0.4s;
+}
+
+.glass-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px rgba(59, 130, 246, 0.1);
+  border-color: rgba(96, 165, 250, 0.25);
+}
+
+.light .glass-card {
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid var(--glass-border-light);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.05);
+}
+
+.light .glass-card:hover {
+  box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.1);
+  border-color: rgba(37, 99, 235, 0.2);
+}
+
+.glass-input {
+  background: rgba(17, 24, 39, 0.5);
+  border: 1px solid var(--glass-border);
+  color: white;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.glass-input:focus {
+  border-color: var(--primary-dark);
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.25);
+  outline: none;
+}
+
+.light .glass-input {
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid var(--glass-border-light);
+  color: #111827;
+}
+
+.light .glass-input:focus {
+  border-color: var(--primary-light);
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
+}
+
+/* Page Loader */
+#page-loader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: #030712;
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: opacity 0.5s ease-out;
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 3px solid rgba(59, 130, 246, 0.1);
+  border-radius: 50%;
+  border-top-color: var(--primary-dark);
+  animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Skeleton Loading Shimmer */
+.skeleton {
+  background: linear-gradient(90deg, #1f2937 25%, #374151 50%, #1f2937 75%);
+  background-size: 200% 100%;
+  animation: loading-shimmer 1.5s infinite;
+}
+
+.light .skeleton {
+  background: linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 50%, #e5e7eb 75%);
+  background-size: 200% 100%;
+}
+
+@keyframes loading-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Live Canvas Printing Styles */
+.canvas-container {
+  margin: 0 auto;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #030712;
+}
+
+.light ::-webkit-scrollbar-track {
+  background: #f9fafb;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #1f2937;
+  border-radius: 4px;
+}
+
+.light ::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #374151;
+}
+
+/* Premium Glow Elements */
+.glow-effect {
+  position: relative;
+}
+
+.glow-effect::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  box-shadow: 0 0 15px rgba(59, 130, 246, 0.4);
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+  pointer-events: none;
+}
+
+.glow-effect:hover::after {
+  opacity: 1;
+}
+
+/* Color Circle Selection Active Ring */
+.color-circle.active {
+  ring-offset-2: true;
+  box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--primary-dark);
+}
+
+.light .color-circle.active {
+  box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--primary-light);
+}
+
+/* Image Zoom Wrapper */
+.zoom-wrapper {
+  overflow: hidden;
+  position: relative;
+}
+
+.zoom-wrapper img {
+  transition: transform 0.5s ease;
+}
+
+.zoom-wrapper:hover img {
+  transform: scale(1.15);
+}
+
+/* Brand Hub Switcher */
+.brand-hub {
+  height: 80vh;
+  display: flex;
+}
+
+.brand-pane {
+  flex: 1;
+  transition: flex 0.6s cubic-bezier(0.25, 1, 0.5, 1), filter 0.6s;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.brand-pane::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.4);
+  transition: background 0.6s;
+  z-index: 1;
+}
+
+.brand-pane:hover {
+  flex: 1.4;
+}
+
+.brand-pane:hover::before {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.brand-pane-content {
+  z-index: 2;
+  text-align: center;
+  color: white;
+}
+
+.custom-wear-pane {
+  background: linear-gradient(rgba(15, 32, 67, 0.35), rgba(10, 15, 30, 0.85)), url('../assets/images/cw-m-oversized-hoodies_cover.jpeg') no-repeat center/cover;
+}
+
+.cradance-pane {
+  background: linear-gradient(rgba(24, 24, 35, 0.3), rgba(3, 7, 18, 0.9)), url('../assets/images/crad_supima_tee.jpeg') no-repeat center/cover;
+}
+
+/* ============================
+   Mobile Responsive Fixes
+   ============================ */
+
+/* Brand Hub: stacked on mobile */
+@media (max-width: 767px) {
+  .brand-hub {
+    flex-direction: column;
+    height: auto;
+    min-height: 100svh;
+  }
+
+  .brand-pane {
+    min-height: 50svh;
+    flex: none;
+  }
+
+  .brand-pane:hover {
+    flex: none;
+  }
+
+  /* Prevent navbar overflow on small screens */
+  body {
+    overflow-x: hidden;
+  }
+}
+
+/* Canvas designer: full width canvas on mobile */
+@media (max-width: 1023px) {
+  #canvas-workspace {
+    min-height: 300px;
+  }
+}
+
+/* Glass card: disable lift animation on touch devices */
+@media (hover: none) {
+  .glass-card:hover {
+    transform: none;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.4);
+  }
+}
+
+/* Smooth mobile menu animation */
+#mobile-menu {
+  animation-duration: 0.2s;
+  animation-timing-function: ease-out;
+}
+
+/* Step tracker (order progress) active node */
+.step-active {
+  border-color: #2563eb;
+  background-color: rgba(37, 99, 235, 0.12);
+  color: #60a5fa;
+}
+
+.line-active {
+  background-color: #2563eb;
+}
+
+/* Tab panel utility */
+.tab-panel.hidden {
+  display: none;
+}

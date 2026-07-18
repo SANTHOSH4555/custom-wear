@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Customer Dashboard | CUSTOM WEAR & CRADANCE</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: { brand: { blue: '#2563eb' } }
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Firebase SDK v8 compat -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+  <style>
+    .step-active {
+      background-color: #2563eb !important;
+      border-color: #2563eb !important;
+      box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+    }
+    
+    .line-active {
+      background-color: #2563eb !important;
+    }
+  </style>
+</head>
+<body class="bg-gray-950 text-gray-100 min-h-screen pt-20">
+
+  <!-- Page Loader -->
+  <div id="page-loader">
+    <div class="flex flex-col items-center">
+      <div class="spinner mb-4"></div>
+      <h1 class="text-xl font-bold tracking-widest text-blue-500">LOADING YOUR PANEL</h1>
+    </div>
+  </div>
+
+  <!-- Navbar -->
+  <nav class="glass-nav fixed top-0 left-0 w-full z-50 transition duration-300">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-20">
+        <a href="index.html" class="flex items-center gap-3">
+          <img src="assets/images/brand_logo.jpeg" alt="Logo" class="h-10 w-10 rounded-full border border-blue-500">
+          <span class="font-extrabold text-xl tracking-wider text-blue-500">CW & CRADANCE</span>
+        </a>
+        <div class="hidden md:flex items-center space-x-6 text-sm font-medium">
+          <a href="index.html" class="hover:text-blue-400 transition">Home</a>
+          <a href="custom-wear.html" class="hover:text-blue-400 transition">CUSTOM WEAR</a>
+          <a href="cradance.html" class="hover:text-blue-400 transition">CRADANCE</a>
+          <a href="custom-printing.html" class="hover:text-blue-400 transition">Custom Printing</a>
+          <a href="products.html" class="hover:text-blue-400 transition">Shop All</a>
+        </div>
+        <div class="flex items-center space-x-4">
+          <a href="cart.html" class="p-2 rounded-full hover:bg-gray-800 text-gray-400 hover:text-white transition relative">
+            <i data-lucide="shopping-bag" class="w-5 h-5"></i>
+            <span class="cart-count-badge absolute -top-1 -right-1 bg-blue-600 text-white rounded-full text-[10px] w-4 h-4 flex items-center justify-center font-bold hidden">0</span>
+          </a>
+          <button onclick="handleLogout()" class="p-2 text-red-400 hover:text-red-300 transition" title="Logout">
+            <i data-lucide="log-out" class="w-5 h-5"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <div class="flex flex-col lg:flex-row gap-8">
+      
+      <!-- Left sidebar navigation tabs -->
+      <aside class="w-full lg:w-64 shrink-0">
+        <div class="glass-card p-6 rounded-2xl border border-gray-800 flex flex-col gap-2">
+          <div class="text-center pb-6 border-b border-gray-800 mb-4">
+            <div class="h-16 w-16 bg-blue-600 rounded-full flex items-center justify-center font-bold text-xl text-white mx-auto mb-3" id="profile-avatar">
+              U
+            </div>
+            <h4 class="font-extrabold text-sm text-white" id="profile-welcome-name">Welcome User</h4>
+            <span class="text-[10px] text-gray-500 font-bold" id="profile-welcome-email">user@email.com</span>
+          </div>
+
+          <button onclick="switchTab('profile')" id="tab-btn-profile" class="flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold bg-blue-600 text-white transition text-left">
+            <i data-lucide="user" class="w-4 h-4"></i> Profile Details
+          </button>
+          <button onclick="switchTab('orders')" id="tab-btn-orders" class="flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold text-gray-400 hover:text-white transition text-left">
+            <i data-lucide="package" class="w-4 h-4"></i> My Orders
+          </button>
+          <button onclick="switchTab('wishlist')" id="tab-btn-wishlist" class="flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold text-gray-400 hover:text-white transition text-left">
+            <i data-lucide="heart" class="w-4 h-4"></i> My Wishlist
+          </button>
+          <button onclick="switchTab('addresses')" id="tab-btn-addresses" class="flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold text-gray-400 hover:text-white transition text-left">
+            <i data-lucide="map-pin" class="w-4 h-4"></i> Saved Addresses
+          </button>
+          <button onclick="switchTab('notifications')" id="tab-btn-notifications" class="flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold text-gray-400 hover:text-white transition text-left relative">
+            <i data-lucide="bell" class="w-4 h-4"></i> Notifications
+            <span class="h-2 w-2 rounded-full bg-blue-600 absolute right-4 top-1/2 -translate-y-1/2 hidden" id="noti-dot"></span>
+          </button>
+          <button onclick="handleLogout()" class="flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold text-red-400 hover:bg-red-500/10 transition text-left">
+            <i data-lucide="log-out" class="w-4 h-4"></i> Log Out
+          </button>
+        </div>
+      </aside>
+
+      <!-- Right Tab Panels -->
+      <section class="flex-1">
+        
+        <!-- Profile Tab -->
+        <div id="tab-profile" class="tab-panel glass-card p-6 sm:p-8 rounded-2xl border border-gray-800">
+          <h2 class="text-xl font-bold mb-6 border-b border-gray-800 pb-2">Profile Details</h2>
+          <form onsubmit="handleUpdateProfile(event)" class="flex flex-col gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div class="flex flex-col">
+                <label class="text-[10px] text-gray-500 uppercase font-black tracking-widest mb-1.5">Full Name</label>
+                <input type="text" id="prof-name" class="glass-input px-4 py-3 rounded-xl text-xs focus:outline-none" required>
+              </div>
+              <div class="flex flex-col">
+                <label class="text-[10px] text-gray-500 uppercase font-black tracking-widest mb-1.5">Phone Number</label>
+                <input type="tel" id="prof-phone" class="glass-input px-4 py-3 rounded-xl text-xs focus:outline-none">
+              </div>
+            </div>
+            <div class="flex flex-col">
+              <label class="text-[10px] text-gray-500 uppercase font-black tracking-widest mb-1.5">Email Address</label>
+              <input type="email" id="prof-email" class="glass-input px-4 py-3 rounded-xl text-xs focus:outline-none" readonly>
+            </div>
+            
+            <button type="submit" class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-lg transition self-start mt-2">
+              Save Changes
+            </button>
+          </form>
+        </div>
+
+        <!-- Orders Tab -->
+        <div id="tab-orders" class="tab-panel hidden flex flex-col gap-6">
+          <!-- Injected dynamically -->
+        </div>
+
+        <!-- Wishlist Tab -->
+        <div id="tab-wishlist" class="tab-panel hidden">
+          <h2 class="text-xl font-bold mb-6 border-b border-gray-800 pb-2">My Wishlist</h2>
+          <div id="wishlist-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Injected dynamically -->
+          </div>
+        </div>
+
+        <!-- Saved Addresses Tab -->
+        <div id="tab-addresses" class="tab-panel hidden glass-card p-6 sm:p-8 rounded-2xl border border-gray-800">
+          <h2 class="text-xl font-bold mb-6 border-b border-gray-800 pb-2">Saved Addresses</h2>
+          <div id="addresses-container" class="flex flex-col gap-4">
+            <!-- List address -->
+          </div>
+        </div>
+
+        <!-- Notifications Tab -->
+        <div id="tab-notifications" class="tab-panel hidden glass-card p-6 rounded-2xl border border-gray-800">
+          <h2 class="text-xl font-bold mb-6 border-b border-gray-800 pb-2">Notifications</h2>
+          <div id="notifications-container" class="flex flex-col gap-4">
+            <div class="p-4 rounded-xl bg-gray-900/60 border border-gray-800 text-xs text-gray-400">
+              Welcome to CUSTOM WEAR & CRADANCE! Browse our catalogues and customize your streetwear designs.
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-gray-950 border-t border-gray-900 py-8 text-center text-xs text-gray-500 mt-20">
+    &copy; 2026 CUSTOM WEAR & CRADANCE. All rights reserved.
+  </footer>
+
+  <script src="js/products-data.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/firebase-config.js"></script>
+  <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+  <script>
+    AOS.init({ duration: 800, once: true });
+
+    document.addEventListener("DOMContentLoaded", () => {
+      // Force auth check
+      if (!getAuthToken()) {
+        window.location.href = "login.html";
+        return;
+      }
+
+      loadProfileData();
+      loadOrdersData();
+      loadWishlistData();
+      
+      const urlParams = new URLSearchParams(window.location.search);
+      const tabParam = urlParams.get("tab");
+      if (tabParam) {
+        switchTab(tabParam);
+      }
+      
+      hidePageLoader();
+    });
+
+    function switchTab(tabName) {
+      document.querySelectorAll(".tab-panel").forEach(p => p.classList.add("hidden"));
+      document.getElementById(`tab-${tabName}`).classList.remove("hidden");
+      
+      document.querySelectorAll("[id^='tab-btn-']").forEach(btn => {
+        btn.className = "flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold text-gray-400 hover:text-white transition text-left";
+      });
+      document.getElementById(`tab-btn-${tabName}`).className = "flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold bg-blue-600 text-white transition text-left";
+    }
+
+    async function loadProfileData() {
+      try {
+        const user = await apiRequest("/auth/profile");
+        document.getElementById("profile-welcome-name").textContent = `Welcome ${user.name}`;
+        document.getElementById("profile-welcome-email").textContent = user.email;
+        document.getElementById("profile-avatar").textContent = user.name[0].toUpperCase();
+        
+        document.getElementById("prof-name").value = user.name;
+        document.getElementById("prof-email").value = user.email;
+        document.getElementById("prof-phone").value = user.phone || "";
+
+        // Addresses rendering
+        const addrContainer = document.getElementById("addresses-container");
+        addrContainer.innerHTML = "";
+        
+        if (!user.addresses || user.addresses.length === 0) {
+          addrContainer.innerHTML = "<p class='text-xs text-gray-500 italic'>No saved addresses yet.</p>";
+          return;
+        }
+
+        user.addresses.forEach(addr => {
+          const item = document.createElement("div");
+          item.className = "p-4 rounded-xl border border-gray-800 bg-gray-900/40 text-xs leading-relaxed text-gray-400 flex justify-between items-center";
+          item.innerHTML = `
+            <div>
+              <p class="font-bold text-white mb-1">${addr.name}</p>
+              <p>${addr.address}</p>
+              <p>${addr.city}, ${addr.district}, ${addr.state} - ${addr.pin}</p>
+              <p class="mt-1 font-bold">Phone: ${addr.phone}</p>
+            </div>
+            <i data-lucide="map-pin" class="w-5 h-5 text-blue-500 shrink-0"></i>
+          `;
+          addrContainer.appendChild(item);
+        });
+        lucide.createIcons();
+      } catch (err) {
+        showToast(err.message, "error");
+      }
+    }
+
+    async function handleUpdateProfile(e) {
+      e.preventDefault();
+      const name = document.getElementById("prof-name").value;
+      const phone = document.getElementById("prof-phone").value;
+
+      try {
+        await apiRequest("/auth/profile", "PUT", { name, phone });
+        showToast("Profile updated successfully!", "success");
+        loadProfileData();
+      } catch (err) {
+        showToast(err.message, "error");
+      }
+    }
+
+    function getWhatsAppLinkForDashboard(o) {
+      const number = "917708374473";
+      let message = `*ORDER ENQUIRY!* 🛍️\n\n`;
+      message += `*Order ID:* ${o.id}\n`;
+      message += `*Customer:* ${o.shipping_address.name}\n`;
+      message += `*Phone:* ${o.shipping_address.phone}\n\n`;
+      message += `*Items:*\n`;
+      o.items.forEach((item, index) => {
+        message += `${index + 1}. *${item.name}* (x${item.quantity}) - Size: ${item.size} - Color: ${item.color}\n`;
+      });
+      message += `\n*Total Amount:* Rs. ${o.pricing.grandTotal}\n`;
+      message += `*Status:* ${o.status}\n`;
+      message += `*Payment:* ${o.payment_status}`;
+      return `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
+    }
+
+    async function loadOrdersData() {
+      const container = document.getElementById("tab-orders");
+      container.innerHTML = "<h2 class='text-xl font-bold mb-6 border-b border-gray-800 pb-2'>My Orders</h2><p class='text-xs text-gray-500'>Loading your orders...</p>";
+
+      try {
+        const orders = await apiRequest("/orders");
+        container.innerHTML = "<h2 class='text-xl font-bold mb-6 border-b border-gray-800 pb-2'>My Orders</h2>";
+        
+        if (orders.length === 0) {
+          container.innerHTML += `
+            <div class="glass-card py-16 rounded-2xl text-center flex flex-col items-center">
+              <i data-lucide="package" class="w-12 h-12 text-gray-600 mb-4"></i>
+              <h3 class="font-extrabold text-sm text-gray-400">You haven't ordered anything yet</h3>
+              <p class="text-xs text-gray-500 mt-1 mb-6">Browse our collection and design your first custom wear.</p>
+              <a href="products.html" class="px-5 py-2.5 bg-blue-600 text-white font-bold text-xs rounded-xl transition">Explore Shop</a>
+            </div>
+          `;
+          lucide.createIcons();
+          return;
+        }
+
+        orders.forEach(o => {
+          const card = document.createElement("div");
+          card.className = "glass-card p-6 rounded-2xl border border-gray-800 flex flex-col gap-6";
+          
+          // Shipping progress indicator calculation
+          const statuses = ["Ordered", "Packed", "Shipped", "Out for Delivery", "Delivered"];
+          const curIdx = statuses.indexOf(o.status);
+          
+          let trackNodes = "";
+          statuses.forEach((s, idx) => {
+            const isActive = idx <= curIdx;
+            trackNodes += `
+              <div class="flex flex-col items-center relative flex-1">
+                <!-- Node circle -->
+                <div class="h-6 w-6 rounded-full border-2 border-gray-800 bg-gray-950 text-[10px] font-bold flex items-center justify-center z-10 transition ${
+                  isActive ? 'step-active' : ''
+                }">
+                  ${idx + 1}
+                </div>
+                <!-- Text -->
+                <span class="text-[8px] text-gray-500 mt-2 font-bold uppercase ${isActive ? 'text-blue-400' : ''}">${s}</span>
+                
+                <!-- Connector Line -->
+                ${idx < 4 ? `
+                  <div class="absolute top-3 left-[50%] right-[-50%] h-[2px] bg-gray-800 z-0 transition ${
+                    idx < curIdx ? 'line-active' : ''
+                  }"></div>
+                ` : ''}
+              </div>
+            `;
+          });
+
+          // Invoice endpoint link
+          const invoiceUrl = `${API_BASE_URL}/orders/${o.id}/invoice`;
+          const token = getAuthToken();
+
+          card.innerHTML = `
+            <div class="flex justify-between items-center border-b border-gray-800/40 pb-4">
+              <div>
+                <span class="text-[9px] text-gray-500 font-bold uppercase tracking-widest">Order ID</span>
+                <h4 class="font-extrabold text-xs text-blue-400 uppercase mt-0.5">${o.id}</h4>
+              </div>
+              <div class="text-right">
+                <span class="text-[9px] text-gray-500 font-bold uppercase tracking-widest">Total Bill</span>
+                <h4 class="font-extrabold text-xs text-white mt-0.5">Rs. ${o.pricing.grandTotal}</h4>
+              </div>
+            </div>
+
+            <!-- Items info -->
+            <div class="flex flex-col gap-3">
+              ${o.items.map(item => `
+                <div class="flex justify-between text-xs text-gray-400">
+                  <span>${item.name} (x${item.quantity}) | Size: ${item.size} | Color: ${item.color}</span>
+                  <span class="text-white">Rs. ${item.price * item.quantity}</span>
+                </div>
+              `).join('')}
+            </div>
+
+            <!-- Visual Progress Tracker -->
+            <div class="py-4 border-t border-b border-gray-800/40">
+              <label class="text-[9px] text-gray-500 font-black tracking-widest uppercase block mb-4">Track Dispatch Stage</label>
+              <div class="flex items-center justify-between relative">
+                ${trackNodes}
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between text-xs">
+              <span class="text-gray-500">Payment Status: <span class="font-extrabold ${o.payment_status === 'Paid' ? 'text-green-400' : 'text-yellow-500'}">${o.payment_status}</span></span>
+              <div class="flex gap-4">
+                <a href="${getWhatsAppLinkForDashboard(o)}" target="_blank" class="text-xs text-green-400 hover:text-green-300 font-bold flex items-center gap-1.5">
+                  <i data-lucide="message-square" class="w-4 h-4"></i> WhatsApp Admin
+                </a>
+                <a href="${invoiceUrl}?Authorization=Bearer ${token}" download class="text-xs text-blue-400 hover:text-blue-300 font-bold flex items-center gap-1.5">
+                  <i data-lucide="download" class="w-4 h-4"></i> Download Invoice
+                </a>
+              </div>
+            </div>
+          `;
+          container.appendChild(card);
+        });
+        lucide.createIcons();
+      } catch (err) {
+        showToast(err.message, "error");
+      }
+    }
+
+    async function loadWishlistData() {
+      const grid = document.getElementById("wishlist-grid");
+      if (!grid || typeof PRODUCTS_DATA === 'undefined') return;
+
+      const wishlistIds = getLocalWishlist();
+      grid.innerHTML = "";
+
+      if (wishlistIds.length === 0) {
+        grid.innerHTML = "<p class='col-span-full text-center text-xs text-gray-500 italic py-10'>No items in your wishlist yet.</p>";
+        return;
+      }
+
+      wishlistIds.forEach((id, idx) => {
+        const p = PRODUCTS_DATA.find(x => x.id === id);
+        if (!p) return;
+
+        const card = document.createElement("div");
+        card.className = "glass-card rounded-2xl overflow-hidden p-4 flex flex-col justify-between group relative";
+        card.setAttribute("data-aos", "fade-up");
+        card.setAttribute("data-aos-delay", `${idx * 50}`);
+
+        card.innerHTML = `
+          <div onclick="window.location.href='product-details.html?id=${p.id}'" class="zoom-wrapper rounded-xl aspect-[3/4] relative bg-gray-950/40 mb-4 flex items-center justify-center overflow-hidden cursor-pointer">
+            <img src="${p.cover_image || 'assets/images/brand_logo.jpeg'}" alt="${p.name}" class="w-full h-full object-cover">
+            <span class="absolute top-2 left-2 text-[9px] uppercase font-black px-2 py-1 rounded bg-blue-600 text-white tracking-widest">${p.brand}</span>
+          </div>
+          <div>
+            <h4 onclick="window.location.href='product-details.html?id=${p.id}'" class="font-bold text-sm tracking-wide text-white group-hover:text-blue-400 transition truncate cursor-pointer">${p.name}</h4>
+            <div class="flex items-center justify-between mt-2">
+              <span class="text-xs text-gray-500">${p.gender}'s ${p.category}</span>
+              <span class="text-sm font-extrabold text-blue-400">Rs. ${p.prices.plain}</span>
+            </div>
+          </div>
+          <div class="mt-4 pt-3 border-t border-gray-800/40 flex justify-between items-center text-xs">
+             <button onclick="event.stopPropagation(); removeWishlistId('${p.id}')" class="text-red-500 hover:text-red-400 transition flex items-center gap-1">
+               <i data-lucide="trash" class="w-3.5 h-3.5"></i> Remove
+             </button>
+             <a href="product-details.html?id=${p.id}" class="text-blue-400 hover:text-blue-300 font-semibold">Buy Now</a>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+      lucide.createIcons();
+    }
+
+    function removeWishlistId(id) {
+      toggleWishlist(id);
+      loadWishlistData();
+      showToast("Item removed from wishlist.", "success");
+    }
+  </script>
+</body>
+</html>

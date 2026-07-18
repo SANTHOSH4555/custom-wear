@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Checkout | CUSTOM WEAR & CRADANCE</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: { brand: { blue: '#2563eb' } }
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Firebase SDK v8 compat -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+</head>
+<body class="bg-gray-950 text-gray-100 min-h-screen pt-20">
+
+  <!-- Page Loader -->
+  <div id="page-loader">
+    <div class="flex flex-col items-center">
+      <div class="spinner mb-4"></div>
+      <h1 class="text-xl font-bold tracking-widest text-blue-500">SETTING UP ORDER</h1>
+    </div>
+  </div>
+
+  <!-- Navbar -->
+  <nav class="glass-nav fixed top-0 left-0 w-full z-50 transition duration-300">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-20">
+        <a href="index.html" class="flex items-center gap-3">
+          <img src="assets/images/brand_logo.jpeg" alt="Logo" class="h-10 w-10 rounded-full border border-blue-500">
+          <span class="font-extrabold text-xl tracking-wider text-blue-500">CW & CRADANCE</span>
+        </a>
+        <div class="hidden md:flex items-center space-x-6 text-sm font-medium">
+          <a href="index.html" class="hover:text-blue-400 transition">Home</a>
+          <a href="custom-wear.html" class="hover:text-blue-400 transition">CUSTOM WEAR</a>
+          <a href="cradance.html" class="hover:text-blue-400 transition">CRADANCE</a>
+          <a href="custom-printing.html" class="hover:text-blue-400 transition">Custom Printing</a>
+          <a href="products.html" class="hover:text-blue-400 transition">Shop All</a>
+        </div>
+        <div class="flex items-center space-x-4">
+          <a href="cart.html" class="p-2 rounded-full hover:bg-gray-800 text-gray-400 hover:text-white transition relative">
+            <i data-lucide="shopping-bag" class="w-5 h-5"></i>
+            <span class="cart-count-badge absolute -top-1 -right-1 bg-blue-600 text-white rounded-full text-[10px] w-4 h-4 flex items-center justify-center font-bold hidden">0</span>
+          </a>
+          <a href="dashboard.html" class="p-2 rounded-full hover:bg-gray-800 text-gray-400 hover:text-white transition"><i data-lucide="user" class="w-5 h-5"></i></a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Checkout Container -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <h1 class="text-3xl font-extrabold mb-8" data-aos="fade-right">Delivery Details</h1>
+
+    <div class="flex flex-col lg:flex-row gap-8">
+      
+      <!-- Left Column: Details Form -->
+      <section class="flex-1">
+        <form onsubmit="handlePlaceOrder(event)" class="glass-card p-6 sm:p-8 rounded-2xl border border-gray-800 flex flex-col gap-6" data-aos="fade-up">
+          
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="flex flex-col">
+              <label class="text-[10px] text-gray-500 uppercase font-black tracking-widest mb-1.5">Customer Name</label>
+              <input type="text" id="ship-name" class="glass-input px-4 py-3 rounded-xl text-xs focus:outline-none" required>
+            </div>
+            <div class="flex flex-col">
+              <label class="text-[10px] text-gray-500 uppercase font-black tracking-widest mb-1.5">Phone Number</label>
+              <input type="tel" id="ship-phone" class="glass-input px-4 py-3 rounded-xl text-xs focus:outline-none" required>
+            </div>
+          </div>
+
+          <div class="flex flex-col">
+            <label class="text-[10px] text-gray-500 uppercase font-black tracking-widest mb-1.5">Email Address</label>
+            <input type="email" id="ship-email" class="glass-input px-4 py-3 rounded-xl text-xs focus:outline-none" required>
+          </div>
+
+          <div class="flex flex-col">
+            <label class="text-[10px] text-gray-500 uppercase font-black tracking-widest mb-1.5">Shipping Address</label>
+            <textarea id="ship-address" placeholder="Flat, Street, Area details..." class="glass-input px-4 py-3 rounded-xl text-xs min-h-[80px] focus:outline-none" required></textarea>
+          </div>
+
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <div class="flex flex-col">
+              <label class="text-[10px] text-gray-500 uppercase font-black tracking-widest mb-1.5">City</label>
+              <input type="text" id="ship-city" class="glass-input px-4 py-3 rounded-xl text-xs focus:outline-none" required>
+            </div>
+            <div class="flex flex-col">
+              <label class="text-[10px] text-gray-500 uppercase font-black tracking-widest mb-1.5">District</label>
+              <input type="text" id="ship-district" class="glass-input px-4 py-3 rounded-xl text-xs focus:outline-none" required>
+            </div>
+            <div class="flex flex-col">
+              <label class="text-[10px] text-gray-500 uppercase font-black tracking-widest mb-1.5">State</label>
+              <input type="text" id="ship-state" class="glass-input px-4 py-3 rounded-xl text-xs focus:outline-none" required>
+            </div>
+            <div class="flex flex-col">
+              <label class="text-[10px] text-gray-500 uppercase font-black tracking-widest mb-1.5">PIN Code</label>
+              <input type="text" id="ship-pin" class="glass-input px-4 py-3 rounded-xl text-xs focus:outline-none" required>
+            </div>
+          </div>
+
+          <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 font-bold py-4 rounded-xl shadow-lg transition flex items-center justify-center gap-2 mt-4 text-sm">
+            <i data-lucide="package" class="w-5 h-5"></i> Generate Order & Pay
+          </button>
+        </form>
+      </section>
+
+      <!-- Right Column: Order breakdown -->
+      <aside class="w-full lg:w-96 shrink-0">
+        <div class="glass-card p-6 rounded-2xl border border-gray-800" data-aos="fade-left">
+          <h3 class="font-extrabold text-sm tracking-wider uppercase mb-6 pb-2 border-b border-gray-800">ORDER BILL</h3>
+          
+          <div class="flex flex-col gap-3 text-xs" id="checkout-breakdown">
+            <!-- Dynamic calculation details -->
+          </div>
+
+          <div class="glass-card p-4 rounded-xl flex items-center justify-between border border-blue-500/10 mb-2 mt-6">
+            <span class="text-xs text-gray-400 font-bold uppercase tracking-wider">Total Amount Due</span>
+            <span id="checkout-total" class="text-xl font-black text-blue-400">Rs. 0</span>
+          </div>
+        </div>
+      </aside>
+
+    </div>
+  </main>
+
+  <!-- UPI Payment Simulation Modal -->
+  <div id="upi-payment-modal" class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 backdrop-blur-sm px-4 hidden">
+    <div class="glass-card max-w-sm w-full rounded-2xl p-6 relative border border-gray-800 flex flex-col items-center text-center">
+      <h3 class="font-extrabold text-sm tracking-wider uppercase mb-2">UPI Transaction Portal</h3>
+      <span id="pay-order-id" class="text-[9px] text-gray-500 font-bold uppercase tracking-widest mb-6">Order ID: ORD-12345</span>
+      
+      <!-- Scannable QR -->
+      <div class="bg-white p-3 rounded-xl shadow-lg border border-gray-100 mb-6 relative">
+        <img id="upi-qr-image" src="" alt="UPI Pay QR" class="w-48 h-48 object-contain">
+        <div class="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-blue-600 text-white rounded px-2.5 py-0.5 text-[9px] font-bold shadow tracking-widest uppercase">
+          7708374473
+        </div>
+      </div>
+      
+      <p class="text-xs text-gray-400 max-w-[250px] leading-relaxed mb-6">
+        Scan the QR code above with Google Pay, PhonePe, Paytm, or SuperMoney to pay.
+      </p>
+
+      <!-- App links simulation -->
+      <div class="grid grid-cols-2 gap-2 w-full mb-6 text-[10px] font-bold">
+        <button onclick="simulateAppClick('Google Pay')" class="flex items-center justify-center gap-1.5 p-2 bg-gray-900 border border-gray-800 hover:border-gray-600 rounded-lg transition"><i data-lucide="smartphone" class="w-3.5 h-3.5"></i> Google Pay</button>
+        <button onclick="simulateAppClick('PhonePe')" class="flex items-center justify-center gap-1.5 p-2 bg-gray-900 border border-gray-800 hover:border-gray-600 rounded-lg transition"><i data-lucide="smartphone" class="w-3.5 h-3.5"></i> PhonePe</button>
+        <button onclick="simulateAppClick('Paytm')" class="flex items-center justify-center gap-1.5 p-2 bg-gray-900 border border-gray-800 hover:border-gray-600 rounded-lg transition"><i data-lucide="smartphone" class="w-3.5 h-3.5"></i> Paytm</button>
+        <button onclick="simulateAppClick('SuperMoney')" class="flex items-center justify-center gap-1.5 p-2 bg-gray-900 border border-gray-800 hover:border-gray-600 rounded-lg transition"><i data-lucide="smartphone" class="w-3.5 h-3.5"></i> SuperMoney</button>
+      </div>
+
+      <!-- Simulator Button -->
+      <button onclick="confirmSimulatedPayment()" class="w-full py-3 bg-green-600 hover:bg-green-700 text-white font-bold rounded-xl text-xs transition shadow-lg flex items-center justify-center gap-2">
+        <i data-lucide="check-circle" class="w-4 h-4"></i> Simulate Payment Success
+      </button>
+    </div>
+  </div>
+
+  <!-- Order Success Page View Overlay -->
+  <div id="success-overlay" class="fixed inset-0 z-[10000] flex items-center justify-center bg-gray-950 px-4 hidden">
+    <div class="max-w-md w-full text-center flex flex-col items-center" data-aos="zoom-in">
+      <div class="h-20 w-20 bg-green-500/10 border border-green-500/30 text-green-500 rounded-full flex items-center justify-center mb-6 shadow-2xl shadow-green-500/10 animate-bounce">
+        <i data-lucide="check" class="w-10 h-10"></i>
+      </div>
+      <h2 class="text-3xl font-black tracking-tight text-white mb-2">Order Confirmed!</h2>
+      <p class="text-xs text-gray-500 mb-6">Payment verified. Your packaging begins shortly.</p>
+      
+      <div class="glass-card p-6 rounded-2xl w-full border border-gray-800 text-xs mb-8 flex flex-col gap-3 text-left">
+        <div class="flex justify-between border-b border-gray-800 pb-2.5">
+          <span class="text-gray-500">Order Reference</span>
+          <span id="success-order-id" class="font-extrabold text-blue-400 uppercase">ORD-XYZ</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-gray-500">Amount Transacted</span>
+          <span id="success-amount" class="font-semibold text-white">Rs. 0</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-gray-500">Expected Delivery</span>
+          <span class="font-semibold text-white">3 to 5 Business Days</span>
+        </div>
+      </div>
+      
+      <button onclick="window.location.href='dashboard.html?tab=orders'" class="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-sm transition shadow-lg">
+        Track Your Order
+      </button>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="bg-gray-950 border-t border-gray-900 py-8 text-center text-xs text-gray-500 mt-20">
+    &copy; 2026 CUSTOM WEAR & CRADANCE. All rights reserved.
+  </footer>
+
+  <script src="js/app.js"></script>
+  <script src="js/firebase-config.js"></script>
+  <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+  <script>
+    AOS.init({ duration: 800, once: true });
+    
+    let generatedOrder = null;
+
+    document.addEventListener("DOMContentLoaded", () => {
+      loadCheckoutSummary();
+      fillUserInfo();
+      hidePageLoader();
+    });
+
+    function fillUserInfo() {
+      const user = getCurrentUser();
+      if (user) {
+        document.getElementById("ship-name").value = user.name || "";
+        document.getElementById("ship-email").value = user.email || "";
+        document.getElementById("ship-phone").value = user.phone || "";
+        if (user.addresses && user.addresses.length > 0) {
+          const addr = user.addresses[0];
+          document.getElementById("ship-address").value = addr.address || "";
+          document.getElementById("ship-city").value = addr.city || "";
+          document.getElementById("ship-district").value = addr.district || "";
+          document.getElementById("ship-state").value = addr.state || "";
+          document.getElementById("ship-pin").value = addr.pin || "";
+        }
+      }
+    }
+
+    function loadCheckoutSummary() {
+      const summaryStr = localStorage.getItem("checkout_summary");
+      if (!summaryStr) {
+        showToast("Error locating billing details.", "error");
+        setTimeout(() => window.location.href = "cart.html", 1500);
+        return;
+      }
+
+      const summary = JSON.parse(summaryStr);
+      const container = document.getElementById("checkout-breakdown");
+      container.innerHTML = `
+        <div class="flex justify-between items-center text-gray-400">
+          <span>Subtotal</span>
+          <span class="font-semibold text-white">Rs. ${summary.subtotal.toFixed(2)}</span>
+        </div>
+        <div class="flex justify-between items-center text-gray-400">
+          <span>Discount ${summary.coupon ? `(${summary.coupon})` : ''}</span>
+          <span class="font-semibold text-green-400">Rs. ${summary.discount.toFixed(2)}</span>
+        </div>
+        <div class="flex justify-between items-center text-gray-400">
+          <span>GST (0%)</span>
+          <span class="font-semibold text-white">Rs. ${summary.gst.toFixed(2)}</span>
+        </div>
+        <div class="flex justify-between items-center text-gray-400">
+          <span>Shipping Charges</span>
+          <span class="font-semibold text-white">${summary.shipping === 0 ? "FREE" : `Rs. ${summary.shipping}`}</span>
+        </div>
+      `;
+      document.getElementById("checkout-total").textContent = `Rs. ${summary.grandTotal.toFixed(2)}`;
+    }
+
+    async function handlePlaceOrder(e) {
+      e.preventDefault();
+      
+      const cart = getLocalCart();
+      if (cart.length === 0) {
+        showToast("Cart is empty!", "error");
+        return;
+      }
+
+      showPageLoader();
+      
+      const shipAddress = {
+        name: document.getElementById("ship-name").value,
+        phone: document.getElementById("ship-phone").value,
+        email: document.getElementById("ship-email").value,
+        address: document.getElementById("ship-address").value,
+        city: document.getElementById("ship-city").value,
+        district: document.getElementById("ship-district").value,
+        state: document.getElementById("ship-state").value,
+        pin: document.getElementById("ship-pin").value
+      };
+
+      // Create update profile address on backend if user didn't have one
+      const user = getCurrentUser();
+      if (user && user.addresses.length === 0) {
+        try {
+          await apiRequest("/auth/profile", "PUT", { 
+            phone: shipAddress.phone,
+            addresses: [shipAddress] 
+          });
+        } catch (e) {
+          console.warn("Update profile address failed: ", e);
+        }
+      }
+
+      const summary = JSON.parse(localStorage.getItem("checkout_summary"));
+      
+      try {
+        const orderData = {
+          items: cart,
+          shipping_address: shipAddress,
+          coupon_code: summary.coupon || null
+        };
+        
+        const response = await apiRequest("/orders", "POST", orderData);
+        generatedOrder = response.order;
+        
+        // Fetch UPI payment details
+        const payDetails = await apiRequest(`/orders/${generatedOrder.id}/pay`, "POST");
+        
+        // Update UI
+        document.getElementById("pay-order-id").textContent = `Order ID: ${generatedOrder.id}`;
+        document.getElementById("upi-qr-image").src = payDetails.qr_code_url;
+        
+        // Show UPI QR Modal
+        hidePageLoader();
+        document.getElementById("upi-payment-modal").classList.remove("hidden");
+      } catch (err) {
+        hidePageLoader();
+        showToast(err.message, "error");
+      }
+    }
+
+    function simulateAppClick(app) {
+      showToast(`Redirecting to ${app} UPI App (Simulation)...`, "success");
+      // Simulate confirmation automatically after 2s
+      setTimeout(() => {
+        confirmSimulatedPayment();
+      }, 2000);
+    }
+
+    function getWhatsAppLink(order) {
+      const number = "917708374473";
+      let message = `*NEW ORDER CONFIRMED!* 🛍️\n\n`;
+      message += `*Order ID:* ${order.id}\n`;
+      message += `*Customer:* ${order.shipping_address.name}\n`;
+      message += `*Phone:* ${order.shipping_address.phone}\n`;
+      message += `*Email:* ${order.shipping_address.email}\n\n`;
+      
+      message += `*Shipping Address:*\n`;
+      message += `${order.shipping_address.address}, ${order.shipping_address.city}, ${order.shipping_address.district}, ${order.shipping_address.state} - ${order.shipping_address.pin}\n\n`;
+      
+      message += `*Items Ordered:*\n`;
+      order.items.forEach((item, index) => {
+        message += `${index + 1}. *${item.name}* (x${item.quantity})\n`;
+        message += `   - Size: ${item.size}\n`;
+        message += `   - Color: ${item.color}\n`;
+        if (item.customization) {
+          message += `   - Custom Type: ${item.customization.type}\n`;
+          if (item.customization.text) {
+            message += `   - Custom Text: "${item.customization.text}"\n`;
+          }
+          if (item.customization.image_uploaded === "Yes (Custom Graphic)") {
+            message += `   - Custom Graphic: Uploaded\n`;
+          }
+        }
+        message += `   - Price: Rs. ${item.price * item.quantity}\n\n`;
+      });
+      
+      message += `*Total Amount:* Rs. ${order.pricing.grandTotal.toFixed(2)}\n`;
+      message += `*Payment Method:* UPI\n`;
+      message += `*Payment Status:* Paid\n\n`;
+      message += `Please process my order. Thank you!`;
+      
+      return `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
+    }
+
+    async function confirmSimulatedPayment() {
+      if (!generatedOrder) return;
+      
+      showPageLoader();
+      try {
+        const response = await apiRequest(`/orders/${generatedOrder.id}/pay`, "POST", { 
+          simulate_success: true 
+        });
+        
+        // Success flow
+        saveLocalCart([]); // Clear local cart
+        
+        hidePageLoader();
+        document.getElementById("upi-payment-modal").classList.add("hidden");
+        
+        // Open success view overlay
+        document.getElementById("success-order-id").textContent = generatedOrder.id;
+        document.getElementById("success-amount").textContent = `Rs. ${generatedOrder.pricing.grandTotal.toFixed(2)}`;
+        
+        // Generate WhatsApp link
+        const waLink = getWhatsAppLink(generatedOrder);
+        
+        // Ensure success container has a button to manually notify if popups are blocked
+        const successContainer = document.getElementById("success-overlay").firstElementChild;
+        let waBtn = document.getElementById("whatsapp-notify-btn");
+        if (!waBtn) {
+          waBtn = document.createElement("a");
+          waBtn.id = "whatsapp-notify-btn";
+          waBtn.className = "w-full py-4 bg-green-600 hover:bg-green-700 text-white font-bold rounded-xl text-sm transition shadow-lg flex items-center justify-center gap-2 mb-3 cursor-pointer";
+          waBtn.innerHTML = `<i data-lucide="message-square" class="w-5 h-5"></i> Send Order Details to Seller`;
+          const trackBtn = successContainer.querySelector("button");
+          successContainer.insertBefore(waBtn, trackBtn);
+          lucide.createIcons();
+        }
+        waBtn.href = waLink;
+        waBtn.target = "_blank";
+        
+        // Update track order button to point to the new public tracker
+        const trackBtn = successContainer.querySelector("button");
+        if (trackBtn) {
+          trackBtn.onclick = () => {
+            window.location.href = `track-order.html?id=${generatedOrder.id}&contact=${encodeURIComponent(generatedOrder.shipping_address.email)}`;
+          };
+        }
+        
+        document.getElementById("success-overlay").classList.remove("hidden");
+        
+        // Auto-redirect/open tab after rendering overlay
+        setTimeout(() => {
+          window.open(waLink, "_blank");
+        }, 100);
+      } catch (err) {
+        hidePageLoader();
+        showToast(err.message, "error");
+      }
+    }
+  </script>
+</body>
+</html>

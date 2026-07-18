@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Custom Printing Canvas | CUSTOM WEAR</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: { brand: { blue: '#2563eb' } }
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Firebase SDK v8 compat -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+  <style>
+    #canvas-workspace {
+      position: relative;
+      background-size: contain;
+      background-position: center;
+      background-repeat: no-repeat;
+      transition: background-image 0.3s;
+    }
+    
+    .design-overlay {
+      position: absolute;
+      width: 120px;
+      height: 120px;
+      border: 2px dashed transparent;
+      cursor: grab;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      user-select: none;
+      touch-action: none;
+      transition: border-color 0.2s;
+    }
+
+    .design-overlay.active {
+      border-color: rgba(59, 130, 246, 0.6);
+    }
+
+    .design-overlay:hover {
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    .design-overlay.active:hover {
+      border-color: rgba(59, 130, 246, 0.8);
+    }
+    
+    .design-overlay:active {
+      cursor: grabbing;
+    }
+    
+    .design-element {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      font-weight: bold;
+      pointer-events: none;
+    }
+    
+    .design-element img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
+    
+    .resize-handle {
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      background: #2563eb;
+      border: 2px solid white;
+      border-radius: 50%;
+      bottom: -6px;
+      right: -6px;
+      cursor: se-resize;
+    }
+  </style>
+</head>
+<body class="bg-gray-950 text-gray-100 min-h-screen pt-20">
+
+  <!-- Page Loader -->
+  <div id="page-loader">
+    <div class="flex flex-col items-center">
+      <div class="spinner mb-4"></div>
+      <h1 class="text-xl font-bold tracking-widest text-blue-500">OPENING DESIGN CANVAS</h1>
+    </div>
+  </div>
+
+  <!-- Navbar -->
+  <nav class="glass-nav fixed top-0 left-0 w-full z-50 transition duration-300">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-20">
+        <a href="index.html" class="flex items-center gap-3">
+          <img src="assets/images/brand_logo.jpeg" alt="Logo" class="h-10 w-10 rounded-full border border-blue-500">
+          <span class="font-extrabold text-xl tracking-wider text-blue-500">CUSTOM WEAR</span>
+        </a>
+        <div class="hidden md:flex items-center space-x-6 text-sm font-medium">
+          <a href="index.html" class="hover:text-blue-400 transition">Home</a>
+          <a href="custom-wear.html" class="hover:text-blue-400 transition">CUSTOM WEAR</a>
+          <a href="cradance.html" class="hover:text-blue-400 transition">CRADANCE</a>
+          <a href="custom-printing.html" class="text-blue-500 hover:text-blue-400 transition">Custom Printing</a>
+          <a href="products.html" class="hover:text-blue-400 transition">Shop All</a>
+        </div>
+        <div class="flex items-center space-x-4">
+          <a href="cart.html" class="p-2 rounded-full hover:bg-gray-800 text-gray-400 hover:text-white transition relative">
+            <i data-lucide="shopping-bag" class="w-5 h-5"></i>
+            <span class="cart-count-badge absolute -top-1 -right-1 bg-blue-600 text-white rounded-full text-[10px] w-4 h-4 flex items-center justify-center font-bold hidden">0</span>
+          </a>
+          <a href="dashboard.html" class="p-2 rounded-full hover:bg-gray-800 text-gray-400 hover:text-white transition"><i data-lucide="user" class="w-5 h-5"></i></a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Canvas Designer Container -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="flex flex-col lg:flex-row gap-8">
+      
+      <!-- Left Panel: Design Controls -->
+      <aside class="w-full lg:w-80 shrink-0 flex flex-col gap-6 order-2 lg:order-1">
+        <div class="glass-card p-6 rounded-2xl border border-gray-800">
+          <h3 class="font-extrabold text-sm tracking-wider uppercase mb-6 pb-2 border-b border-gray-800">DESIGN UTILITIES</h3>
+          
+          <!-- Printing Positions -->
+          <div class="mb-6">
+            <h4 class="text-xs font-bold text-gray-400 tracking-wider uppercase mb-3">Print Placement</h4>
+            <div class="grid grid-cols-2 gap-2 text-xs">
+              <button onclick="changePlacement('front')" id="btn-place-front" class="p-2.5 rounded-lg bg-blue-600 text-white border border-blue-500 font-bold transition">Front Print</button>
+              <button onclick="changePlacement('back')" id="btn-place-back" class="p-2.5 rounded-lg bg-gray-900 border border-gray-800 hover:border-gray-600 transition">Back Print</button>
+              <button onclick="changePlacement('left')" id="btn-place-left" class="p-2.5 rounded-lg bg-gray-900 border border-gray-800 hover:border-gray-600 transition">Left Sleeve</button>
+              <button onclick="changePlacement('right')" id="btn-place-right" class="p-2.5 rounded-lg bg-gray-900 border border-gray-800 hover:border-gray-600 transition">Right Sleeve</button>
+            </div>
+          </div>
+
+          <!-- Logo & Graphic Upload -->
+          <div class="mb-6">
+            <h4 class="text-xs font-bold text-gray-400 tracking-wider uppercase mb-3">Upload Graphic (PNG / SVG)</h4>
+            <label class="flex flex-col items-center justify-center border-2 border-dashed border-gray-800 hover:border-blue-500/50 rounded-xl p-4 cursor-pointer bg-gray-900/20 transition">
+              <i data-lucide="upload-cloud" class="w-8 h-8 text-blue-500 mb-2"></i>
+              <span class="text-[10px] text-gray-500 font-bold">PNG, SVG, PDF, or JPEG</span>
+              <input type="file" id="upload-image-input" accept="image/*" class="hidden" onchange="handleImageUpload(event)">
+            </label>
+          </div>
+
+          <!-- Add Text -->
+          <div class="mb-6">
+            <h4 class="text-xs font-bold text-gray-400 tracking-wider uppercase mb-3">Add Custom Text</h4>
+            <input type="text" id="custom-text-input" placeholder="Type here..." class="glass-input px-3 py-2 rounded-xl text-xs w-full mb-3 focus:outline-none" oninput="updateTextElement()">
+            
+            <!-- Font Selection -->
+            <label class="text-[10px] font-bold text-gray-500 uppercase block mb-1">Font Family</label>
+            <select id="font-select" class="glass-input px-3 py-2 rounded-xl text-xs w-full mb-3 bg-gray-900 border-gray-800 focus:outline-none" onchange="updateTextElement()">
+              <option value="Outfit">Outfit (Sporty/Modern)</option>
+              <option value="Inter">Inter (Sleek/Minimal)</option>
+              <option value="Impact">Impact (Bold/Street)</option>
+              <option value="Courier New">Courier (Retro/Code)</option>
+            </select>
+
+            <!-- Text Colors -->
+            <label class="text-[10px] font-bold text-gray-500 uppercase block mb-1">Text Color</label>
+            <div class="flex gap-2">
+              <input type="color" id="text-color-picker" value="#ffffff" class="w-8 h-8 rounded border-0 bg-transparent cursor-pointer" oninput="updateTextElement()">
+              <input type="text" id="text-color-hex" value="#FFFFFF" class="glass-input px-2 py-1.5 rounded-lg text-xs w-20 focus:outline-none text-center" readonly>
+            </div>
+          </div>
+
+          <!-- Fine Adjustments Range -->
+          <div>
+            <h4 class="text-xs font-bold text-gray-400 tracking-wider uppercase mb-3">Rotation Adjust</h4>
+            <input type="range" id="rotation-range" min="0" max="360" value="0" class="w-full h-1 bg-gray-800 rounded-lg appearance-none cursor-pointer accent-blue-600" oninput="rotateDesign(this.value)">
+          </div>
+
+        </div>
+      </aside>
+
+      <!-- Middle Panel: Main Canvas -->
+      <section class="flex-1 flex flex-col items-center order-1 lg:order-2">
+        <div class="w-full max-w-lg aspect-square border border-gray-800/80 rounded-3xl relative overflow-hidden bg-gray-900/30 flex items-center justify-center p-4 sm:p-6" style="touch-action: none;">
+          <!-- Canvas Layer Workspace -->
+          <div id="canvas-workspace" class="w-full h-full relative">
+            
+            <!-- Interactive Draggable Image Overlay -->
+            <div id="image-layer" class="design-overlay hidden" style="top: 20%; left: 35%;">
+              <div id="image-element" class="design-element"></div>
+              <div class="resize-handle" id="image-resize-handle"></div>
+            </div>
+
+            <!-- Interactive Draggable Text Overlay -->
+            <div id="text-layer" class="design-overlay active" style="top: 50%; left: 35%;">
+              <div id="text-element" class="design-element">
+                <span id="text-element-node" class="text-white text-base">Your Text</span>
+              </div>
+              <div class="resize-handle" id="text-resize-handle"></div>
+            </div>
+
+          </div>
+        </div>
+        <p class="text-[10px] text-gray-500 mt-4 font-bold flex items-center gap-1">
+          <i data-lucide="info" class="w-3.5 h-3.5"></i> Drag handles to position, resize, or rotate text/graphics on the garment.
+        </p>
+      </section>
+
+      <!-- Right Panel: Spec Summary -->
+      <aside class="w-full lg:w-80 shrink-0 flex flex-col gap-6 order-3 lg:order-3">
+        <div class="glass-card p-6 rounded-2xl border border-gray-800">
+          <h3 class="font-extrabold text-sm tracking-wider uppercase mb-6 pb-2 border-b border-gray-800">ORDER SUMMARY</h3>
+          
+          <!-- Product Selection Info -->
+          <div class="mb-4">
+            <label class="text-[10px] text-gray-500 uppercase font-black tracking-widest">Base Garment</label>
+            <h4 id="summary-prod-name" class="text-base font-bold mt-1 text-white">Round Neck T-Shirt</h4>
+            <span id="summary-prod-brand" class="text-[10px] text-blue-400 font-bold">CUSTOM WEAR</span>
+          </div>
+
+          <!-- Color Circles -->
+          <div class="mb-4">
+            <label class="text-[10px] text-gray-500 uppercase font-black tracking-widest">Garment Color</label>
+            <div class="flex items-center gap-2 mt-2" id="summary-colors">
+              <!-- Injected circles -->
+            </div>
+          </div>
+
+          <!-- Sizes -->
+          <div class="mb-6">
+            <label class="text-[10px] text-gray-500 uppercase font-black tracking-widest text-block mb-2">Size Choice</label>
+            <div class="flex gap-2" id="summary-sizes">
+              <!-- Injected sizes buttons -->
+            </div>
+          </div>
+
+          <!-- Base Price Detail -->
+          <div class="flex justify-between items-center text-xs py-2 border-t border-gray-800/40">
+            <span class="text-gray-500">Base Price (Plain)</span>
+            <span id="price-base" class="font-semibold">Rs. 0</span>
+          </div>
+          
+          <!-- Printing Surcharge Detail -->
+          <div class="flex justify-between items-center text-xs py-2 border-t border-gray-800/40">
+            <span class="text-gray-500">Printing Surcharge</span>
+            <span id="price-printing-markup" class="font-semibold text-green-400">Rs. 100</span>
+          </div>
+
+          <!-- Total Estimations -->
+          <div class="glass-card p-4 rounded-xl flex items-center justify-between border border-blue-500/10 mb-6 mt-4">
+            <span class="text-xs text-gray-400 font-bold uppercase tracking-wider">Estimated Total</span>
+            <span id="price-total" class="text-xl font-black text-blue-400">Rs. 0</span>
+          </div>
+
+          <!-- Add to Cart -->
+          <button onclick="addCustomProductToCart()" class="w-full bg-blue-600 hover:bg-blue-700 font-bold py-4 rounded-xl shadow-lg transition flex items-center justify-center gap-2 text-sm">
+            <i data-lucide="shopping-bag" class="w-5 h-5"></i> Add Custom To Cart
+          </button>
+        </div>
+      </aside>
+
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-gray-950 border-t border-gray-900 py-8 text-center text-xs text-gray-500 mt-20">
+    &copy; 2026 CUSTOM WEAR & CRADANCE. All rights reserved.
+  </footer>
+
+  <script src="js/products-data.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/firebase-config.js"></script>
+  <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+  <script>
+    AOS.init({ duration: 800, once: true });
+    
+    let activeProduct = null;
+    let selectedColor = "";
+    let selectedSize = "M";
+    let activePlacement = "front";
+    let activeLayer = "text"; // text or image
+    
+    let textState = {
+      left: 35,
+      top: 50,
+      width: 120,
+      height: 120,
+      rotation: 0
+    };
+    
+    let imageState = {
+      left: 35,
+      top: 20,
+      width: 120,
+      height: 120,
+      rotation: 0
+    };
+    
+    document.addEventListener("DOMContentLoaded", () => {
+      loadCanvasData();
+      initDragging();
+      hidePageLoader();
+    });
+
+    function setActiveLayer(layerId) {
+      activeLayer = layerId;
+      document.querySelectorAll(".design-overlay").forEach(el => {
+        el.classList.remove("active");
+      });
+      const activeEl = document.getElementById(`${layerId}-layer`);
+      if (activeEl) {
+        activeEl.classList.add("active");
+        const currentRot = layerId === "text" ? textState.rotation : imageState.rotation;
+        document.getElementById("rotation-range").value = currentRot;
+      }
+    }
+
+    function loadCanvasData() {
+      const urlParams = new URLSearchParams(window.location.search);
+      let prodId = urlParams.get("id");
+      
+      if (typeof PRODUCTS_DATA === 'undefined') return;
+
+      // Filter products only belong to CUSTOM WEAR
+      const cwProds = PRODUCTS_DATA.filter(p => p.brand === "CUSTOM WEAR");
+      
+      // Default to first custom t-shirt if none specified
+      if (!prodId) {
+        const defaultTee = cwProds.find(p => p.id.includes("round-neck"));
+        activeProduct = defaultTee || cwProds[0];
+      } else {
+        activeProduct = PRODUCTS_DATA.find(p => p.id === prodId);
+      }
+
+      if (!activeProduct) {
+        showToast("Error locating base product details", "error");
+        return;
+      }
+
+      // Selected size and color presets
+      selectedSize = urlParams.get("size") || "M";
+      selectedColor = urlParams.get("color") || activeProduct.colors[0].name;
+
+      // Summary Info
+      document.getElementById("summary-prod-name").textContent = activeProduct.name;
+      document.getElementById("summary-prod-brand").textContent = activeProduct.brand;
+      
+      // Load color circles
+      const colorContainer = document.getElementById("summary-colors");
+      colorContainer.innerHTML = "";
+      activeProduct.colors.forEach(c => {
+        const item = document.createElement("button");
+        item.className = `w-6 h-6 rounded-full border border-gray-800 ${
+          c.name === selectedColor ? 'ring-2 ring-blue-500' : ''
+        }`;
+        
+        let bg = c.name.toLowerCase();
+        if (bg.includes("red")) bg = "#dc2626";
+        else if (bg.includes("blue")) bg = "#1e3a8a";
+        else if (bg.includes("pink")) bg = "#ffc0cb";
+        else if (bg.includes("white")) bg = "#ffffff";
+        else if (bg.includes("beige")) bg = "#f5f5dc";
+        else if (bg.includes("lavender") || bg.includes("lilac")) bg = "#e6e6fa";
+        else if (bg.includes("green")) bg = "#556b2f";
+        else if (bg.includes("grey")) bg = "#808080";
+        else if (bg.includes("charcoal")) bg = "#36454f";
+        else if (bg.includes("burgundy")) bg = "#800020";
+
+        item.style.backgroundColor = bg;
+        item.addEventListener("click", () => {
+          selectedColor = c.name;
+          document.querySelectorAll("#summary-colors button").forEach(b => b.classList.remove("ring-2", "ring-blue-500"));
+          item.classList.add("ring-2", "ring-blue-500");
+          updateGarmentWorkspaceImage();
+        });
+        colorContainer.appendChild(item);
+      });
+
+      // Load size buttons
+      const sizeContainer = document.getElementById("summary-sizes");
+      sizeContainer.innerHTML = "";
+      activeProduct.sizes.forEach(s => {
+        const btn = document.createElement("button");
+        btn.className = `px-3 py-1 rounded bg-gray-900 border text-[10px] font-bold transition ${
+          s === selectedSize ? 'border-blue-500 text-blue-400 bg-blue-600/10' : 'border-gray-800 hover:border-gray-600'
+        }`;
+        btn.textContent = s;
+        btn.addEventListener("click", () => {
+          selectedSize = s;
+          document.querySelectorAll("#summary-sizes button").forEach(b => b.classList.remove("border-blue-500", "text-blue-400", "bg-blue-600/10"));
+          btn.classList.add("border-blue-500", "text-blue-400", "bg-blue-600/10");
+        });
+        sizeContainer.appendChild(btn);
+      });
+
+      // Update workspace image
+      updateGarmentWorkspaceImage();
+      
+      // Update Price details
+      document.getElementById("price-base").textContent = `Rs. ${activeProduct.prices.plain}`;
+      const markup = activeProduct.prices.printed - activeProduct.prices.plain;
+      document.getElementById("price-printing-markup").textContent = `Rs. ${markup}`;
+      document.getElementById("price-total").textContent = `Rs. ${activeProduct.prices.printed}`;
+      
+      lucide.createIcons();
+    }
+
+    function updateGarmentWorkspaceImage() {
+      if (!activeProduct) return;
+      const matchingColor = activeProduct.colors.find(c => c.name === selectedColor);
+      const imgPath = matchingColor ? matchingColor.image : activeProduct.cover_image;
+      
+      // Draw background of workspace
+      document.getElementById("canvas-workspace").style.backgroundImage = `url('${imgPath}')`;
+    }
+
+    function changePlacement(place) {
+      activePlacement = place;
+      document.querySelectorAll("[id^='btn-place-']").forEach(btn => {
+        btn.className = "p-2.5 rounded-lg bg-gray-900 border border-gray-800 hover:border-gray-600 transition";
+      });
+      document.getElementById(`btn-place-${place}`).className = "p-2.5 rounded-lg bg-blue-600 text-white border border-blue-500 font-bold transition";
+      showToast(`Swapped to ${place} print view`, "success");
+    }
+
+    // Handles graphics uploading
+    function handleImageUpload(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        const imageLayer = document.getElementById("image-layer");
+        const elementNode = document.getElementById("image-element");
+        elementNode.innerHTML = `<img src="${evt.target.result}" alt="Custom graphic">`;
+        
+        imageLayer.classList.remove("hidden");
+        
+        // Reset overlay size to default
+        imageState.width = 120;
+        imageState.height = 120;
+        imageLayer.style.width = "120px";
+        imageLayer.style.height = "120px";
+        
+        setActiveLayer("image");
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // Add/Update text elements
+    function updateTextElement() {
+      const val = document.getElementById("custom-text-input").value;
+      const font = document.getElementById("font-select").value;
+      const color = document.getElementById("text-color-picker").value;
+
+      document.getElementById("text-color-hex").value = color.toUpperCase();
+
+      const elementNode = document.getElementById("text-element");
+      const textVal = val.trim() || "Your Text";
+      elementNode.innerHTML = `<span id="text-element-node" style="font-family: '${font}'; color: ${color};" class="text-base">${textVal}</span>`;
+      
+      setActiveLayer("text");
+    }
+
+    function rotateDesign(val) {
+      const layer = document.getElementById(`${activeLayer}-layer`);
+      if (layer) {
+        layer.style.transform = `rotate(${val}deg)`;
+        if (activeLayer === "text") {
+          textState.rotation = parseInt(val);
+        } else {
+          imageState.rotation = parseInt(val);
+        }
+      }
+    }
+
+    // Drag, Scale / Positioning Logic
+    function initDragging() {
+      setupLayerDragging("text");
+      setupLayerDragging("image");
+    }
+
+    function setupLayerDragging(layerId) {
+      const layer = document.getElementById(`${layerId}-layer`);
+      const workspace = document.getElementById("canvas-workspace");
+      const resizeHandle = document.getElementById(`${layerId}-resize-handle`);
+      const state = layerId === "text" ? textState : imageState;
+
+      let isDragging = false;
+      let isResizing = false;
+      let startX, startY;
+      let startWidth, startHeight;
+
+      // Mouse drag start
+      layer.addEventListener("mousedown", (e) => {
+        if (e.target === resizeHandle) return;
+        setActiveLayer(layerId);
+        isDragging = true;
+        startX = e.clientX;
+        startY = e.clientY;
+      });
+
+      // Touch start
+      layer.addEventListener("touchstart", (e) => {
+        if (e.target === resizeHandle) return;
+        setActiveLayer(layerId);
+        isDragging = true;
+        startX = e.touches[0].clientX;
+        startY = e.touches[0].clientY;
+      }, { passive: true });
+
+      // Resize handle start
+      resizeHandle.addEventListener("mousedown", (e) => {
+        setActiveLayer(layerId);
+        isResizing = true;
+        startX = e.clientX;
+        startY = e.clientY;
+        startWidth = parseInt(document.defaultView.getComputedStyle(layer).width, 10);
+        startHeight = parseInt(document.defaultView.getComputedStyle(layer).height, 10);
+        e.preventDefault();
+      });
+
+      resizeHandle.addEventListener("touchstart", (e) => {
+        setActiveLayer(layerId);
+        isResizing = true;
+        startX = e.touches[0].clientX;
+        startY = e.touches[0].clientY;
+        startWidth = parseInt(document.defaultView.getComputedStyle(layer).width, 10);
+        startHeight = parseInt(document.defaultView.getComputedStyle(layer).height, 10);
+        e.preventDefault();
+      }, { passive: false });
+
+      // Move listener
+      document.addEventListener("mousemove", (e) => {
+        if (!isDragging && !isResizing) return;
+        const workspaceRect = workspace.getBoundingClientRect();
+        
+        if (isDragging) {
+          const dx = e.clientX - startX;
+          const dy = e.clientY - startY;
+          
+          const percentX = (dx / workspaceRect.width) * 100;
+          const percentY = (dy / workspaceRect.height) * 100;
+          
+          state.left = Math.min(Math.max(0, state.left + percentX), 80);
+          state.top = Math.min(Math.max(0, state.top + percentY), 80);
+          
+          layer.style.left = `${state.left}%`;
+          layer.style.top = `${state.top}%`;
+          
+          startX = e.clientX;
+          startY = e.clientY;
+        } else if (isResizing) {
+          const dx = e.clientX - startX;
+          const dy = e.clientY - startY;
+          
+          state.width = Math.min(Math.max(40, startWidth + dx), 200);
+          state.height = Math.min(Math.max(40, startHeight + dy), 200);
+          
+          layer.style.width = `${state.width}px`;
+          layer.style.height = `${state.height}px`;
+        }
+      });
+
+      document.addEventListener("touchmove", (e) => {
+        if (!isDragging && !isResizing) return;
+        e.preventDefault();
+        const workspaceRect = workspace.getBoundingClientRect();
+        const clientX = e.touches[0].clientX;
+        const clientY = e.touches[0].clientY;
+        
+        if (isDragging) {
+          const dx = clientX - startX;
+          const dy = clientY - startY;
+          
+          const percentX = (dx / workspaceRect.width) * 100;
+          const percentY = (dy / workspaceRect.height) * 100;
+          
+          state.left = Math.min(Math.max(0, state.left + percentX), 80);
+          state.top = Math.min(Math.max(0, state.top + percentY), 80);
+          
+          layer.style.left = `${state.left}%`;
+          layer.style.top = `${state.top}%`;
+          
+          startX = clientX;
+          startY = clientY;
+        } else if (isResizing) {
+          const dx = clientX - startX;
+          const dy = clientY - startY;
+          
+          state.width = Math.min(Math.max(40, startWidth + dx), 200);
+          state.height = Math.min(Math.max(40, startHeight + dy), 200);
+          
+          layer.style.width = `${state.width}px`;
+          layer.style.height = `${state.height}px`;
+        }
+      }, { passive: false });
+
+      // Stop
+      const stopHandler = () => {
+        isDragging = false;
+        isResizing = false;
+      };
+      document.addEventListener("mouseup", stopHandler);
+      document.addEventListener("touchend", stopHandler);
+    }
+
+    function addCustomProductToCart() {
+      if (!activeProduct) return;
+      
+      const price = activeProduct.prices.printed;
+      const textVal = document.getElementById("custom-text-input").value;
+      const hasText = textVal.trim() !== "";
+      const hasImage = !document.getElementById("image-layer").classList.contains("hidden");
+      
+      let designTypeSummary = "none";
+      if (hasText && hasImage) {
+        designTypeSummary = "text & image";
+      } else if (hasText) {
+        designTypeSummary = "text";
+      } else if (hasImage) {
+        designTypeSummary = "image";
+      }
+      
+      const customDesignMeta = {
+        placement: activePlacement,
+        type: designTypeSummary,
+        text: hasText ? textVal : "",
+        image_uploaded: hasImage ? "Yes (Custom Graphic)" : "No",
+        text_rotation: textState.rotation,
+        image_rotation: imageState.rotation,
+        size: selectedSize,
+        color: selectedColor
+      };
+
+      const cartItem = {
+        product_id: activeProduct.id,
+        name: `${activeProduct.name} (Custom Design)`,
+        price: price,
+        quantity: 1,
+        size: selectedSize,
+        color: selectedColor,
+        print_style: "printed",
+        image: activeProduct.colors.find(c => c.name === selectedColor)?.image || activeProduct.cover_image,
+        customization: customDesignMeta
+      };
+
+      addToCart(cartItem);
+      showToast("Added custom design clothing to cart!", "success");
+      
+      // Redirect to cart
+      setTimeout(() => {
+        window.location.href = "cart.html";
+      }, 1000);
+    }
+  </script>
+</body>
+</html>

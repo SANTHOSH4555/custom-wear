@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shopping Cart | CUSTOM WEAR & CRADANCE</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: { brand: { blue: '#2563eb' } }
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Firebase SDK v8 compat -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+</head>
+<body class="bg-gray-950 text-gray-100 min-h-screen pt-20">
+
+  <!-- Page Loader -->
+  <div id="page-loader">
+    <div class="flex flex-col items-center">
+      <div class="spinner mb-4"></div>
+      <h1 class="text-xl font-bold tracking-widest text-blue-500">PREPARING YOUR BAG</h1>
+    </div>
+  </div>
+
+  <!-- Navbar -->
+  <nav class="glass-nav fixed top-0 left-0 w-full z-50 transition duration-300">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-20">
+        <a href="index.html" class="flex items-center gap-3">
+          <img src="assets/images/brand_logo.jpeg" alt="Logo" class="h-10 w-10 rounded-full border border-blue-500">
+          <span class="font-extrabold text-xl tracking-wider text-blue-500">CW & CRADANCE</span>
+        </a>
+        <div class="hidden md:flex items-center space-x-6 text-sm font-medium">
+          <a href="index.html" class="hover:text-blue-400 transition">Home</a>
+          <a href="custom-wear.html" class="hover:text-blue-400 transition">CUSTOM WEAR</a>
+          <a href="cradance.html" class="hover:text-blue-400 transition">CRADANCE</a>
+          <a href="custom-printing.html" class="hover:text-blue-400 transition">Custom Printing</a>
+          <a href="products.html" class="hover:text-blue-400 transition">Shop All</a>
+        </div>
+        <div class="flex items-center space-x-4">
+          <a href="cart.html" class="p-2 rounded-full hover:bg-gray-800 text-gray-400 hover:text-white transition relative">
+            <i data-lucide="shopping-bag" class="w-5 h-5"></i>
+            <span class="cart-count-badge absolute -top-1 -right-1 bg-blue-600 text-white rounded-full text-[10px] w-4 h-4 flex items-center justify-center font-bold hidden">0</span>
+          </a>
+          <a href="dashboard.html" class="p-2 rounded-full hover:bg-gray-800 text-gray-400 hover:text-white transition"><i data-lucide="user" class="w-5 h-5"></i></a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Cart Container -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <h1 class="text-3xl font-extrabold mb-8" data-aos="fade-right">Shopping Cart</h1>
+
+    <div class="flex flex-col lg:flex-row gap-8">
+      
+      <!-- Left Column: Items List -->
+      <section class="flex-1 flex flex-col gap-4" id="cart-items-container">
+        <!-- Injected by JS -->
+        <div class="glass-card p-6 rounded-xl skeleton h-24"></div>
+        <div class="glass-card p-6 rounded-xl skeleton h-24"></div>
+      </section>
+
+      <!-- Right Column: Cart Summary -->
+      <aside class="w-full lg:w-96 shrink-0">
+        <div class="glass-card p-6 rounded-2xl border border-gray-800" data-aos="fade-left">
+          <h3 class="font-extrabold text-sm tracking-wider uppercase mb-6 pb-2 border-b border-gray-800">SUMMARY</h3>
+          
+          <!-- Promo Code -->
+          <div class="mb-6">
+            <label class="text-[10px] text-gray-500 uppercase font-black tracking-widest block mb-2">Apply Coupon Code</label>
+            <div class="flex gap-2">
+              <input type="text" id="coupon-input" placeholder="e.g. WELCOME10" class="glass-input px-3 py-2 rounded-xl text-xs flex-1 uppercase focus:outline-none">
+              <button onclick="applyCoupon()" class="px-4 py-2 bg-gray-900 border border-gray-800 hover:border-gray-600 font-bold text-xs rounded-xl transition">Apply</button>
+            </div>
+            <span id="coupon-msg" class="text-[10px] mt-2 block font-bold hidden"></span>
+          </div>
+
+          <!-- Invoice Details -->
+          <div class="flex flex-col gap-3 text-xs border-t border-gray-800/40 pt-4">
+            <div class="flex justify-between items-center text-gray-400">
+              <span>Subtotal</span>
+              <span id="summary-subtotal" class="font-semibold text-white">Rs. 0</span>
+            </div>
+            <div class="flex justify-between items-center text-gray-400">
+              <span>Discount</span>
+              <span id="summary-discount" class="font-semibold text-green-400">Rs. 0</span>
+            </div>
+            <div class="flex justify-between items-center text-gray-400">
+              <span>GST (0%)</span>
+              <span id="summary-gst" class="font-semibold text-white">Rs. 0</span>
+            </div>
+            <div class="flex justify-between items-center text-gray-400">
+              <span>Shipping Charges</span>
+              <span id="summary-shipping" class="font-semibold text-white">Rs. 0</span>
+            </div>
+          </div>
+
+          <!-- Total -->
+          <div class="glass-card p-4 rounded-xl flex items-center justify-between border border-blue-500/10 mb-6 mt-6">
+            <span class="text-xs text-gray-400 font-bold uppercase tracking-wider">Grand Total</span>
+            <span id="summary-grandtotal" class="text-xl font-black text-blue-400">Rs. 0</span>
+          </div>
+
+          <!-- Proceed to Checkout -->
+          <button onclick="proceedToCheckout()" class="w-full bg-blue-600 hover:bg-blue-700 font-bold py-4 rounded-xl shadow-lg transition flex items-center justify-center gap-2 text-sm">
+            <i data-lucide="credit-card" class="w-5 h-5"></i> Proceed To Checkout
+          </button>
+        </div>
+      </aside>
+
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-gray-950 border-t border-gray-900 py-8 text-center text-xs text-gray-500 mt-20">
+    &copy; 2026 CUSTOM WEAR & CRADANCE. All rights reserved.
+  </footer>
+
+  <script src="js/app.js"></script>
+  <script src="js/firebase-config.js"></script>
+  <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+  <script>
+    AOS.init({ duration: 800, once: true });
+
+    let activeCoupon = null;
+    let couponDiscountPercent = 0;
+
+    document.addEventListener("DOMContentLoaded", () => {
+      renderCart();
+      hidePageLoader();
+    });
+
+    function renderCart() {
+      const container = document.getElementById("cart-items-container");
+      if (!container) return;
+      
+      const cart = getLocalCart();
+      container.innerHTML = "";
+      
+      if (cart.length === 0) {
+        container.innerHTML = `
+          <div class="glass-card py-20 rounded-2xl text-center flex flex-col items-center border border-gray-800">
+            <i data-lucide="shopping-bag" class="w-12 h-12 text-gray-600 mb-4"></i>
+            <h3 class="font-extrabold text-lg text-gray-400">Your shopping bag is empty</h3>
+            <p class="text-xs text-gray-500 mt-1 mb-6">Fill it up with premium custom designs.</p>
+            <a href="products.html" class="px-6 py-3 bg-blue-600 hover:bg-blue-700 font-bold text-xs rounded-xl shadow-lg transition">Browse Catalog</a>
+          </div>
+        `;
+        updateSummary(0);
+        lucide.createIcons();
+        return;
+      }
+
+      let subtotal = 0;
+
+      cart.forEach((item, idx) => {
+        const itemTotal = item.price * item.quantity;
+        subtotal += itemTotal;
+        
+        const card = document.createElement("div");
+        card.className = "glass-card p-6 rounded-2xl border border-gray-800/80 flex flex-col sm:flex-row gap-6 items-center justify-between";
+        card.setAttribute("data-aos", "fade-up");
+        card.setAttribute("data-aos-delay", `${idx * 50}`);
+        
+        card.innerHTML = `
+          <div class="flex items-center gap-4 w-full sm:w-auto">
+            <img src="${item.image || 'assets/images/brand_logo.jpeg'}" alt="${item.name}" class="h-16 w-16 object-cover rounded-xl border border-gray-800 shrink-0">
+            <div>
+              <h4 class="font-bold text-sm text-white">${item.name}</h4>
+              <p class="text-[10px] text-gray-500 mt-1 uppercase font-semibold">
+                Size: ${item.size} | Color: ${item.color} ${item.gsm ? `| ${item.gsm} GSM` : ''} | Print: ${item.print_style}
+              </p>
+              ${item.customization ? `
+                <span class="text-[8px] bg-indigo-600/20 text-indigo-400 border border-indigo-500/20 px-2 py-0.5 rounded mt-1 inline-block uppercase font-bold tracking-widest">
+                  Custom ${item.customization.placement} Print
+                </span>
+              ` : ''}
+            </div>
+          </div>
+          
+          <div class="flex items-center justify-between sm:justify-end gap-6 w-full sm:w-auto mt-4 sm:mt-0">
+            <!-- Price -->
+            <span class="text-sm font-extrabold text-blue-400">Rs. ${itemTotal}</span>
+            
+            <!-- Qty Adjust -->
+            <div class="flex items-center gap-2">
+              <button onclick="adjustCartItemQty(${idx}, -1)" class="w-8 h-8 rounded bg-gray-900 border border-gray-800 text-xs font-bold hover:border-gray-600 transition">-</button>
+              <span class="text-xs font-extrabold w-4 text-center">${item.quantity}</span>
+              <button onclick="adjustCartItemQty(${idx}, 1)" class="w-8 h-8 rounded bg-gray-900 border border-gray-800 text-xs font-bold hover:border-gray-600 transition">+</button>
+            </div>
+            
+            <!-- Remove -->
+            <button onclick="removeCartItem(${idx})" class="p-2 text-red-500 hover:text-red-400 transition" title="Delete Item">
+              <i data-lucide="trash-2" class="w-4 h-4"></i>
+            </button>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+
+      updateSummary(subtotal);
+      lucide.createIcons();
+    }
+
+    function adjustCartItemQty(index, amount) {
+      let cart = getLocalCart();
+      cart[index].quantity = Math.max(1, cart[index].quantity + amount);
+      saveLocalCart(cart);
+      renderCart();
+    }
+
+    function removeCartItem(index) {
+      let cart = getLocalCart();
+      cart.splice(index, 1);
+      saveLocalCart(cart);
+      renderCart();
+      showToast("Item removed from cart.", "success");
+    }
+
+    function updateSummary(subtotal) {
+      const discount = (subtotal * couponDiscountPercent) / 100.0;
+      const gst = 0.0;
+      
+      // Free shipping above Rs. 1000, otherwise flat Rs. 50
+      let shipping = 0;
+      if (subtotal > 0) {
+        shipping = (subtotal - discount) < 1000 ? 50 : 0;
+      }
+      
+      const grandTotal = (subtotal - discount) + gst + shipping;
+
+      document.getElementById("summary-subtotal").textContent = `Rs. ${subtotal.toFixed(2)}`;
+      document.getElementById("summary-discount").textContent = `Rs. ${discount.toFixed(2)}`;
+      document.getElementById("summary-gst").textContent = `Rs. ${gst.toFixed(2)}`;
+      document.getElementById("summary-shipping").textContent = shipping === 0 ? "FREE" : `Rs. ${shipping}`;
+      document.getElementById("summary-grandtotal").textContent = `Rs. ${grandTotal.toFixed(2)}`;
+
+      // Save summary data locally to use on checkout page
+      localStorage.setItem("checkout_summary", JSON.stringify({
+        subtotal, discount, gst, shipping, grandTotal, coupon: activeCoupon
+      }));
+    }
+
+    function applyCoupon() {
+      const input = document.getElementById("coupon-input").value.toUpperCase();
+      const msg = document.getElementById("coupon-msg");
+      
+      if (!input) {
+        msg.classList.remove("hidden", "text-green-400");
+        msg.classList.add("text-red-400");
+        msg.textContent = "Please enter a coupon code.";
+        return;
+      }
+
+      // Simple local mapping. Later it pulls from DB.
+      const mockCoupons = {
+        "WELCOME10": 10,
+        "PREMIUM20": 20,
+        "FESTIVE30": 30
+      };
+
+      if (input in mockCoupons) {
+        activeCoupon = input;
+        couponDiscountPercent = mockCoupons[input];
+        
+        msg.classList.remove("hidden", "text-red-400");
+        msg.classList.add("text-green-400");
+        msg.textContent = `Coupon ${input} applied successfully (${couponDiscountPercent}% Off)!`;
+        
+        // Re-render cart to update summary total
+        renderCart();
+      } else {
+        msg.classList.remove("hidden", "text-green-400");
+        msg.classList.add("text-red-400");
+        msg.textContent = "Invalid or expired coupon code.";
+      }
+    }
+
+    function proceedToCheckout() {
+      const cart = getLocalCart();
+      if (cart.length === 0) {
+        showToast("Your cart is empty!", "error");
+        return;
+      }
+      
+      // Force Login if not logged in
+      if (!getAuthToken()) {
+        showToast("Please log in to proceed with checkout.", "error");
+        setTimeout(() => {
+          window.location.href = "login.html?redirect=cart.html";
+        }, 1500);
+        return;
+      }
+      
+      window.location.href = "checkout.html";
+    }
+  </script>
+</body>
+</html>

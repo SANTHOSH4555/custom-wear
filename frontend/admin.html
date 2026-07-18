@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard | CUSTOM WEAR & CRADANCE</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: { brand: { blue: '#2563eb' } }
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Firebase SDK v8 compat -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+</head>
+<body class="bg-gray-950 text-gray-100 min-h-screen pt-20">
+
+  <!-- Page Loader -->
+  <div id="page-loader">
+    <div class="flex flex-col items-center">
+      <div class="spinner mb-4"></div>
+      <h1 class="text-xl font-bold tracking-widest text-blue-500">OPENING CONTROL DESK</h1>
+    </div>
+  </div>
+
+  <!-- Navbar -->
+  <nav class="glass-nav fixed top-0 left-0 w-full z-50 transition duration-300">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-20">
+        <a href="index.html" class="flex items-center gap-3">
+          <img src="assets/images/brand_logo.jpeg" alt="Logo" class="h-10 w-10 rounded-full border border-blue-500">
+          <span class="font-extrabold text-xl tracking-wider text-red-500">CW ADMIN PANEL</span>
+        </a>
+        <div class="flex items-center space-x-4">
+          <a href="index.html" class="hover:text-blue-400 text-xs font-bold transition">Storefront</a>
+          <button onclick="handleLogout()" class="p-2 text-red-400 hover:text-red-300 transition" title="Logout">
+            <i data-lucide="log-out" class="w-5 h-5"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Grid Layout -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <div class="flex flex-col lg:flex-row gap-8">
+      
+      <!-- Side Tab Controller -->
+      <aside class="w-full lg:w-64 shrink-0">
+        <div class="glass-card p-6 rounded-2xl border border-gray-800 flex flex-col gap-2">
+          <button onclick="switchTab('analytics')" id="tab-btn-analytics" class="flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold bg-blue-600 text-white transition text-left">
+            <i data-lucide="bar-chart-2" class="w-4 h-4"></i> Sales Analytics
+          </button>
+          <button onclick="switchTab('orders')" id="tab-btn-orders" class="flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold text-gray-400 hover:text-white transition text-left">
+            <i data-lucide="package" class="w-4 h-4"></i> Manage Orders
+          </button>
+          <button onclick="switchTab('inventory')" id="tab-btn-inventory" class="flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold text-gray-400 hover:text-white transition text-left">
+            <i data-lucide="shield-alert" class="w-4 h-4"></i> Inventory Stock
+          </button>
+          <button onclick="switchTab('customers')" id="tab-btn-customers" class="flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold text-gray-400 hover:text-white transition text-left">
+            <i data-lucide="users" class="w-4 h-4"></i> Customer Hub
+          </button>
+          <button onclick="switchTab('messages')" id="tab-btn-messages" class="flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold text-gray-400 hover:text-white transition text-left">
+            <i data-lucide="mail" class="w-4 h-4"></i> Message Inbox
+          </button>
+        </div>
+      </aside>
+
+      <!-- Right Tab Panels -->
+      <section class="flex-1 flex flex-col gap-6">
+        
+        <!-- Tab: Analytics -->
+        <div id="tab-analytics" class="tab-panel flex flex-col gap-8">
+          
+          <!-- Quick Widgets -->
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="glass-card p-5 rounded-2xl border border-gray-800">
+              <span class="text-[9px] text-gray-500 uppercase font-black tracking-widest">Gross Revenue</span>
+              <h3 id="stat-revenue" class="text-xl sm:text-2xl font-black text-blue-400 mt-2">Rs. 0</h3>
+            </div>
+            <div class="glass-card p-5 rounded-2xl border border-gray-800">
+              <span class="text-[9px] text-gray-500 uppercase font-black tracking-widest">Paid Orders</span>
+              <h3 id="stat-paid-orders" class="text-xl sm:text-2xl font-black text-green-400 mt-2">0</h3>
+            </div>
+            <div class="glass-card p-5 rounded-2xl border border-gray-800">
+              <span class="text-[9px] text-gray-500 uppercase font-black tracking-widest">AOV (Average Order)</span>
+              <h3 id="stat-aov" class="text-xl sm:text-2xl font-black text-white mt-2">Rs. 0</h3>
+            </div>
+            <div class="glass-card p-5 rounded-2xl border border-gray-800">
+              <span class="text-[9px] text-gray-500 uppercase font-black tracking-widest">Total Orders</span>
+              <h3 id="stat-total-orders" class="text-xl sm:text-2xl font-black text-white mt-2">0</h3>
+            </div>
+          </div>
+
+          <!-- Sales Report table -->
+          <div class="glass-card p-6 rounded-2xl border border-gray-800">
+            <h3 class="font-extrabold text-sm mb-6 border-b border-gray-800 pb-2">Sales Report Summary</h3>
+            <div class="overflow-x-auto">
+              <table class="w-full text-xs text-left text-gray-400">
+                <thead class="text-[10px] text-gray-500 uppercase border-b border-gray-800">
+                  <tr>
+                    <th class="py-3 px-4">Order ID</th>
+                    <th class="py-3 px-4">Customer</th>
+                    <th class="py-3 px-4">Total</th>
+                    <th class="py-3 px-4">Payment</th>
+                    <th class="py-3 px-4">Dispatch Status</th>
+                    <th class="py-3 px-4">Date</th>
+                  </tr>
+                </thead>
+                <tbody id="sales-report-table">
+                  <!-- Filled by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Tab: Orders dispatch controller -->
+        <div id="tab-orders" class="tab-panel hidden glass-card p-6 rounded-2xl border border-gray-800">
+          <h3 class="font-extrabold text-sm mb-6 border-b border-gray-800 pb-2">Dispatch Control Desk</h3>
+          <div class="overflow-x-auto">
+            <table class="w-full text-xs text-left text-gray-400">
+              <thead class="text-[10px] text-gray-500 uppercase border-b border-gray-800">
+                <tr>
+                  <th class="py-3 px-4">Order ID</th>
+                  <th class="py-3 px-4">Customer</th>
+                  <th class="py-3 px-4">Pay status</th>
+                  <th class="py-3 px-4">Tracking Stage</th>
+                  <th class="py-3 px-4">Operations</th>
+                </tr>
+              </thead>
+              <tbody id="orders-dispatch-table">
+                <!-- Injected dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Tab: Inventory -->
+        <div id="tab-inventory" class="tab-panel hidden glass-card p-6 rounded-2xl border border-gray-800">
+          <h3 class="font-extrabold text-sm mb-6 border-b border-gray-800 pb-2">Garment Inventories</h3>
+          <div class="overflow-x-auto">
+            <table class="w-full text-xs text-left text-gray-400">
+              <thead class="text-[10px] text-gray-500 uppercase border-b border-gray-800">
+                <tr>
+                  <th class="py-3 px-4">Product Name</th>
+                  <th class="py-3 px-4">Brand</th>
+                  <th class="py-3 px-4">Category</th>
+                  <th class="py-3 px-4">Price</th>
+                  <th class="py-3 px-4">In Stock</th>
+                  <th class="py-3 px-4">Edit Stock</th>
+                </tr>
+              </thead>
+              <tbody id="inventory-table-body">
+                <!-- Injected dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Tab: Customers list -->
+        <div id="tab-customers" class="tab-panel hidden glass-card p-6 rounded-2xl border border-gray-800">
+          <h3 class="font-extrabold text-sm mb-6 border-b border-gray-800 pb-2">Registered Customer Log</h3>
+          <div class="overflow-x-auto">
+            <table class="w-full text-xs text-left text-gray-400">
+              <thead class="text-[10px] text-gray-500 uppercase border-b border-gray-800">
+                <tr>
+                  <th class="py-3 px-4">Name</th>
+                  <th class="py-3 px-4">Email</th>
+                  <th class="py-3 px-4">Phone</th>
+                  <th class="py-3 px-4">Created Date</th>
+                </tr>
+              </thead>
+              <tbody id="customers-table-body">
+                <!-- Injected dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Tab: Messages contact -->
+        <div id="tab-messages" class="tab-panel hidden glass-card p-6 rounded-2xl border border-gray-800">
+          <h3 class="font-extrabold text-sm mb-6 border-b border-gray-800 pb-2">Message Inbox</h3>
+          <div class="flex flex-col gap-4" id="messages-container">
+            <!-- Injected dynamically -->
+          </div>
+        </div>
+
+      </section>
+
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-gray-950 border-t border-gray-900 py-8 text-center text-xs text-gray-500 mt-20">
+    &copy; 2026 CUSTOM WEAR & CRADANCE. All rights reserved.
+  </footer>
+
+  <script src="js/app.js"></script>
+  <script src="js/firebase-config.js"></script>
+  <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+  <script>
+    AOS.init({ duration: 800, once: true });
+
+    document.addEventListener("DOMContentLoaded", () => {
+      // Force admin authorization check
+      const user = getCurrentUser();
+      if (!getAuthToken() || !user || user.role !== "admin") {
+        showToast("Access Denied! Administrators Only.", "error");
+        setTimeout(() => window.location.href = "login.html", 1500);
+        return;
+      }
+
+      loadAdminAnalytics();
+      loadOrdersDispatch();
+      loadInventoryStock();
+      loadCustomerLog();
+      loadMessagesLog();
+      
+      hidePageLoader();
+    });
+
+    function switchTab(tabName) {
+      document.querySelectorAll(".tab-panel").forEach(p => p.classList.add("hidden"));
+      document.getElementById(`tab-${tabName}`).classList.remove("hidden");
+      
+      document.querySelectorAll("[id^='tab-btn-']").forEach(btn => {
+        btn.className = "flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold text-gray-400 hover:text-white transition text-left";
+      });
+      document.getElementById(`tab-btn-${tabName}`).className = "flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold bg-blue-600 text-white transition text-left";
+    }
+
+    async function loadAdminAnalytics() {
+      try {
+        const stats = await apiRequest("/admin/analytics");
+        document.getElementById("stat-revenue").textContent = `Rs. ${stats.revenue.toFixed(2)}`;
+        document.getElementById("stat-paid-orders").textContent = stats.paid_orders;
+        document.getElementById("stat-aov").textContent = `Rs. ${stats.average_order_value.toFixed(2)}`;
+        document.getElementById("stat-total-orders").textContent = stats.total_orders;
+
+        const table = document.getElementById("sales-report-table");
+        table.innerHTML = "";
+        
+        if (stats.sales_report.length === 0) {
+          table.innerHTML = "<tr><td colspan='6' class='text-center py-6 text-gray-500 italic'>No sales reports available.</td></tr>";
+          return;
+        }
+
+        stats.sales_report.forEach(report => {
+          const row = document.createElement("tr");
+          row.className = "border-b border-gray-800/20 hover:bg-gray-900/10";
+          row.innerHTML = `
+            <td class="py-3 px-4 font-bold text-blue-400 uppercase">${report.order_id}</td>
+            <td class="py-3 px-4 text-white">${report.customer}</td>
+            <td class="py-3 px-4 font-semibold text-white">Rs. ${report.total}</td>
+            <td class="py-3 px-4"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${
+              report.payment === 'Paid' ? 'bg-green-600/10 text-green-400' : 'bg-yellow-600/10 text-yellow-500'
+            }">${report.payment}</span></td>
+            <td class="py-3 px-4 font-medium text-white">${report.shipping}</td>
+            <td class="py-3 px-4 text-gray-500">${report.date}</td>
+          `;
+          table.appendChild(row);
+        });
+      } catch (err) {
+        showToast(err.message, "error");
+      }
+    }
+
+    async function loadOrdersDispatch() {
+      const table = document.getElementById("orders-dispatch-table");
+      table.innerHTML = "";
+      
+      try {
+        const orders = await apiRequest("/orders");
+        
+        if (orders.length === 0) {
+          table.innerHTML = "<tr><td colspan='5' class='text-center py-6 text-gray-500 italic'>No orders found.</td></tr>";
+          return;
+        }
+
+        orders.forEach(o => {
+          const row = document.createElement("tr");
+          row.className = "border-b border-gray-800/20 hover:bg-gray-900/10";
+          
+          row.innerHTML = `
+            <td class="py-3 px-4 font-bold text-blue-400 uppercase">${o.id}</td>
+            <td class="py-3 px-4 text-white">${o.user_name}</td>
+            <td class="py-3 px-4"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${
+              o.payment_status === 'Paid' ? 'bg-green-600/10 text-green-400' : 'bg-yellow-600/10 text-yellow-500'
+            }">${o.payment_status}</span></td>
+            <td class="py-3 px-4">
+              <select onchange="updateDispatchStatus('${o.id}', this.value)" class="glass-input px-2.5 py-1.5 rounded-lg text-[10px] font-semibold bg-gray-900 border-gray-800 focus:outline-none">
+                <option value="Ordered" ${o.status === 'Ordered' ? 'selected' : ''}>Ordered</option>
+                <option value="Packed" ${o.status === 'Packed' ? 'selected' : ''}>Packed</option>
+                <option value="Shipped" ${o.status === 'Shipped' ? 'selected' : ''}>Shipped</option>
+                <option value="Out for Delivery" ${o.status === 'Out for Delivery' ? 'selected' : ''}>Out for Delivery</option>
+                <option value="Delivered" ${o.status === 'Delivered' ? 'selected' : ''}>Delivered</option>
+              </select>
+            </td>
+            <td class="py-3 px-4">
+              <button onclick="viewDispatchAddress('${o.id}')" class="text-blue-400 hover:text-blue-300 font-bold">Address Info</button>
+            </td>
+          `;
+          table.appendChild(row);
+        });
+      } catch (e) {
+        console.error("Load dispatch table error: ", e);
+      }
+    }
+
+    async function updateDispatchStatus(orderId, newStatus) {
+      try {
+        await apiRequest(`/orders/${orderId}/status`, "PUT", { status: newStatus });
+        showToast(`Order ${orderId} updated to ${newStatus}`, "success");
+        loadAdminAnalytics();
+        loadOrdersDispatch();
+      } catch (err) {
+        showToast(err.message, "error");
+      }
+    }
+
+    async function viewDispatchAddress(orderId) {
+      try {
+        const o = await apiRequest(`/orders/${orderId}`);
+        const addr = o.shipping_address;
+        alert(`SHIPPING ADDRESS FOR ORDER ${orderId}:\n\nName: ${addr.name}\nPhone: ${addr.phone}\nEmail: ${addr.email}\nAddress: ${addr.address}\nCity: ${addr.city}, ${addr.district}, ${addr.state} - ${addr.pin}`);
+      } catch (e) {
+        showToast(e.message, "error");
+      }
+    }
+
+    async function loadInventoryStock() {
+      const tbody = document.getElementById("inventory-table-body");
+      tbody.innerHTML = "";
+      try {
+        const inventory = await apiRequest("/admin/inventory");
+        inventory.forEach(p => {
+          const row = document.createElement("tr");
+          row.className = "border-b border-gray-800/20 hover:bg-gray-900/10";
+          row.innerHTML = `
+            <td class="py-3 px-4 font-bold text-white">${p.name}</td>
+            <td class="py-3 px-4 text-gray-500">${p.brand}</td>
+            <td class="py-3 px-4 text-gray-500">${p.category}</td>
+            <td class="py-3 px-4 font-semibold text-white">Rs. ${p.price}</td>
+            <td class="py-3 px-4 font-bold ${p.stock < 10 ? 'text-red-400' : 'text-gray-300'}">${p.stock}</td>
+            <td class="py-3 px-4 flex gap-2">
+              <input type="number" id="stock-val-${p.id}" value="${p.stock}" class="glass-input px-2 py-1 rounded w-16 text-center text-xs focus:outline-none">
+              <button onclick="updateInventoryStock('${p.id}')" class="px-2.5 py-1 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded transition">Update</button>
+            </td>
+          `;
+          tbody.appendChild(row);
+        });
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    async function updateInventoryStock(id) {
+      const input = document.getElementById(`stock-val-${id}`);
+      const newStock = parseInt(input.value);
+      if (isNaN(newStock) || newStock < 0) {
+        showToast("Please enter a valid stock level.", "error");
+        return;
+      }
+      
+      try {
+        await apiRequest(`/products/${id}`, "PUT", { stock: newStock });
+        showToast("Stock updated successfully!", "success");
+        loadInventoryStock();
+      } catch (err) {
+        showToast(err.message, "error");
+      }
+    }
+
+    async function loadCustomerLog() {
+      const tbody = document.getElementById("customers-table-body");
+      tbody.innerHTML = "";
+      try {
+        const customers = await apiRequest("/admin/customers");
+        customers.forEach(c => {
+          const row = document.createElement("tr");
+          row.className = "border-b border-gray-800/20 hover:bg-gray-900/10";
+          row.innerHTML = `
+            <td class="py-3 px-4 font-bold text-white">${c.name} ${c.role === 'admin' ? '<span class="text-red-500 uppercase text-[9px] font-black tracking-widest ml-1">[Admin]</span>' : ''}</td>
+            <td class="py-3 px-4 text-gray-500">${c.email}</td>
+            <td class="py-3 px-4 text-gray-500">${c.phone || 'N/A'}</td>
+            <td class="py-3 px-4 text-gray-500">${c.created_at ? c.created_at.slice(0, 10) : 'N/A'}</td>
+          `;
+          tbody.appendChild(row);
+        });
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    async function loadMessagesLog() {
+      const container = document.getElementById("messages-container");
+      container.innerHTML = "";
+      try {
+        const msgs = await apiRequest("/admin/messages");
+        if (msgs.length === 0) {
+          container.innerHTML = "<p class='text-xs text-gray-500 italic'>Inbox is empty.</p>";
+          return;
+        }
+
+        msgs.forEach(m => {
+          const div = document.createElement("div");
+          div.className = "bg-gray-900/40 p-4 rounded-xl border border-gray-800 text-xs text-gray-400 leading-relaxed";
+          div.innerHTML = `
+            <div class="flex justify-between items-center mb-2 border-b border-gray-800 pb-2">
+              <span class="font-bold text-white">${m.name} (${m.email}) ${m.phone ? `| Phone: ${m.phone}` : ''}</span>
+              <span class="text-[10px] text-gray-600 font-bold">${m.created_at ? m.created_at.slice(0,19).replace('T', ' ') : ''}</span>
+            </div>
+            <p class="text-white mt-1">${m.message}</p>
+          `;
+          container.appendChild(div);
+        });
+      } catch (e) {
+        console.error(e);
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Product Details | CUSTOM WEAR & CRADANCE</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: { brand: { blue: '#2563eb' } }
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Firebase SDK v8 compat -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+</head>
+<body class="bg-gray-950 text-gray-100 min-h-screen pt-20">
+
+  <!-- Page Loader -->
+  <div id="page-loader">
+    <div class="flex flex-col items-center">
+      <div class="spinner mb-4"></div>
+      <h1 class="text-xl font-bold tracking-widest text-blue-500">LOADING PRODUCT DETAILS</h1>
+    </div>
+  </div>
+
+  <!-- Navbar -->
+  <nav class="glass-nav fixed top-0 left-0 w-full z-50 transition duration-300">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-20">
+        <a href="index.html" class="flex items-center gap-3">
+          <img src="assets/images/brand_logo.jpeg" alt="Logo" class="h-10 w-10 rounded-full border border-blue-500">
+          <span class="font-extrabold text-xl tracking-wider text-blue-500">CW & CRADANCE</span>
+        </a>
+        <div class="hidden md:flex items-center space-x-6 text-sm font-medium">
+          <a href="index.html" class="hover:text-blue-400 transition">Home</a>
+          <a href="custom-wear.html" class="hover:text-blue-400 transition">CUSTOM WEAR</a>
+          <a href="cradance.html" class="hover:text-blue-400 transition">CRADANCE</a>
+          <a href="custom-printing.html" class="hover:text-blue-400 transition">Custom Printing</a>
+          <a href="products.html" class="hover:text-blue-400 transition">Shop All</a>
+        </div>
+        <div class="flex items-center space-x-4">
+          <a href="cart.html" class="p-2 rounded-full hover:bg-gray-800 text-gray-400 hover:text-white transition relative">
+            <i data-lucide="shopping-bag" class="w-5 h-5"></i>
+            <span class="cart-count-badge absolute -top-1 -right-1 bg-blue-600 text-white rounded-full text-[10px] w-4 h-4 flex items-center justify-center font-bold hidden">0</span>
+          </a>
+          <a href="dashboard.html" class="p-2 rounded-full hover:bg-gray-800 text-gray-400 hover:text-white transition"><i data-lucide="user" class="w-5 h-5"></i></a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Product Details Layout -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <div class="flex flex-col lg:flex-row gap-12 mb-16">
+      
+      <!-- Left Column: Gallery & Zoom -->
+      <div class="flex-1 flex flex-col gap-4">
+        <div class="zoom-wrapper aspect-[3/4] rounded-2xl bg-gray-900 border border-gray-800 overflow-hidden relative flex items-center justify-center">
+          <img id="main-product-image" src="" alt="Main Product" class="w-full h-full object-cover">
+        </div>
+        <!-- Thumbnails of alternate colors -->
+        <div id="product-thumbnails" class="flex gap-3 overflow-x-auto py-2">
+          <!-- Filled by JS -->
+        </div>
+      </div>
+
+      <!-- Right Column: Interactive Selectors -->
+      <div class="flex-1 flex flex-col justify-between">
+        
+        <div>
+          <!-- Brand Badge -->
+          <span id="product-brand" class="text-xs font-black uppercase text-blue-400 tracking-wider bg-blue-600/10 px-3 py-1.5 rounded-full inline-block mb-3"></span>
+          <!-- Product Title -->
+          <h1 id="product-name" class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight mb-2"></h1>
+          <p id="product-category" class="text-sm text-gray-500 mb-4"></p>
+          
+          <!-- Rating -->
+          <div class="flex items-center gap-1 text-yellow-500 mb-6">
+            <i data-lucide="star" class="w-4 h-4 fill-current"></i>
+            <span id="product-rating" class="text-xs text-gray-300 font-bold"></span>
+          </div>
+
+          <!-- Description -->
+          <p id="product-desc" class="text-sm text-gray-400 leading-relaxed mb-6"></p>
+          
+          <!-- Live Price Display -->
+          <div class="glass-card p-4 rounded-xl flex items-center justify-between border border-blue-500/10 mb-6">
+            <span class="text-xs text-gray-400 font-bold uppercase tracking-wider">Estimated Price</span>
+            <span id="live-price" class="text-2xl font-black text-blue-400">Rs. 0</span>
+          </div>
+
+          <!-- GSM Choice (if available) -->
+          <div id="gsm-variant-wrapper" class="mb-6 hidden">
+            <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">Select GSM Variant</h3>
+            <div class="flex gap-3" id="gsm-buttons">
+              <!-- JS Injected Buttons -->
+            </div>
+          </div>
+
+          <!-- Plain vs Printed selection -->
+          <div id="print-style-wrapper" class="mb-6">
+            <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">Style/Print Option</h3>
+            <div class="grid grid-cols-2 gap-4">
+              <button onclick="selectPrintStyle('plain')" id="btn-style-plain" class="p-3 rounded-xl bg-blue-600 border border-blue-500 text-xs font-bold transition">
+                Plain Base Style
+              </button>
+              <button onclick="selectPrintStyle('printed')" id="btn-style-printed" class="p-3 rounded-xl bg-gray-900 border border-gray-800 text-xs font-bold hover:border-gray-600 transition">
+                Custom Printed Design
+              </button>
+            </div>
+          </div>
+
+          <!-- Color selection -->
+          <div class="mb-6">
+            <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">Color: <span id="selected-color-name" class="text-white normal-case font-medium ml-1"></span></h3>
+            <div class="flex items-center gap-3" id="color-circles-container">
+              <!-- JS Injected Circles -->
+            </div>
+          </div>
+
+          <!-- Size Selection -->
+          <div class="mb-6">
+            <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">Select Size</h3>
+            <div class="flex flex-wrap gap-2" id="sizes-container">
+              <!-- JS Injected -->
+            </div>
+          </div>
+
+          <!-- Quantity Selector -->
+          <div class="mb-8">
+            <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">Quantity</h3>
+            <div class="flex items-center gap-3">
+              <button onclick="adjustQty(-1)" class="w-10 h-10 rounded-xl bg-gray-900 border border-gray-800 text-sm font-bold flex items-center justify-center hover:border-gray-600 transition">-</button>
+              <span id="qty-value" class="text-sm font-extrabold w-8 text-center">1</span>
+              <button onclick="adjustQty(1)" class="w-10 h-10 rounded-xl bg-gray-900 border border-gray-800 text-sm font-bold flex items-center justify-center hover:border-gray-600 transition">+</button>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Buttons Panel -->
+        <div class="flex flex-col sm:flex-row gap-4">
+          <button onclick="triggerAddToCart()" class="flex-1 bg-gray-900 border border-gray-800 hover:bg-gray-800 font-bold py-4 rounded-xl transition flex items-center justify-center gap-2">
+            <i data-lucide="shopping-bag" class="w-5 h-5"></i> Add to Cart
+          </button>
+          <button onclick="triggerBuyNow()" class="flex-1 bg-blue-600 hover:bg-blue-700 font-bold py-4 rounded-xl shadow-lg transition flex items-center justify-center gap-2">
+            <i data-lucide="credit-card" class="w-5 h-5"></i> Buy Now
+          </button>
+          <button id="customize-btn" onclick="triggerCustomize()" class="w-full sm:w-auto bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 font-bold py-4 px-6 rounded-xl shadow-lg transition flex items-center justify-center gap-2">
+            <i data-lucide="palette" class="w-5 h-5"></i> Customize
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Product Specifications Grid -->
+    <section class="mb-16">
+      <h2 class="text-xl font-bold mb-6 border-b border-gray-800 pb-2">Technical Specifications</h2>
+      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 bg-gray-900/40 p-6 rounded-2xl border border-gray-800/60" id="specifications-box">
+        <!-- JS Injected -->
+      </div>
+    </section>
+
+    <!-- Reviews Section -->
+    <section class="mb-16">
+      <h2 class="text-xl font-bold mb-6 border-b border-gray-800 pb-2">Product Reviews</h2>
+      <div id="reviews-feed" class="flex flex-col gap-6">
+        <!-- JS Injected -->
+      </div>
+      <!-- Add Review Form (Only show if logged in) -->
+      <div class="glass-card p-6 rounded-xl border border-gray-800 mt-8" id="add-review-section">
+        <h3 class="font-extrabold text-sm mb-4">Write a Product Review</h3>
+        <form onsubmit="submitReview(event)" class="flex flex-col gap-4">
+          <div class="flex items-center gap-2">
+            <span class="text-xs text-gray-400 font-semibold uppercase">Rating:</span>
+            <select id="review-rating" class="glass-input px-3 py-1.5 rounded-lg text-xs font-semibold focus:outline-none bg-gray-900 border-gray-800">
+              <option value="5">5 Star - Perfect</option>
+              <option value="4">4 Star - Very Good</option>
+              <option value="3">3 Star - Good</option>
+              <option value="2">2 Star - Fair</option>
+              <option value="1">1 Star - Poor</option>
+            </select>
+          </div>
+          <textarea id="review-comment" placeholder="Add your review comment here..." class="glass-input px-4 py-3 rounded-xl text-xs w-full min-h-[100px] focus:outline-none" required></textarea>
+          <button type="submit" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-lg self-start transition">
+            Submit Review
+          </button>
+        </form>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-gray-950 border-t border-gray-900 py-8 text-center text-xs text-gray-500 mt-20">
+    &copy; 2026 CUSTOM WEAR & CRADANCE. All rights reserved.
+  </footer>
+
+  <script src="js/products-data.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/firebase-config.js"></script>
+  <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+  <script>
+    AOS.init({ duration: 800, once: true });
+
+    let currentProduct = null;
+    let selectedColor = "";
+    let selectedSize = "M";
+    let selectedPrintStyle = "plain";
+    let selectedGsm = null;
+    let quantity = 1;
+
+    document.addEventListener("DOMContentLoaded", () => {
+      loadProductDetails();
+      hidePageLoader();
+    });
+
+    function loadProductDetails() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const prodId = urlParams.get("id");
+      if (!prodId || typeof PRODUCTS_DATA === 'undefined') return;
+
+      currentProduct = PRODUCTS_DATA.find(p => p.id === prodId);
+      if (!currentProduct) {
+        showToast("Product not found!", "error");
+        return;
+      }
+
+      // Populate text
+      document.getElementById("product-brand").textContent = currentProduct.brand;
+      document.getElementById("product-name").textContent = currentProduct.name;
+      document.getElementById("product-category").textContent = `${currentProduct.gender}'s ${currentProduct.category}`;
+      document.getElementById("product-rating").textContent = `${currentProduct.rating} Rating`;
+      document.getElementById("product-desc").textContent = currentProduct.description;
+
+      // Disable Customize button if product category is not custom printing friendly
+      const customizeBtn = document.getElementById("customize-btn");
+      const btnStylePrinted = document.getElementById("btn-style-printed");
+      if (currentProduct.brand === "CRADANCE" || currentProduct.category.toLowerCase().includes("pants") || currentProduct.category.toLowerCase().includes("joggers")) {
+        customizeBtn.style.display = "none";
+        if (btnStylePrinted) {
+          btnStylePrinted.style.display = "none";
+          const printStyleGrid = document.querySelector("#print-style-wrapper .grid");
+          if (printStyleGrid) {
+            printStyleGrid.classList.remove("grid-cols-2");
+            printStyleGrid.classList.add("grid-cols-1");
+          }
+        }
+      }
+
+      // Initialize defaults
+      selectedColor = currentProduct.colors[0].name;
+      document.getElementById("selected-color-name").textContent = selectedColor;
+      document.getElementById("main-product-image").src = currentProduct.colors[0].image;
+
+      // Injected GSM variants (if any)
+      const gsmWrapper = document.getElementById("gsm-variant-wrapper");
+      if (currentProduct.gsm_variants && currentProduct.gsm_variants.length > 0) {
+        gsmWrapper.classList.remove("hidden");
+        selectedGsm = currentProduct.gsm_variants[0].gsm;
+        const gsmBtns = document.getElementById("gsm-buttons");
+        gsmBtns.innerHTML = "";
+        
+        currentProduct.gsm_variants.forEach(variant => {
+          const btn = document.createElement("button");
+          btn.className = `gsm-btn px-4 py-2 border rounded-xl font-bold text-xs transition ${
+            variant.gsm === selectedGsm ? 'border-blue-500 bg-blue-600/10 text-blue-400' : 'border-gray-800 bg-gray-900 hover:border-gray-600'
+          }`;
+          btn.textContent = `${variant.gsm} GSM`;
+          btn.addEventListener("click", () => {
+            selectedGsm = variant.gsm;
+            document.querySelectorAll(".gsm-btn").forEach(b => b.classList.remove("border-blue-500", "bg-blue-600/10", "text-blue-400"));
+            btn.classList.add("border-blue-500", "bg-blue-600/10", "text-blue-400");
+            updatePrice();
+          });
+          gsmBtns.appendChild(btn);
+        });
+      }
+
+      // Colors Grid
+      const circles = document.getElementById("color-circles-container");
+      circles.innerHTML = "";
+      currentProduct.colors.forEach(c => {
+        const item = document.createElement("button");
+        // Create matching background colors
+        let bgStyle = c.name.toLowerCase();
+        if (bgStyle === "crimson red" || bgStyle === "red") bgStyle = "#dc2626";
+        else if (bgStyle === "navy blue") bgStyle = "#1e3a8a";
+        else if (bgStyle === "burgundy") bgStyle = "#800020";
+        else if (bgStyle === "beige") bgStyle = "#f5f5dc";
+        else if (bgStyle === "lavender" || bgStyle === "lilac") bgStyle = "#e6e6fa";
+        else if (bgStyle === "olive green" || bgStyle === "army green" || bgStyle === "sage green" || bgStyle === "forest green") bgStyle = "#556b2f";
+        else if (bgStyle === "charcoal gray" || bgStyle === "charcoal grey") bgStyle = "#36454f";
+        else if (bgStyle === "grey" || bgStyle === "grey melange") bgStyle = "#808080";
+        else if (bgStyle === "baby pink" || bgStyle === "dusty pink") bgStyle = "#ffc0cb";
+        else if (bgStyle === "white" || bgStyle === "off-white") bgStyle = "#ffffff";
+        
+        item.className = `color-circle w-8 h-8 rounded-full border border-gray-700/50 hover:scale-110 transition ${
+          c.name === selectedColor ? 'active ring-2 ring-blue-500' : ''
+        }`;
+        item.style.backgroundColor = bgStyle;
+        item.addEventListener("click", () => {
+          selectedColor = c.name;
+          document.getElementById("selected-color-name").textContent = selectedColor;
+          document.getElementById("main-product-image").src = c.image;
+          
+          document.querySelectorAll(".color-circle").forEach(circle => circle.classList.remove("active", "ring-2", "ring-blue-500"));
+          item.classList.add("active", "ring-2", "ring-blue-500");
+        });
+        circles.appendChild(item);
+      });
+
+      // Sizes Grid
+      const sizes = document.getElementById("sizes-container");
+      sizes.innerHTML = "";
+      currentProduct.sizes.forEach(s => {
+        const btn = document.createElement("button");
+        btn.className = `size-choice-btn px-4 py-2 border rounded-xl font-bold text-xs transition ${
+          s === selectedSize ? 'border-blue-500 bg-blue-600/10 text-blue-400' : 'border-gray-800 bg-gray-900 hover:border-gray-600'
+        }`;
+        btn.textContent = s;
+        btn.addEventListener("click", () => {
+          selectedSize = s;
+          document.querySelectorAll(".size-choice-btn").forEach(b => b.classList.remove("border-blue-500", "bg-blue-600/10", "text-blue-400"));
+          btn.classList.add("border-blue-500", "bg-blue-600/10", "text-blue-400");
+        });
+        sizes.appendChild(btn);
+      });
+
+      // Specifications Grid
+      const specsBox = document.getElementById("specifications-box");
+      specsBox.innerHTML = "";
+      Object.entries(currentProduct.specifications).forEach(([k, v]) => {
+        const item = document.createElement("div");
+        item.className = "flex flex-col";
+        item.innerHTML = `<span class="text-[10px] text-gray-500 uppercase font-black tracking-widest">${k}</span><span class="text-xs font-semibold mt-1 text-white">${v}</span>`;
+        specsBox.appendChild(item);
+      });
+
+      // Hide or show Auth form for reviews
+      const addReviewSec = document.getElementById("add-review-section");
+      if (!getAuthToken()) {
+        addReviewSec.style.display = "none";
+      }
+
+      // Initial review items fetch
+      fetchReviews();
+
+      updatePrice();
+      lucide.createIcons();
+    }
+
+    function selectPrintStyle(style) {
+      selectedPrintStyle = style;
+      const plainBtn = document.getElementById("btn-style-plain");
+      const printBtn = document.getElementById("btn-style-printed");
+
+      if (style === "plain") {
+        plainBtn.className = "p-3 rounded-xl bg-blue-600 border border-blue-500 text-xs font-bold transition";
+        printBtn.className = "p-3 rounded-xl bg-gray-900 border border-gray-800 text-xs font-bold hover:border-gray-600 transition";
+      } else {
+        plainBtn.className = "p-3 rounded-xl bg-gray-900 border border-gray-800 text-xs font-bold hover:border-gray-600 transition";
+        printBtn.className = "p-3 rounded-xl bg-blue-600 border border-blue-500 text-xs font-bold transition";
+      }
+      updatePrice();
+    }
+
+    function updatePrice() {
+      if (!currentProduct) return;
+      
+      let price = currentProduct.prices[selectedPrintStyle];
+      
+      if (selectedGsm && currentProduct.gsm_variants) {
+        const matchingGsm = currentProduct.gsm_variants.find(v => v.gsm === selectedGsm);
+        if (matchingGsm) {
+          price = matchingGsm.prices[selectedPrintStyle];
+        }
+      }
+      
+      document.getElementById("live-price").textContent = `Rs. ${price}`;
+    }
+
+    function adjustQty(amount) {
+      quantity = Math.max(1, quantity + amount);
+      document.getElementById("qty-value").textContent = quantity;
+    }
+
+    function triggerAddToCart() {
+      if (!currentProduct) return;
+      
+      let basePrice = currentProduct.prices[selectedPrintStyle];
+      if (selectedGsm && currentProduct.gsm_variants) {
+        const matchingGsm = currentProduct.gsm_variants.find(v => v.gsm === selectedGsm);
+        if (matchingGsm) {
+          basePrice = matchingGsm.prices[selectedPrintStyle];
+        }
+      }
+
+      const item = {
+        product_id: currentProduct.id,
+        name: currentProduct.name,
+        price: basePrice,
+        quantity: quantity,
+        size: selectedSize,
+        color: selectedColor,
+        print_style: selectedPrintStyle,
+        image: currentProduct.colors.find(c => c.name === selectedColor)?.image || currentProduct.cover_image,
+        gsm: selectedGsm
+      };
+
+      addToCart(item);
+      showToast(`${currentProduct.name} added to cart!`, "success");
+    }
+
+    function triggerBuyNow() {
+      triggerAddToCart();
+      window.location.href = "cart.html";
+    }
+
+    function triggerCustomize() {
+      if (!currentProduct) return;
+      window.location.href = `custom-printing.html?id=${currentProduct.id}&size=${selectedSize}&color=${selectedColor}`;
+    }
+
+    // Reviews list render
+    async function fetchReviews() {
+      const feed = document.getElementById("reviews-feed");
+      if (!feed || !currentProduct) return;
+      
+      feed.innerHTML = "<p class='text-xs text-gray-500'>Fetching reviews...</p>";
+      try {
+        const reviews = await apiRequest(`/products/${currentProduct.id}/reviews`);
+        feed.innerHTML = "";
+        
+        if (reviews.length === 0) {
+          feed.innerHTML = "<p class='text-xs text-gray-500 italic'>No reviews for this product yet. Be the first to write a review!</p>";
+          return;
+        }
+
+        reviews.forEach(r => {
+          const item = document.createElement("div");
+          item.className = "bg-gray-900/20 p-4 rounded-xl border border-gray-800 flex gap-4";
+          
+          let stars = "";
+          for(let i=0; i<5; i++) {
+            stars += `<i data-lucide="star" class="w-3.5 h-3.5 ${i < r.rating ? 'text-yellow-500 fill-current' : 'text-gray-700'}"></i>`;
+          }
+          
+          item.innerHTML = `
+            <div class="flex-1">
+              <div class="flex items-center justify-between mb-2">
+                <span class="font-bold text-xs text-white">${r.user_name}</span>
+                <span class="text-[10px] text-gray-600 font-bold">${r.created_at ? r.created_at.slice(0,10) : ''}</span>
+              </div>
+              <div class="flex items-center gap-0.5 mb-2">${stars}</div>
+              <p class="text-xs text-gray-400 leading-relaxed">${r.comment}</p>
+            </div>
+          `;
+          feed.appendChild(item);
+        });
+        lucide.createIcons();
+      } catch (err) {
+        console.error("Fetch reviews error: ", err);
+        feed.innerHTML = "<p class='text-xs text-red-400'>Failed to load reviews.</p>";
+      }
+    }
+
+    async function submitReview(e) {
+      e.preventDefault();
+      if (!currentProduct) return;
+
+      const rating = document.getElementById("review-rating").value;
+      const comment = document.getElementById("review-comment").value;
+
+      try {
+        await apiRequest(`/products/${currentProduct.id}/reviews`, "POST", { rating, comment });
+        showToast("Review submitted successfully!", "success");
+        document.getElementById("review-comment").value = "";
+        fetchReviews();
+        
+        // Recalculate average rating locally
+        const productRes = await apiRequest(`/products/${currentProduct.id}`);
+        document.getElementById("product-rating").textContent = `${productRes.rating} Rating`;
+      } catch (err) {
+        showToast(err.message, "error");
+      }
+    }
+  </script>
+</body>
+</html>

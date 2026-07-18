@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Account Authentication | CUSTOM WEAR & CRADANCE</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: { brand: { blue: '#2563eb' } }
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Firebase SDK v8 compat (works with our firebase-config.js) -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+</head>
+<body class="bg-gray-950 text-gray-100 min-h-screen pt-20 flex items-center justify-center">
+
+  <!-- Page Loader -->
+  <div id="page-loader">
+    <div class="flex flex-col items-center">
+      <div class="spinner mb-4"></div>
+      <h1 class="text-xl font-bold tracking-widest text-blue-500">ESTABLISHING SESSION</h1>
+    </div>
+  </div>
+
+  <!-- Navbar -->
+  <nav class="glass-nav fixed top-0 left-0 w-full z-50 transition duration-300">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-20">
+        <a href="index.html" class="flex items-center gap-3">
+          <img src="assets/images/brand_logo.jpeg" alt="Logo" class="h-10 w-10 rounded-full border border-blue-500">
+          <span class="font-extrabold text-xl tracking-wider text-blue-500">CW & CRADANCE</span>
+        </a>
+        <div class="flex items-center space-x-4">
+          <a href="index.html" class="hover:text-blue-400 text-xs font-bold transition">Back to Home</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Login/Register Card -->
+  <main class="max-w-md w-full px-4 py-10" data-aos="zoom-in">
+    <div class="glass-card p-6 sm:p-8 rounded-2xl border border-gray-800">
+      
+      <!-- Tab Selector -->
+      <div class="grid grid-cols-2 gap-2 mb-8 bg-gray-900/60 p-1.5 rounded-xl border border-gray-800">
+        <button onclick="toggleAuthTab('login')" id="btn-tab-login" class="py-2.5 rounded-lg text-xs font-bold bg-blue-600 text-white transition">Login</button>
+        <button onclick="toggleAuthTab('register')" id="btn-tab-register" class="py-2.5 rounded-lg text-xs font-bold text-gray-400 hover:text-white transition">Register</button>
+      </div>
+
+      <!-- Tab Content: Login -->
+      <div id="auth-login-panel">
+        <form onsubmit="handleLoginSubmit(event)" class="flex flex-col gap-4">
+          <div class="flex flex-col">
+            <label class="text-[10px] text-gray-500 uppercase font-black tracking-widest mb-1.5">Email Address</label>
+            <input type="email" id="login-email" class="glass-input px-4 py-3 rounded-xl text-xs focus:outline-none" required>
+          </div>
+          <div class="flex flex-col">
+            <div class="flex justify-between items-center mb-1.5">
+              <label class="text-[10px] text-gray-500 uppercase font-black tracking-widest">Password</label>
+              <button type="button" onclick="handleForgotPassword()" class="text-[10px] text-blue-400 hover:underline">Forgot?</button>
+            </div>
+            <input type="password" id="login-password" class="glass-input px-4 py-3 rounded-xl text-xs focus:outline-none" required>
+          </div>
+          <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 font-bold py-3.5 rounded-xl shadow-lg transition text-xs mt-2">
+            SIGN IN
+          </button>
+        </form>
+      </div>
+
+      <!-- Tab Content: Register -->
+      <div id="auth-register-panel" class="hidden">
+        <form onsubmit="handleRegisterSubmit(event)" class="flex flex-col gap-4">
+          <div class="flex flex-col">
+            <label class="text-[10px] text-gray-500 uppercase font-black tracking-widest mb-1.5">Full Name</label>
+            <input type="text" id="reg-name" class="glass-input px-4 py-3 rounded-xl text-xs focus:outline-none" required>
+          </div>
+          <div class="flex flex-col">
+            <label class="text-[10px] text-gray-500 uppercase font-black tracking-widest mb-1.5">Email Address</label>
+            <input type="email" id="reg-email" class="glass-input px-4 py-3 rounded-xl text-xs focus:outline-none" required>
+          </div>
+          <div class="flex flex-col">
+            <label class="text-[10px] text-gray-500 uppercase font-black tracking-widest mb-1.5">Password</label>
+            <input type="password" id="reg-password" class="glass-input px-4 py-3 rounded-xl text-xs focus:outline-none" required>
+          </div>
+          <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 font-bold py-3.5 rounded-xl shadow-lg transition text-xs mt-2">
+            CREATE ACCOUNT
+          </button>
+        </form>
+      </div>
+
+      <!-- Separator -->
+      <div class="relative my-6 flex items-center justify-center">
+        <div class="absolute inset-x-0 h-[1px] bg-gray-800"></div>
+        <span class="relative z-10 px-3 bg-gray-950 text-[10px] font-bold text-gray-500 uppercase tracking-widest">OR CONTINUE WITH</span>
+      </div>
+
+      <!-- Google Login Button -->
+      <button onclick="handleGoogleSignIn()" class="w-full py-3 bg-gray-900 border border-gray-800 hover:border-gray-600 text-xs font-bold rounded-xl transition flex items-center justify-center gap-2">
+        <svg class="w-4 h-4" viewBox="0 0 24 24" width="24" height="24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+          <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+          <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05"/>
+          <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" fill="#EA4335"/>
+        </svg>
+        Google Login
+      </button>
+
+    </div>
+  </main>
+
+  <script src="js/app.js"></script>
+  <script src="js/firebase-config.js"></script>
+  <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+  <script>
+    AOS.init({ duration: 800, once: true });
+    
+    let activeTab = "login";
+    let redirectUrl = "index.html";
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const redir = urlParams.get("redirect");
+      if (redir) {
+        redirectUrl = redir;
+      }
+      
+      hidePageLoader();
+    });
+
+    function toggleAuthTab(tab) {
+      activeTab = tab;
+      const loginBtn = document.getElementById("btn-tab-login");
+      const regBtn = document.getElementById("btn-tab-register");
+      
+      const loginPanel = document.getElementById("auth-login-panel");
+      const regPanel = document.getElementById("auth-register-panel");
+
+      if (tab === "login") {
+        loginBtn.className = "py-2.5 rounded-lg text-xs font-bold bg-blue-600 text-white transition";
+        regBtn.className = "py-2.5 rounded-lg text-xs font-bold text-gray-400 hover:text-white transition";
+        loginPanel.classList.remove("hidden");
+        regPanel.classList.add("hidden");
+      } else {
+        loginBtn.className = "py-2.5 rounded-lg text-xs font-bold text-gray-400 hover:text-white transition";
+        regBtn.className = "py-2.5 rounded-lg text-xs font-bold bg-blue-600 text-white transition";
+        loginPanel.classList.add("hidden");
+        regPanel.classList.remove("hidden");
+      }
+    }
+
+    async function handleLoginSubmit(e) {
+      e.preventDefault();
+      
+      const email = document.getElementById("login-email").value;
+      const password = document.getElementById("login-password").value;
+
+      showPageLoader();
+      try {
+        const response = await performLogin(email, password);
+        saveSession(response.token, response.user);
+        
+        hidePageLoader();
+        showToast("Signed in successfully!", "success");
+        
+        // Redirect
+        setTimeout(() => {
+          if (response.user.role === "admin") {
+            window.location.href = "admin.html";
+          } else {
+            window.location.href = redirectUrl;
+          }
+        }, 1000);
+      } catch (err) {
+        hidePageLoader();
+        showToast(err.message, "error");
+      }
+    }
+
+    async function handleRegisterSubmit(e) {
+      e.preventDefault();
+      
+      const name = document.getElementById("reg-name").value;
+      const email = document.getElementById("reg-email").value;
+      const password = document.getElementById("reg-password").value;
+
+      showPageLoader();
+      try {
+        const response = await performRegister(name, email, password);
+        saveSession(response.token, response.user);
+        
+        hidePageLoader();
+        showToast("Account created successfully!", "success");
+        
+        setTimeout(() => {
+          window.location.href = redirectUrl;
+        }, 1000);
+      } catch (err) {
+        hidePageLoader();
+        showToast(err.message, "error");
+      }
+    }
+
+    async function handleGoogleSignIn() {
+      try {
+        const response = await performGoogleLogin();
+        saveSession(response.token, response.user);
+        
+        showToast("Signed in with Google successfully!", "success");
+        setTimeout(() => {
+          window.location.href = redirectUrl;
+        }, 1000);
+      } catch (err) {
+        showToast(err.message, "error");
+      }
+    }
+
+    async function handleForgotPassword() {
+      const email = document.getElementById("login-email").value;
+      if (!email) {
+        showToast("Please enter your email address to reset password.", "error");
+        return;
+      }
+      
+      try {
+        const response = await apiRequest("/auth/forgot-password", "POST", { email });
+        showToast(response.message, "success");
+      } catch (err) {
+        showToast(err.message, "error");
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,896 @@
+{
+  "users": {
+    "c6a7713e-57cf-4e9f-913e-01708f2ac3e3": {
+      "name": "Order Tester",
+      "email": "order.tester@customwear.io",
+      "password": "scrypt:32768:8:1$nvRwLP3BZJuUZMbB$aa0edb9b0487386ca75176b8af749937f0d2c247eec15729aa8079a453b6c22a097bf2f24fa652e01ba74fd7216d7514364524bfe2559283aa890d93949235f1",
+      "role": "user",
+      "created_at": "2026-07-17T23:26:19.972930",
+      "addresses": [],
+      "phone": "",
+      "id": "c6a7713e-57cf-4e9f-913e-01708f2ac3e3"
+    },
+    "2c423218-7072-485d-8533-4ce03e2b2524": {
+      "name": "Test User",
+      "email": "test@gmail.com",
+      "role": "user",
+      "created_at": "2026-07-17T23:55:56.359225",
+      "addresses": [],
+      "phone": "",
+      "google_auth": true,
+      "id": "2c423218-7072-485d-8533-4ce03e2b2524"
+    }
+  },
+  "products": {
+    "cw-m-3-4th-oversized-t-shirts": {
+      "id": "cw-m-3-4th-oversized-t-shirts",
+      "brand": "CUSTOM WEAR",
+      "name": "3 4Th Oversized T Shirts",
+      "gender": "Men",
+      "category": "3 4Th Oversized T Shirts",
+      "prices": {
+        "plain": 420,
+        "printed": 480
+      },
+      "gsm_variants": [],
+      "colors": [
+        {
+          "name": "Beige",
+          "image": "assets/images/cw-m-3-4th-oversized-t-shirts_beige.jpeg"
+        },
+        {
+          "name": "Lavender",
+          "image": "assets/images/cw-m-3-4th-oversized-t-shirts_lavender.jpeg"
+        },
+        {
+          "name": "Off-White",
+          "image": "assets/images/cw-m-3-4th-oversized-t-shirts_off-white.jpeg"
+        },
+        {
+          "name": "Olive Green",
+          "image": "assets/images/cw-m-3-4th-oversized-t-shirts_olive-green.jpeg"
+        }
+      ],
+      "sizes": [
+        "XS",
+        "S",
+        "M",
+        "L",
+        "XL",
+        "2XL"
+      ],
+      "images": {},
+      "cover_image": "assets/images/cw-m-3-4th-oversized-t-shirts_cover.jpeg",
+      "specifications": {
+        "Material": "100% Super-Combed Premium Cotton",
+        "GSM": "180",
+        "Made in India": "Yes",
+        "Printing Type": "Premium Screen/DTG",
+        "Fabric": "Biowashed & Preshrunk Soft-Hand",
+        "Bio Washed": "Yes",
+        "Eco Friendly": "Yes",
+        "Side Seam": "Yes",
+        "Fit Type": "Oversized Fit"
+      },
+      "description": "Premium quality 3 4th oversized t shirts crafted for durability and max comfort. Features a premium biowashed fabric with dual-stitching.",
+      "rating": 4.8,
+      "stock": 120
+    },
+    "cw-m-bomber-jackets": {
+      "id": "cw-m-bomber-jackets",
+      "brand": "CUSTOM WEAR",
+      "name": "Bomber Jackets",
+      "gender": "Men",
+      "category": "Jacket",
+      "prices": {
+        "plain": 880,
+        "printed": 970
+      },
+      "gsm_variants": [],
+      "colors": [
+        {
+          "name": "Army Green",
+          "image": "assets/images/cw-m-bomber-jackets_army-green.jpeg"
+        },
+        {
+          "name": "Navy Blue",
+          "image": "assets/images/cw-m-bomber-jackets_navy-blue.jpeg"
+        }
+      ],
+      "sizes": [
+        "XS",
+        "S",
+        "M",
+        "L",
+        "XL",
+        "2XL"
+      ],
+      "images": {},
+      "cover_image": "assets/images/cw-m-bomber-jackets_cover.jpeg",
+      "specifications": {
+        "Material": "Premium Water-Resistant Nylon Polyester",
+        "GSM": "340",
+        "Made in India": "Yes",
+        "Printing Type": "Premium Screen/DTG",
+        "Fabric": "Biowashed & Preshrunk Soft-Hand",
+        "Bio Washed": "Yes",
+        "Eco Friendly": "Yes",
+        "Side Seam": "Yes",
+        "Fit Type": "Regular Fit"
+      },
+      "description": "Premium quality bomber jackets crafted for durability and max comfort. Features a premium biowashed fabric with dual-stitching.",
+      "rating": 4.8,
+      "stock": 120
+    },
+    "cw-m-mens-long-sleevet-t-shirt": {
+      "id": "cw-m-mens-long-sleevet-t-shirt",
+      "brand": "CUSTOM WEAR",
+      "name": "Mens Long Sleevet T Shirt",
+      "gender": "Men",
+      "category": "Mens Long Sleevet T Shirt",
+      "prices": {
+        "plain": 320,
+        "printed": 430
+      },
+      "gsm_variants": [],
+      "colors": [
+        {
+          "name": "Navy Blue",
+          "image": "assets/images/cw-m-mens-long-sleevet-t-shirt_navy-blue.jpeg"
+        },
+        {
+          "name": "Red",
+          "image": "assets/images/cw-m-mens-long-sleevet-t-shirt_red.jpeg"
+        },
+        {
+          "name": "White",
+          "image": "assets/images/cw-m-mens-long-sleevet-t-shirt_white.jpeg"
+        }
+      ],
+      "sizes": [
+        "XS",
+        "S",
+        "M",
+        "L",
+        "XL",
+        "2XL"
+      ],
+      "images": {},
+      "cover_image": "assets/images/cw-m-mens-long-sleevet-t-shirt_cover.jpeg",
+      "specifications": {
+        "Material": "100% Super-Combed Premium Cotton",
+        "GSM": "180",
+        "Made in India": "Yes",
+        "Printing Type": "Premium Screen/DTG",
+        "Fabric": "Biowashed & Preshrunk Soft-Hand",
+        "Bio Washed": "Yes",
+        "Eco Friendly": "Yes",
+        "Side Seam": "Yes",
+        "Fit Type": "Regular Fit"
+      },
+      "description": "Premium quality mens long sleevet t shirt crafted for durability and max comfort. Features a premium biowashed fabric with dual-stitching.",
+      "rating": 4.8,
+      "stock": 120
+    },
+    "cw-m-mens-round-neck-t-shirt": {
+      "id": "cw-m-mens-round-neck-t-shirt",
+      "brand": "CUSTOM WEAR",
+      "name": "Mens Round Neck T Shirt",
+      "gender": "Men",
+      "category": "Mens Round Neck T Shirt",
+      "prices": {
+        "plain": 320,
+        "printed": 420
+      },
+      "gsm_variants": [
+        {
+          "gsm": 180,
+          "prices": {
+            "plain": 320,
+            "printed": 420
+          }
+        },
+        {
+          "gsm": 220,
+          "prices": {
+            "plain": 380,
+            "printed": 470
+          }
+        }
+      ],
+      "colors": [
+        {
+          "name": "Crimson Red",
+          "image": "assets/images/cw-m-mens-round-neck-t-shirt_crimson-red.jpeg"
+        },
+        {
+          "name": "Grey",
+          "image": "assets/images/cw-m-mens-round-neck-t-shirt_grey.jpeg"
+        },
+        {
+          "name": "Navy Blue",
+          "image": "assets/images/cw-m-mens-round-neck-t-shirt_navy-blue.png"
+        },
+        {
+          "name": "White",
+          "image": "assets/images/cw-m-mens-round-neck-t-shirt_white.png"
+        }
+      ],
+      "sizes": [
+        "XS",
+        "S",
+        "M",
+        "L",
+        "XL",
+        "2XL"
+      ],
+      "images": {},
+      "cover_image": "assets/images/cw-m-mens-round-neck-t-shirt_cover.jpeg",
+      "specifications": {
+        "Material": "100% Super-Combed Premium Cotton",
+        "GSM": "180 & 220 Options Available",
+        "Made in India": "Yes",
+        "Printing Type": "Premium Screen/DTG",
+        "Fabric": "Biowashed & Preshrunk Soft-Hand",
+        "Bio Washed": "Yes",
+        "Eco Friendly": "Yes",
+        "Side Seam": "Yes",
+        "Fit Type": "Regular Fit"
+      },
+      "description": "Premium quality mens round neck t shirt crafted for durability and max comfort. Features a premium biowashed fabric with dual-stitching.",
+      "rating": 4.8,
+      "stock": 120
+    },
+    "cw-m-normal-hoodie": {
+      "id": "cw-m-normal-hoodie",
+      "brand": "CUSTOM WEAR",
+      "name": "Normal Hoodie",
+      "gender": "Men",
+      "category": "Hoodie",
+      "prices": {
+        "plain": 620,
+        "printed": 730
+      },
+      "gsm_variants": [],
+      "colors": [
+        {
+          "name": "Burgundy",
+          "image": "assets/images/cw-m-normal-hoodie_burgundy.jpeg"
+        },
+        {
+          "name": "Charcoal Gray",
+          "image": "assets/images/cw-m-normal-hoodie_charcoal-gray.jpeg"
+        },
+        {
+          "name": "Navy Blue",
+          "image": "assets/images/cw-m-normal-hoodie_navy-blue.jpeg"
+        },
+        {
+          "name": "Olive Green",
+          "image": "assets/images/cw-m-normal-hoodie_olive-green.jpeg"
+        }
+      ],
+      "sizes": [
+        "XS",
+        "S",
+        "M",
+        "L",
+        "XL",
+        "2XL"
+      ],
+      "images": {},
+      "cover_image": "assets/images/cw-m-normal-hoodie_cover.jpeg",
+      "specifications": {
+        "Material": "Premium Cotton Fleece Blend",
+        "GSM": "320",
+        "Made in India": "Yes",
+        "Printing Type": "Premium Screen/DTG",
+        "Fabric": "Biowashed & Preshrunk Soft-Hand",
+        "Bio Washed": "Yes",
+        "Eco Friendly": "Yes",
+        "Side Seam": "Yes",
+        "Fit Type": "Regular Fit"
+      },
+      "description": "Premium quality normal hoodie crafted for durability and max comfort. Features a premium biowashed fabric with dual-stitching.",
+      "rating": 4.8,
+      "stock": 120
+    },
+    "cw-m-oversized-hoodies": {
+      "id": "cw-m-oversized-hoodies",
+      "brand": "CUSTOM WEAR",
+      "name": "Oversized Hoodies",
+      "gender": "Men",
+      "category": "Hoodie",
+      "prices": {
+        "plain": 680,
+        "printed": 780
+      },
+      "gsm_variants": [],
+      "colors": [
+        {
+          "name": "Charcoal Grey",
+          "image": "assets/images/cw-m-oversized-hoodies_charcoal-grey.jpeg"
+        },
+        {
+          "name": "Dusty Pink",
+          "image": "assets/images/cw-m-oversized-hoodies_dusty-pink.jpeg"
+        },
+        {
+          "name": "Sage Green",
+          "image": "assets/images/cw-m-oversized-hoodies_sage-green.jpeg"
+        },
+        {
+          "name": "White",
+          "image": "assets/images/cw-m-oversized-hoodies_white.jpeg"
+        }
+      ],
+      "sizes": [
+        "XS",
+        "S",
+        "M",
+        "L",
+        "XL",
+        "2XL"
+      ],
+      "images": {},
+      "cover_image": "assets/images/cw-m-oversized-hoodies_cover.jpeg",
+      "specifications": {
+        "Material": "Premium Cotton Fleece Blend",
+        "GSM": "320",
+        "Made in India": "Yes",
+        "Printing Type": "Premium Screen/DTG",
+        "Fabric": "Biowashed & Preshrunk Soft-Hand",
+        "Bio Washed": "Yes",
+        "Eco Friendly": "Yes",
+        "Side Seam": "Yes",
+        "Fit Type": "Oversized Fit"
+      },
+      "description": "Premium quality oversized hoodies crafted for durability and max comfort. Features a premium biowashed fabric with dual-stitching.",
+      "rating": 4.8,
+      "stock": 120
+    },
+    "cw-m-sweat-shirt": {
+      "id": "cw-m-sweat-shirt",
+      "brand": "CUSTOM WEAR",
+      "name": "Sweat Shirt",
+      "gender": "Men",
+      "category": "Sweatshirt",
+      "prices": {
+        "plain": 500,
+        "printed": 550
+      },
+      "gsm_variants": [],
+      "colors": [
+        {
+          "name": "Forest Green",
+          "image": "assets/images/cw-m-sweat-shirt_forest-green.jpeg"
+        },
+        {
+          "name": "Grey Melange",
+          "image": "assets/images/cw-m-sweat-shirt_grey-melange.jpeg"
+        },
+        {
+          "name": "Navy Blue",
+          "image": "assets/images/cw-m-sweat-shirt_navy-blue.jpeg"
+        }
+      ],
+      "sizes": [
+        "XS",
+        "S",
+        "M",
+        "L",
+        "XL",
+        "2XL"
+      ],
+      "images": {},
+      "cover_image": "assets/images/cw-m-sweat-shirt_cover.jpeg",
+      "specifications": {
+        "Material": "Premium Cotton Blend Fleece",
+        "GSM": "300",
+        "Made in India": "Yes",
+        "Printing Type": "Premium Screen/DTG",
+        "Fabric": "Biowashed & Preshrunk Soft-Hand",
+        "Bio Washed": "Yes",
+        "Eco Friendly": "Yes",
+        "Side Seam": "Yes",
+        "Fit Type": "Regular Fit"
+      },
+      "description": "Premium quality sweat shirt crafted for durability and max comfort. Features a premium biowashed fabric with dual-stitching.",
+      "rating": 4.8,
+      "stock": 120
+    },
+    "cw-w-pants": {
+      "id": "cw-w-pants",
+      "brand": "CUSTOM WEAR",
+      "name": "Pants",
+      "gender": "Women",
+      "category": "Joggers",
+      "prices": {
+        "plain": 550,
+        "printed": 550
+      },
+      "gsm_variants": [],
+      "colors": [
+        {
+          "name": "Standard",
+          "image": "assets/images/cw-w-pants_cover.jpeg"
+        }
+      ],
+      "sizes": [
+        "XS",
+        "S",
+        "M",
+        "L",
+        "XL",
+        "2XL"
+      ],
+      "images": {},
+      "cover_image": "assets/images/cw-w-pants_cover.jpeg",
+      "specifications": {
+        "Material": "Premium Cotton Terry Blend",
+        "GSM": "260",
+        "Made in India": "Yes",
+        "Printing Type": "Premium Screen/DTG",
+        "Fabric": "Biowashed & Preshrunk Soft-Hand",
+        "Bio Washed": "Yes",
+        "Eco Friendly": "Yes",
+        "Side Seam": "Yes",
+        "Fit Type": "Regular Fit"
+      },
+      "description": "Premium quality pants crafted for durability and max comfort. Features a premium biowashed fabric with dual-stitching.",
+      "rating": 4.8,
+      "stock": 120
+    },
+    "cw-w-woman-crop-hoodies": {
+      "id": "cw-w-woman-crop-hoodies",
+      "brand": "CUSTOM WEAR",
+      "name": "Crop Hoodies",
+      "gender": "Women",
+      "category": "Hoodie",
+      "prices": {
+        "plain": 520,
+        "printed": 650
+      },
+      "gsm_variants": [],
+      "colors": [
+        {
+          "name": "Dusty Pink",
+          "image": "assets/images/cw-w-woman-crop-hoodies_dusty-pink.jpeg"
+        },
+        {
+          "name": "Lilac",
+          "image": "assets/images/cw-w-woman-crop-hoodies_lilac.jpeg"
+        },
+        {
+          "name": "Sage Green",
+          "image": "assets/images/cw-w-woman-crop-hoodies_sage-green.jpeg"
+        },
+        {
+          "name": "White",
+          "image": "assets/images/cw-w-woman-crop-hoodies_white.jpeg"
+        }
+      ],
+      "sizes": [
+        "XS",
+        "S",
+        "M",
+        "L",
+        "XL",
+        "2XL"
+      ],
+      "images": {},
+      "cover_image": "assets/images/cw-w-woman-crop-hoodies_cover.jpeg",
+      "specifications": {
+        "Material": "Premium Cotton Fleece Blend",
+        "GSM": "320",
+        "Made in India": "Yes",
+        "Printing Type": "Premium Screen/DTG",
+        "Fabric": "Biowashed & Preshrunk Soft-Hand",
+        "Bio Washed": "Yes",
+        "Eco Friendly": "Yes",
+        "Side Seam": "Yes",
+        "Fit Type": "Regular Fit"
+      },
+      "description": "Premium quality crop hoodies crafted for durability and max comfort. Features a premium biowashed fabric with dual-stitching.",
+      "rating": 4.8,
+      "stock": 120
+    },
+    "cw-w-women-crop-tops": {
+      "id": "cw-w-women-crop-tops",
+      "brand": "CUSTOM WEAR",
+      "name": "Crop Tops",
+      "gender": "Women",
+      "category": "Crop Top",
+      "prices": {
+        "plain": 265,
+        "printed": 375
+      },
+      "gsm_variants": [],
+      "colors": [
+        {
+          "name": "Baby Pink",
+          "image": "assets/images/cw-w-women-crop-tops_baby-pink.jpeg"
+        },
+        {
+          "name": "Beige",
+          "image": "assets/images/cw-w-women-crop-tops_beige.jpeg"
+        },
+        {
+          "name": "Lavender",
+          "image": "assets/images/cw-w-women-crop-tops_lavender.jpeg"
+        },
+        {
+          "name": "White",
+          "image": "assets/images/cw-w-women-crop-tops_white.jpeg"
+        }
+      ],
+      "sizes": [
+        "XS",
+        "S",
+        "M",
+        "L",
+        "XL",
+        "2XL"
+      ],
+      "images": {},
+      "cover_image": "assets/images/cw-w-women-crop-tops_cover.jpeg",
+      "specifications": {
+        "Material": "100% Super-Combed Premium Cotton",
+        "GSM": "180",
+        "Made in India": "Yes",
+        "Printing Type": "Premium Screen/DTG",
+        "Fabric": "Biowashed & Preshrunk Soft-Hand",
+        "Bio Washed": "Yes",
+        "Eco Friendly": "Yes",
+        "Side Seam": "Yes",
+        "Fit Type": "Regular Fit"
+      },
+      "description": "Premium quality crop tops crafted for durability and max comfort. Features a premium biowashed fabric with dual-stitching.",
+      "rating": 4.8,
+      "stock": 120
+    },
+    "crad-supima-tee": {
+      "id": "crad-supima-tee",
+      "brand": "CRADANCE",
+      "name": "Supima Cotton Streetwear Tee",
+      "gender": "Men",
+      "category": "Oversized T-Shirt",
+      "prices": {
+        "plain": 1700,
+        "printed": 1700
+      },
+      "colors": [
+        {
+          "name": "Midnight Black",
+          "image": "assets/images/crad_supima_tee.jpeg"
+        },
+        {
+          "name": "Sage Green",
+          "image": "assets/images/crad_supima_tee.jpeg"
+        },
+        {
+          "name": "Off-White",
+          "image": "assets/images/crad_supima_tee.jpeg"
+        }
+      ],
+      "sizes": [
+        "XS",
+        "S",
+        "M",
+        "L",
+        "XL",
+        "2XL"
+      ],
+      "cover_image": "assets/images/crad_supima_tee.jpeg",
+      "specifications": {
+        "Material": "100% Premium Supima Cotton",
+        "GSM": "240 Heavyweight",
+        "Made in India": "Yes",
+        "Printing Type": "High-Density Rubber/DTG Screen",
+        "Fabric": "Combed, Ring-Spun, Interlock Knit, Bio-Washed",
+        "Bio Washed": "Yes",
+        "Eco Friendly": "Yes",
+        "Side Seam": "Yes",
+        "Fit Type": "Premium Streetwear Fit"
+      },
+      "description": "Crafted from 100% genuine Supima cotton. Heavyweight 240 GSM, combed and ring-spun interlock knit. Featuring a luxurious bio-washed finish for unmatched softness and long-lasting fabric integrity.",
+      "rating": 4.9,
+      "stock": 80
+    }
+  },
+  "categories": [
+    {
+      "id": "t-shirt",
+      "name": "T-Shirt"
+    },
+    {
+      "id": "hoodie",
+      "name": "Hoodie"
+    },
+    {
+      "id": "jacket",
+      "name": "Jacket"
+    },
+    {
+      "id": "sweatshirt",
+      "name": "Sweatshirt"
+    },
+    {
+      "id": "joggers",
+      "name": "Joggers"
+    },
+    {
+      "id": "crop-top",
+      "name": "Crop Top"
+    }
+  ],
+  "orders": {
+    "ORD-4354308F": {
+      "user_id": "c6a7713e-57cf-4e9f-913e-01708f2ac3e3",
+      "user_name": "Order Tester",
+      "user_email": "order.tester@customwear.io",
+      "items": [
+        {
+          "product_id": "cw-m-3-4th-oversized-t-shirts",
+          "name": "Test Tee",
+          "price": 320,
+          "quantity": 2,
+          "size": "L",
+          "color": "White",
+          "print_style": "plain"
+        }
+      ],
+      "shipping_address": {
+        "name": "Order Tester",
+        "phone": "9999999999",
+        "email": "order.tester@customwear.io",
+        "address": "123 Verification Street",
+        "city": "Salem",
+        "district": "Salem",
+        "state": "Tamil Nadu",
+        "pin": "636001"
+      },
+      "coupon_code": null,
+      "pricing": {
+        "subtotal": 840.0,
+        "discount": 0.0,
+        "gst": 151.2,
+        "shipping": 50.0,
+        "grand_total": 1041.2
+      },
+      "status": "Ordered",
+      "payment_status": "Pending",
+      "payment_method": "UPI",
+      "id": "ORD-4354308F",
+      "created_at": "2026-07-17T23:26:20.229479"
+    },
+    "ORD-9EBBFCA7": {
+      "user_id": "c6a7713e-57cf-4e9f-913e-01708f2ac3e3",
+      "user_name": "Order Tester",
+      "user_email": "order.tester@customwear.io",
+      "items": [
+        {
+          "product_id": "cw-m-3-4th-oversized-t-shirts",
+          "name": "Test Tee",
+          "price": 320,
+          "quantity": 2,
+          "size": "L",
+          "color": "White",
+          "print_style": "plain"
+        }
+      ],
+      "shipping_address": {
+        "name": "Order Tester",
+        "phone": "9999999999",
+        "email": "order.tester@customwear.io",
+        "address": "123 Verification Street",
+        "city": "Salem",
+        "district": "Salem",
+        "state": "Tamil Nadu",
+        "pin": "636001"
+      },
+      "coupon_code": null,
+      "pricing": {
+        "subtotal": 840.0,
+        "discount": 0.0,
+        "gst": 151.2,
+        "shipping": 50.0,
+        "grand_total": 1041.2
+      },
+      "status": "Ordered",
+      "payment_status": "Pending",
+      "payment_method": "UPI",
+      "id": "ORD-9EBBFCA7",
+      "created_at": "2026-07-17T23:26:44.766354"
+    },
+    "ORD-B053D75F": {
+      "user_id": "c6a7713e-57cf-4e9f-913e-01708f2ac3e3",
+      "user_name": "Order Tester",
+      "user_email": "order.tester@customwear.io",
+      "items": [
+        {
+          "product_id": "cw-m-3-4th-oversized-t-shirts",
+          "name": "Test Tee",
+          "price": 320,
+          "quantity": 2,
+          "size": "L",
+          "color": "White",
+          "print_style": "plain"
+        }
+      ],
+      "shipping_address": {
+        "name": "Order Tester",
+        "phone": "9999999999",
+        "email": "order.tester@customwear.io",
+        "address": "123 Verification Street",
+        "city": "Salem",
+        "district": "Salem",
+        "state": "Tamil Nadu",
+        "pin": "636001"
+      },
+      "coupon_code": null,
+      "pricing": {
+        "subtotal": 840.0,
+        "discount": 0.0,
+        "gst": 151.2,
+        "shipping": 50.0,
+        "grand_total": 1041.2
+      },
+      "status": "Ordered",
+      "payment_status": "Paid",
+      "payment_method": "UPI",
+      "id": "ORD-B053D75F",
+      "created_at": "2026-07-17T23:27:09.785865"
+    },
+    "ORD-FEBAC011": {
+      "user_id": "c6a7713e-57cf-4e9f-913e-01708f2ac3e3",
+      "user_name": "Order Tester",
+      "user_email": "order.tester@customwear.io",
+      "items": [
+        {
+          "product_id": "cw-m-3-4th-oversized-t-shirts",
+          "name": "Test Tee",
+          "price": 320,
+          "quantity": 2,
+          "size": "L",
+          "color": "White",
+          "print_style": "plain"
+        }
+      ],
+      "shipping_address": {
+        "name": "Order Tester",
+        "phone": "9999999999",
+        "email": "order.tester@customwear.io",
+        "address": "123 Verification Street",
+        "city": "Salem",
+        "district": "Salem",
+        "state": "Tamil Nadu",
+        "pin": "636001"
+      },
+      "coupon_code": null,
+      "pricing": {
+        "subtotal": 840.0,
+        "discount": 0.0,
+        "gst": 0.0,
+        "shipping": 50.0,
+        "grand_total": 890.0
+      },
+      "status": "Ordered",
+      "payment_status": "Paid",
+      "payment_method": "UPI",
+      "id": "ORD-FEBAC011",
+      "created_at": "2026-07-18T17:39:59.380322"
+    },
+    "ORD-5C1856A6": {
+      "user_id": "c6a7713e-57cf-4e9f-913e-01708f2ac3e3",
+      "user_name": "Order Tester",
+      "user_email": "order.tester@customwear.io",
+      "items": [
+        {
+          "product_id": "cw-m-3-4th-oversized-t-shirts",
+          "name": "Test Tee",
+          "price": 320,
+          "quantity": 2,
+          "size": "L",
+          "color": "White",
+          "print_style": "plain"
+        }
+      ],
+      "shipping_address": {
+        "name": "Order Tester",
+        "phone": "9999999999",
+        "email": "order.tester@customwear.io",
+        "address": "123 Verification Street",
+        "city": "Salem",
+        "district": "Salem",
+        "state": "Tamil Nadu",
+        "pin": "636001"
+      },
+      "coupon_code": null,
+      "pricing": {
+        "subtotal": 840.0,
+        "discount": 0.0,
+        "gst": 0.0,
+        "shipping": 50.0,
+        "grand_total": 890.0
+      },
+      "status": "Ordered",
+      "payment_status": "Paid",
+      "payment_method": "UPI",
+      "id": "ORD-5C1856A6",
+      "created_at": "2026-07-18T17:42:58.690371"
+    },
+    "ORD-24D41F79": {
+      "user_id": "c6a7713e-57cf-4e9f-913e-01708f2ac3e3",
+      "user_name": "Order Tester",
+      "user_email": "order.tester@customwear.io",
+      "items": [
+        {
+          "product_id": "cw-m-3-4th-oversized-t-shirts",
+          "name": "Test Tee",
+          "price": 320,
+          "quantity": 2,
+          "size": "L",
+          "color": "White",
+          "print_style": "plain"
+        }
+      ],
+      "shipping_address": {
+        "name": "Order Tester",
+        "phone": "9999999999",
+        "email": "order.tester@customwear.io",
+        "address": "123 Verification Street",
+        "city": "Salem",
+        "district": "Salem",
+        "state": "Tamil Nadu",
+        "pin": "636001"
+      },
+      "coupon_code": null,
+      "pricing": {
+        "subtotal": 840.0,
+        "discount": 0.0,
+        "gst": 0.0,
+        "shipping": 50.0,
+        "grand_total": 890.0
+      },
+      "status": "Ordered",
+      "payment_status": "Paid",
+      "payment_method": "UPI",
+      "id": "ORD-24D41F79",
+      "created_at": "2026-07-18T17:44:26.470083"
+    }
+  },
+  "cart": {
+    "c6a7713e-57cf-4e9f-913e-01708f2ac3e3": {
+      "items": []
+    }
+  },
+  "wishlist": {},
+  "payments": {},
+  "reviews": {},
+  "coupons": {
+    "WELCOME10": {
+      "discount_percent": 10,
+      "active": true
+    },
+    "PREMIUM20": {
+      "discount_percent": 20,
+      "active": true
+    },
+    "FESTIVE30": {
+      "discount_percent": 30,
+      "active": true
+    }
+  },
+  "notifications": {},
+  "messages": {
+    "f43488ed-72a4-434e-a71e-59b8f1f2d0dc": {
+      "name": "Test",
+      "email": "test@test.com",
+      "phone": "",
+      "message": "Hello",
+      "id": "f43488ed-72a4-434e-a71e-59b8f1f2d0dc",
+      "created_at": "2026-07-17T23:56:12.007857"
+    }
+  }
+}

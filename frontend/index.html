@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CUSTOM WEAR & CRADANCE | Premium E-Commerce Hub</title>
+  <!-- SEO Tags -->
+  <meta name="description" content="Discover premium streetwear and customize your own apparel at CUSTOM WEAR & CRADANCE. Wear your identity with supima cotton and high-quality canvas printing.">
+  <link rel="icon" href="assets/images/brand_logo.jpeg" type="image/jpeg">
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              blue: '#2563eb',
+              darkblue: '#1d4ed8',
+              darkbg: '#030712',
+              glass: 'rgba(17, 24, 39, 0.7)'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="css/style.css">
+  <!-- AOS CSS for Scroll Animations -->
+  <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+  <!-- FontAwesome / Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Firebase SDK v8 compat -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+</head>
+<body class="bg-gray-950 text-gray-100 min-h-screen">
+
+  <!-- Page Loader -->
+  <div id="page-loader">
+    <div class="flex flex-col items-center">
+      <div class="spinner mb-4"></div>
+      <h1 class="text-xl font-bold tracking-widest text-blue-500">CUSTOM WEAR & CRADANCE</h1>
+    </div>
+  </div>
+
+  <!-- Navbar -->
+  <nav class="glass-nav fixed top-0 left-0 w-full z-50 transition duration-300">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16 sm:h-20">
+        
+        <!-- Logo -->
+        <a href="index.html" class="flex items-center gap-2 sm:gap-3 shrink-0">
+          <img src="assets/images/brand_logo.jpeg" alt="Logo" class="h-9 w-9 sm:h-10 sm:w-10 rounded-full border border-blue-500">
+          <span class="font-extrabold text-base sm:text-xl tracking-wider bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-indigo-400">
+            CW & CRADANCE
+          </span>
+        </a>
+
+        <!-- Desktop Navigation Links -->
+        <div class="hidden lg:flex items-center space-x-5 text-sm font-medium">
+          <a href="index.html" class="text-blue-500 hover:text-blue-400 transition">Home</a>
+          <a href="custom-wear.html" class="hover:text-blue-400 transition">CUSTOM WEAR</a>
+          <a href="cradance.html" class="hover:text-blue-400 transition">CRADANCE</a>
+          <a href="products.html?gender=Men" class="hover:text-blue-400 transition">Men</a>
+          <a href="products.html?gender=Women" class="hover:text-blue-400 transition">Women</a>
+          <a href="custom-printing.html" class="px-3 py-1 rounded-full bg-blue-600/20 border border-blue-500/30 text-blue-400 hover:bg-blue-600 hover:text-white transition">Custom Printing</a>
+          <a href="products.html" class="hover:text-blue-400 transition">Shop All</a>
+          <a href="track-order.html" class="hover:text-blue-400 transition">Track Order</a>
+        </div>
+
+        <!-- Right Action Icons + Hamburger -->
+        <div class="flex items-center space-x-1 sm:space-x-3">
+          <!-- Search -->
+          <a href="products.html" class="p-2 rounded-full hover:bg-gray-800 text-gray-400 hover:text-white transition" title="Search">
+            <i data-lucide="search" class="w-5 h-5"></i>
+          </a>
+
+          <!-- Cart -->
+          <a href="cart.html" class="p-2 rounded-full hover:bg-gray-800 text-gray-400 hover:text-white transition relative" title="Cart">
+            <i data-lucide="shopping-bag" class="w-5 h-5"></i>
+            <span class="cart-count-badge absolute -top-1 -right-1 bg-blue-600 text-white rounded-full text-[10px] w-4 h-4 flex items-center justify-center font-bold hidden">0</span>
+          </a>
+
+          <!-- Wishlist (desktop only) -->
+          <a href="dashboard.html?tab=wishlist" class="hidden sm:block p-2 rounded-full hover:bg-gray-800 text-gray-400 hover:text-white transition" title="Wishlist">
+            <i data-lucide="heart" class="w-5 h-5"></i>
+          </a>
+
+          <!-- Theme Toggle (desktop only) -->
+          <button id="theme-toggle" class="hidden sm:block p-2 rounded-full hover:bg-gray-800 text-gray-400 hover:text-white transition" title="Toggle Theme">
+            <i data-lucide="sun" class="w-5 h-5 block dark:hidden"></i>
+            <i data-lucide="moon" class="w-5 h-5 hidden dark:block"></i>
+          </button>
+
+          <!-- Profile / Login (desktop only) -->
+          <div class="hidden sm:block relative auth-guest">
+            <a href="login.html" class="px-4 py-2 text-xs font-semibold tracking-wider rounded-lg bg-blue-600 hover:bg-blue-700 text-white transition">
+              LOGIN
+            </a>
+          </div>
+          <div class="hidden sm:flex relative auth-user items-center gap-2">
+            <a href="dashboard.html" class="p-2 rounded-full hover:bg-gray-800 text-gray-400 hover:text-white transition" title="Dashboard">
+              <i data-lucide="user" class="w-5 h-5"></i>
+            </a>
+            <span id="nav-username" class="text-xs font-medium max-w-[80px] truncate hidden lg:block">User</span>
+            <button id="nav-logout" class="p-2 text-red-400 hover:text-red-300 transition" title="Logout">
+              <i data-lucide="log-out" class="w-4 h-4"></i>
+            </button>
+          </div>
+
+          <!-- Hamburger Button (mobile/tablet) -->
+          <button id="mobile-menu-btn" onclick="toggleMobileMenu()" class="lg:hidden p-2 rounded-xl hover:bg-gray-800 text-gray-400 hover:text-white transition ml-1" aria-label="Open menu">
+            <i data-lucide="menu" class="w-6 h-6" id="mobile-menu-icon"></i>
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Mobile Slide-down Menu -->
+    <div id="mobile-menu" class="lg:hidden hidden bg-gray-950/95 backdrop-blur-xl border-t border-gray-800/60">
+      <div class="max-w-7xl mx-auto px-4 py-5 flex flex-col gap-1">
+        <a href="index.html" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-blue-400 bg-blue-600/10">
+          <i data-lucide="home" class="w-4 h-4"></i> Home
+        </a>
+        <a href="custom-wear.html" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium hover:bg-gray-800/60 transition">
+          <i data-lucide="shirt" class="w-4 h-4 text-gray-400"></i> CUSTOM WEAR
+        </a>
+        <a href="cradance.html" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium hover:bg-gray-800/60 transition">
+          <i data-lucide="star" class="w-4 h-4 text-gray-400"></i> CRADANCE
+        </a>
+        <a href="products.html?gender=Men" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium hover:bg-gray-800/60 transition">
+          <i data-lucide="user" class="w-4 h-4 text-gray-400"></i> Men's Collection
+        </a>
+        <a href="products.html?gender=Women" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium hover:bg-gray-800/60 transition">
+          <i data-lucide="user-check" class="w-4 h-4 text-gray-400"></i> Women's Collection
+        </a>
+        <a href="custom-printing.html" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium hover:bg-gray-800/60 transition">
+          <i data-lucide="printer" class="w-4 h-4 text-gray-400"></i> Custom Printing Studio
+        </a>
+        <a href="products.html" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium hover:bg-gray-800/60 transition">
+          <i data-lucide="grid" class="w-4 h-4 text-gray-400"></i> Shop All
+        </a>
+        <a href="contact.html" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium hover:bg-gray-800/60 transition">
+          <i data-lucide="mail" class="w-4 h-4 text-gray-400"></i> Contact
+        </a>
+        <a href="track-order.html" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium hover:bg-gray-800/60 transition">
+          <i data-lucide="map-pin" class="w-4 h-4 text-gray-400"></i> Track Order
+        </a>
+        <div class="border-t border-gray-800 mt-2 pt-3 flex flex-col gap-2">
+          <div class="auth-guest">
+            <a href="login.html" class="flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm transition">
+              <i data-lucide="log-in" class="w-4 h-4"></i> LOGIN / REGISTER
+            </a>
+          </div>
+          <div class="auth-user hidden flex-col gap-2">
+            <a href="dashboard.html" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium hover:bg-gray-800/60 transition">
+              <i data-lucide="layout-dashboard" class="w-4 h-4 text-gray-400"></i> My Dashboard
+            </a>
+            <a href="dashboard.html?tab=orders" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium hover:bg-gray-800/60 transition">
+              <i data-lucide="package" class="w-4 h-4 text-gray-400"></i> My Orders
+            </a>
+            <button id="mobile-logout" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-red-400 hover:bg-gray-800/60 transition text-left w-full">
+              <i data-lucide="log-out" class="w-4 h-4"></i> Logout
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Large Brand Split Hero Hub -->
+  <section class="brand-hub pt-16 sm:pt-20">
+    <!-- Brand 1: CUSTOM WEAR -->
+    <div onclick="window.location.href='custom-wear.html'" class="brand-pane custom-wear-pane group">
+      <div class="brand-pane-content" data-aos="fade-right">
+        <h2 class="text-4xl sm:text-6xl font-black tracking-wider uppercase mb-2 group-hover:scale-105 transition duration-500">
+          CUSTOM WEAR
+        </h2>
+        <p class="text-lg sm:text-2xl text-blue-200 tracking-widest italic mb-6">"Wear Your Identity"</p>
+        <span class="px-6 py-3 rounded-full border border-white/30 bg-white/10 backdrop-blur text-sm font-semibold hover:bg-white hover:text-blue-950 transition duration-300">
+          EXPLORE CUSTOM APPAREL
+        </span>
+      </div>
+    </div>
+    <!-- Brand 2: CRADANCE -->
+    <div onclick="window.location.href='cradance.html'" class="brand-pane cradance-pane group">
+      <div class="brand-pane-content" data-aos="fade-left">
+        <h2 class="text-4xl sm:text-6xl font-black tracking-wider uppercase mb-2 group-hover:scale-105 transition duration-500">
+          CRADANCE
+        </h2>
+        <p class="text-lg sm:text-2xl text-gray-300 tracking-widest italic mb-6">"Premium Streetwear Collection"</p>
+        <span class="px-6 py-3 rounded-full border border-white/20 bg-gray-900/40 backdrop-blur text-sm font-semibold hover:bg-white hover:text-black transition duration-300">
+          VIEW EXCLUSIVE DROPS
+        </span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Content Wrapper -->
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+
+    <!-- Custom Printing Live Canvas Banner -->
+    <section class="mb-20" data-aos="fade-up">
+      <div class="rounded-3xl overflow-hidden relative glass-card p-8 sm:p-12 flex flex-col md:flex-row items-center justify-between gap-8 border border-blue-500/20">
+        <div class="absolute -right-20 -bottom-20 w-80 h-80 bg-blue-600/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="flex-1 text-center md:text-left z-10">
+          <span class="text-xs font-bold tracking-widest uppercase text-blue-400 bg-blue-500/10 px-3 py-1 rounded-full mb-4 inline-block">LIVE PRINTING STUDIO</span>
+          <h2 class="text-3xl sm:text-5xl font-black tracking-tight mb-4">Design Your Own Identity</h2>
+          <p class="text-gray-400 max-w-xl text-base mb-6">
+            Upload custom logos, designs, vector SVGs, and texts onto hoodies, sweatshirts, and tees. Interactive live placement preview and price builder instantly updated.
+          </p>
+          <a href="custom-printing.html" class="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold px-8 py-4 rounded-xl shadow-lg hover:from-blue-700 hover:to-indigo-700 transition">
+            Launch Canvas Designer <i data-lucide="palette" class="w-5 h-5"></i>
+          </a>
+        </div>
+        <div class="flex-1 max-w-md w-full relative z-10">
+          <div class="relative bg-gray-900/60 p-6 rounded-2xl border border-gray-800 shadow-2xl">
+            <img src="assets/images/brand_logo.jpeg" alt="Canvas Designer Preview" class="w-full h-64 object-cover rounded-xl opacity-80 filter saturate-50 hover:saturate-100 transition duration-500">
+            <div class="absolute inset-0 flex items-center justify-center">
+              <span class="bg-blue-600 text-white rounded-full p-4 shadow-lg animate-pulse">
+                <i data-lucide="edit-3" class="w-6 h-6"></i>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Categories Grid -->
+    <section class="mb-20">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl sm:text-4xl font-extrabold tracking-tight" data-aos="fade-up">Apparel Categories</h2>
+        <p class="text-gray-400 mt-2" data-aos="fade-up" data-aos-delay="100">Explore premium quality apparel tailored to every season.</p>
+      </div>
+
+      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+        <!-- T-Shirt -->
+        <a href="products.html?category=T-Shirt" class="glass-card p-6 rounded-2xl flex flex-col items-center text-center group" data-aos="zoom-in" data-aos-delay="50">
+          <div class="p-4 rounded-full bg-blue-600/10 text-blue-400 group-hover:bg-blue-600 group-hover:text-white transition duration-300 mb-4">
+            <i data-lucide="shirt" class="w-8 h-8"></i>
+          </div>
+          <span class="font-bold text-sm">T-Shirts</span>
+        </a>
+        <!-- Hoodie -->
+        <a href="products.html?category=Hoodie" class="glass-card p-6 rounded-2xl flex flex-col items-center text-center group" data-aos="zoom-in" data-aos-delay="100">
+          <div class="p-4 rounded-full bg-blue-600/10 text-blue-400 group-hover:bg-blue-600 group-hover:text-white transition duration-300 mb-4">
+            <i data-lucide="flame" class="w-8 h-8"></i>
+          </div>
+          <span class="font-bold text-sm">Hoodies</span>
+        </a>
+        <!-- Jacket -->
+        <a href="products.html?category=Jacket" class="glass-card p-6 rounded-2xl flex flex-col items-center text-center group" data-aos="zoom-in" data-aos-delay="150">
+          <div class="p-4 rounded-full bg-blue-600/10 text-blue-400 group-hover:bg-blue-600 group-hover:text-white transition duration-300 mb-4">
+            <i data-lucide="wind" class="w-8 h-8"></i>
+          </div>
+          <span class="font-bold text-sm">Jackets</span>
+        </a>
+        <!-- Sweatshirt -->
+        <a href="products.html?category=Sweatshirt" class="glass-card p-6 rounded-2xl flex flex-col items-center text-center group" data-aos="zoom-in" data-aos-delay="200">
+          <div class="p-4 rounded-full bg-blue-600/10 text-blue-400 group-hover:bg-blue-600 group-hover:text-white transition duration-300 mb-4">
+            <i data-lucide="sparkles" class="w-8 h-8"></i>
+          </div>
+          <span class="font-bold text-sm">Sweatshirts</span>
+        </a>
+        <!-- Joggers -->
+        <a href="products.html?category=Joggers" class="glass-card p-6 rounded-2xl flex flex-col items-center text-center group" data-aos="zoom-in" data-aos-delay="250">
+          <div class="p-4 rounded-full bg-blue-600/10 text-blue-400 group-hover:bg-blue-600 group-hover:text-white transition duration-300 mb-4">
+            <i data-lucide="activity" class="w-8 h-8"></i>
+          </div>
+          <span class="font-bold text-sm">Joggers</span>
+        </a>
+        <!-- Crop Top -->
+        <a href="products.html?category=Crop%20Top" class="glass-card p-6 rounded-2xl flex flex-col items-center text-center group" data-aos="zoom-in" data-aos-delay="300">
+          <div class="p-4 rounded-full bg-blue-600/10 text-blue-400 group-hover:bg-blue-600 group-hover:text-white transition duration-300 mb-4">
+            <i data-lucide="heart" class="w-8 h-8"></i>
+          </div>
+          <span class="font-bold text-sm">Crop Tops</span>
+        </a>
+      </div>
+    </section>
+
+    <!-- Trending & Best Sellers Section -->
+    <section class="mb-20">
+      <div class="flex items-center justify-between mb-12">
+        <div data-aos="fade-right">
+          <h2 class="text-3xl sm:text-4xl font-extrabold tracking-tight">Best Sellers & Trending</h2>
+          <p class="text-gray-400 mt-1">Our customer favorites from this week's drop.</p>
+        </div>
+        <a href="products.html" class="flex items-center gap-2 text-sm text-blue-400 font-bold hover:text-blue-300 transition duration-300" data-aos="fade-left">
+          View Catalog <i data-lucide="arrow-right" class="w-4 h-4"></i>
+        </a>
+      </div>
+
+      <!-- Skeleton loading placeholders or dynamic products catalog list -->
+      <div id="featured-products-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+        <!-- JS injected cards or 4 skeleton items -->
+        <div class="glass-card rounded-2xl overflow-hidden p-4 flex flex-col gap-4">
+          <div class="skeleton h-64 rounded-xl w-full"></div>
+          <div class="skeleton h-6 rounded w-3/4"></div>
+          <div class="skeleton h-4 rounded w-1/2"></div>
+        </div>
+        <div class="glass-card rounded-2xl overflow-hidden p-4 flex flex-col gap-4">
+          <div class="skeleton h-64 rounded-xl w-full"></div>
+          <div class="skeleton h-6 rounded w-3/4"></div>
+          <div class="skeleton h-4 rounded w-1/2"></div>
+        </div>
+        <div class="glass-card rounded-2xl overflow-hidden p-4 flex flex-col gap-4">
+          <div class="skeleton h-64 rounded-xl w-full"></div>
+          <div class="skeleton h-6 rounded w-3/4"></div>
+          <div class="skeleton h-4 rounded w-1/2"></div>
+        </div>
+        <div class="glass-card rounded-2xl overflow-hidden p-4 flex flex-col gap-4">
+          <div class="skeleton h-64 rounded-xl w-full"></div>
+          <div class="skeleton h-6 rounded w-3/4"></div>
+          <div class="skeleton h-4 rounded w-1/2"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Brand Philosophy Section -->
+    <section class="mb-20" data-aos="fade-up">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div class="glass-card p-8 rounded-2xl text-center flex flex-col items-center">
+          <div class="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-400 mb-6">
+            <i data-lucide="crown" class="w-6 h-6"></i>
+          </div>
+          <h3 class="text-xl font-bold mb-3">Superior Fabric Quality</h3>
+          <p class="text-sm text-gray-400 leading-relaxed">
+            From 180 to 220 GSM bio-washed ring-spun combed cotton options, up to 240 GSM heavy Supima premium knit. Built to withstand fading and wear.
+          </p>
+        </div>
+        <div class="glass-card p-8 rounded-2xl text-center flex flex-col items-center">
+          <div class="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-400 mb-6">
+            <i data-lucide="palette" class="w-6 h-6"></i>
+          </div>
+          <h3 class="text-xl font-bold mb-3">Wear Your Identity</h3>
+          <p class="text-sm text-gray-400 leading-relaxed">
+            Customize print positions on the Front, Back, or Sleeves of the apparel. Real-time SVG/PNG uploads, font rendering, resizing, and rotation.
+          </p>
+        </div>
+        <div class="glass-card p-8 rounded-2xl text-center flex flex-col items-center">
+          <div class="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-400 mb-6">
+            <i data-lucide="truck" class="w-6 h-6"></i>
+          </div>
+          <h3 class="text-xl font-bold mb-3">Eco-Friendly Shipping</h3>
+          <p class="text-sm text-gray-400 leading-relaxed">
+            Sourced responsibly, stitched locally, and packed in biodegradable packets. Free shipping on all purchases above Rs. 1,000.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Reviews / Testimonials -->
+    <section class="mb-20">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl sm:text-4xl font-extrabold tracking-tight" data-aos="fade-up">Customer Reviews</h2>
+        <p class="text-gray-400 mt-2" data-aos="fade-up" data-aos-delay="100">See what our community has to say about their custom wear.</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div class="glass-card p-6 rounded-2xl flex flex-col justify-between" data-aos="fade-up" data-aos-delay="50">
+          <div>
+            <div class="flex items-center gap-1 text-yellow-500 mb-4">
+              <i data-lucide="star" class="w-4 h-4 fill-current"></i>
+              <i data-lucide="star" class="w-4 h-4 fill-current"></i>
+              <i data-lucide="star" class="w-4 h-4 fill-current"></i>
+              <i data-lucide="star" class="w-4 h-4 fill-current"></i>
+              <i data-lucide="star" class="w-4 h-4 fill-current"></i>
+            </div>
+            <p class="text-gray-300 text-sm leading-relaxed mb-6 italic">
+              "The custom design tool is so responsive on my phone! I uploaded my logo, added text in the Outfit font, and placed it on the left sleeve. It turned out exactly how it looked on screen. Insanely high quality printing!"
+            </p>
+          </div>
+          <div class="flex items-center gap-3">
+            <div class="h-10 w-10 rounded-full bg-blue-600 flex items-center justify-center font-bold text-white text-sm">
+              AM
+            </div>
+            <div>
+              <h4 class="font-bold text-sm">Adithya M.</h4>
+              <p class="text-gray-500 text-xs">Verified Buyer</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="glass-card p-6 rounded-2xl flex flex-col justify-between" data-aos="fade-up" data-aos-delay="100">
+          <div>
+            <div class="flex items-center gap-1 text-yellow-500 mb-4">
+              <i data-lucide="star" class="w-4 h-4 fill-current"></i>
+              <i data-lucide="star" class="w-4 h-4 fill-current"></i>
+              <i data-lucide="star" class="w-4 h-4 fill-current"></i>
+              <i data-lucide="star" class="w-4 h-4 fill-current"></i>
+              <i data-lucide="star" class="w-4 h-4 fill-current"></i>
+            </div>
+            <p class="text-gray-300 text-sm leading-relaxed mb-6 italic">
+              "Cradance Supima Tee is pure luxury. The 240 GSM heavyweight feel holds its shape beautifully. It's soft and breathes incredibly well. Already ordered two more colors."
+            </p>
+          </div>
+          <div class="flex items-center gap-3">
+            <div class="h-10 w-10 rounded-full bg-indigo-600 flex items-center justify-center font-bold text-white text-sm">
+              KP
+            </div>
+            <div>
+              <h4 class="font-bold text-sm">Karthik P.</h4>
+              <p class="text-gray-500 text-xs">Verified Buyer</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="glass-card p-6 rounded-2xl flex flex-col justify-between" data-aos="fade-up" data-aos-delay="150">
+          <div>
+            <div class="flex items-center gap-1 text-yellow-500 mb-4">
+              <i data-lucide="star" class="w-4 h-4 fill-current"></i>
+              <i data-lucide="star" class="w-4 h-4 fill-current"></i>
+              <i data-lucide="star" class="w-4 h-4 fill-current"></i>
+              <i data-lucide="star" class="w-4 h-4 fill-current"></i>
+              <i data-lucide="star" class="w-4 h-4 fill-current"></i>
+            </div>
+            <p class="text-gray-300 text-sm leading-relaxed mb-6 italic">
+              "I love their crop hoodies. Very thick fleece, and the color matches the pictures perfectly. The local delivery took only 3 days and payments were seamless via Paytm UPI scan."
+            </p>
+          </div>
+          <div class="flex items-center gap-3">
+            <div class="h-10 w-10 rounded-full bg-pink-600 flex items-center justify-center font-bold text-white text-sm">
+              RV
+            </div>
+            <div>
+              <h4 class="font-bold text-sm">Riya V.</h4>
+              <p class="text-gray-500 text-xs">Verified Buyer</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Newsletter -->
+    <section class="mb-10" data-aos="fade-up">
+      <div class="glass-card p-8 sm:p-12 rounded-3xl text-center max-w-4xl mx-auto border border-blue-500/10">
+        <h2 class="text-3xl font-extrabold mb-4">Join the Club</h2>
+        <p class="text-gray-400 mb-8 max-w-xl mx-auto">
+          Subscribe to get notified about secret drops, exclusive brand discounts, and custom vector templates.
+        </p>
+        <form class="flex flex-col sm:flex-row gap-3 max-w-md mx-auto" onsubmit="event.preventDefault(); showToast('Subscribed to newsletter!', 'success'); this.reset();">
+          <input type="email" placeholder="Enter your email" class="glass-input px-5 py-3 rounded-xl flex-1 text-sm text-white" required>
+          <button type="submit" class="px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 font-bold text-white transition text-sm">
+            SUBSCRIBE
+          </button>
+        </form>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- Footer -->
+  <footer class="bg-gray-950 border-t border-gray-900 py-16 text-sm text-gray-500">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-4 gap-12">
+      
+      <!-- Brand & Info -->
+      <div class="flex flex-col gap-4">
+        <span class="font-extrabold text-lg text-white">CUSTOM WEAR & CRADANCE</span>
+        <p class="text-xs text-gray-500 leading-relaxed">
+          Premium identity customization and high-grade streetwear collections. Made in India.
+        </p>
+        <div class="flex items-center gap-3 mt-2">
+          <a href="https://instagram.com/custom_wear_io" target="_blank" class="text-gray-400 hover:text-white transition">
+            <i data-lucide="instagram" class="w-5 h-5"></i>
+          </a>
+          <a href="https://wa.me/917708374473" target="_blank" class="text-gray-400 hover:text-white transition">
+            <i data-lucide="message-square" class="w-5 h-5"></i>
+          </a>
+        </div>
+      </div>
+      
+      <!-- Quick Links -->
+      <div>
+        <h4 class="font-semibold text-white mb-4">SHOP COLLECTIONS</h4>
+        <ul class="flex flex-col gap-2 text-xs">
+          <li><a href="custom-wear.html" class="hover:text-white transition">CUSTOM WEAR</a></li>
+          <li><a href="cradance.html" class="hover:text-white transition">CRADANCE</a></li>
+          <li><a href="products.html?gender=Men" class="hover:text-white transition">Men's Catalog</a></li>
+          <li><a href="products.html?gender=Women" class="hover:text-white transition">Women's Catalog</a></li>
+          <li><a href="custom-printing.html" class="hover:text-white transition">Custom Printing Studio</a></li>
+          <li><a href="contact.html" class="hover:text-white transition">Contact Us</a></li>
+        </ul>
+      </div>
+      
+      <!-- Customer Care -->
+      <div>
+        <h4 class="font-semibold text-white mb-4">CUSTOMER CARE</h4>
+        <ul class="flex flex-col gap-2 text-xs">
+          <li><a href="track-order.html" class="hover:text-white transition">Track Your Order</a></li>
+          <li><a href="contact.html" class="hover:text-white transition">FAQ &amp; Help</a></li>
+          <li><a href="contact.html" class="hover:text-white transition">Refund Policy</a></li>
+          <li><a href="contact.html" class="hover:text-white transition">Shipping Policy</a></li>
+          <li><a href="contact.html" class="hover:text-white transition">Terms &amp; Privacy</a></li>
+        </ul>
+      </div>
+      
+      <!-- Contact -->
+      <div>
+        <h4 class="font-semibold text-white mb-4">STORE CONTACT</h4>
+        <ul class="flex flex-col gap-3 text-xs text-gray-400">
+          <li class="flex items-start gap-2">
+            <i data-lucide="map-pin" class="w-4 h-4 text-blue-500 shrink-0"></i>
+            <span>Salem, Tamil Nadu, India</span>
+          </li>
+          <li class="flex items-center gap-2">
+            <i data-lucide="phone" class="w-4 h-4 text-blue-500 shrink-0"></i>
+            <span>+91 7708374473 (WhatsApp)</span>
+          </li>
+          <li class="flex items-center gap-2">
+            <i data-lucide="clock" class="w-4 h-4 text-blue-500 shrink-0"></i>
+            <span>Mon - Sat: 9:00 AM - 7:00 PM</span>
+          </li>
+        </ul>
+      </div>
+
+    </div>
+    
+    <!-- Copy -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12 pt-8 border-t border-gray-900 text-center text-xs">
+      &copy; 2026 CUSTOM WEAR & CRADANCE. All rights reserved.
+    </div>
+  </footer>
+
+  <!-- Include App Scripts -->
+  <script src="js/products-data.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/firebase-config.js"></script>
+  
+  <!-- AOS Animation Script -->
+  <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+  <script>
+    AOS.init({
+      duration: 800,
+      once: true
+    });
+    
+    // Lucide Icons initialization
+    lucide.createIcons();
+    
+    // Dynamically render a few featured products from products-data.js
+    document.addEventListener("DOMContentLoaded", () => {
+      renderFeaturedProducts();
+    });
+    
+    function renderFeaturedProducts() {
+      const grid = document.getElementById("featured-products-grid");
+      if (!grid || typeof PRODUCTS_DATA === 'undefined') return;
+      
+      grid.innerHTML = "";
+      
+      // Get first 4 products
+      const featured = PRODUCTS_DATA.slice(0, 4);
+      featured.forEach((p, idx) => {
+        const card = document.createElement("div");
+        card.className = "glass-card rounded-2xl overflow-hidden p-4 flex flex-col justify-between group cursor-pointer border border-white/5 hover:border-blue-500/20";
+        card.setAttribute("data-aos", "fade-up");
+        card.setAttribute("data-aos-delay", `${idx * 100}`);
+        card.setAttribute("onclick", `window.location.href='product-details.html?id=${p.id}'`);
+        
+        card.innerHTML = `
+          <div class="zoom-wrapper rounded-xl aspect-[3/4] relative bg-gray-950/40 mb-4 flex items-center justify-center overflow-hidden">
+            <img src="${p.cover_image || 'assets/images/brand_logo.jpeg'}" alt="${p.name}" class="w-full h-full object-cover">
+            <span class="absolute top-3 left-3 text-[9px] uppercase font-black px-2.5 py-1 rounded-md bg-blue-600/90 text-white tracking-widest backdrop-blur-md shadow-sm">${p.brand}</span>
+            <div class="absolute inset-0 bg-black/20 backdrop-blur-sm opacity-0 group-hover:opacity-100 flex items-center justify-center gap-2 transition duration-300">
+              <span class="p-3 rounded-full bg-blue-600 text-white font-bold shadow-lg hover:scale-110 transition duration-300">
+                <i data-lucide="eye" class="w-5 h-5"></i>
+              </span>
+            </div>
+          </div>
+          <div>
+            <h4 class="font-bold text-sm tracking-wide text-white group-hover:text-blue-400 transition duration-300 truncate">${p.name}</h4>
+            <div class="flex items-center justify-between mt-2">
+              <span class="text-xs text-gray-400">${p.gender}'s ${p.category}</span>
+              <span class="text-sm font-bold text-blue-400">Rs. ${p.prices.plain}</span>
+            </div>
+            <div class="flex items-center gap-1 mt-2 text-xs text-yellow-500">
+              <i data-lucide="star" class="w-3 h-3 fill-current"></i>
+              <span class="text-gray-400 ml-1 font-semibold">${p.rating} (${p.stock} In Stock)</span>
+            </div>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+      lucide.createIcons();
+    }
+
+    // Mobile menu toggle
+    function toggleMobileMenu() {
+      const menu = document.getElementById("mobile-menu");
+      const icon = document.getElementById("mobile-menu-icon");
+      const isHidden = menu.classList.toggle("hidden");
+      if (isHidden) {
+        icon.setAttribute("data-lucide", "menu");
+      } else {
+        icon.setAttribute("data-lucide", "x");
+      }
+      lucide.createIcons();
+    }
+
+    // Close mobile menu on resize above lg
+    window.addEventListener("resize", () => {
+      if (window.innerWidth >= 1024) {
+        const menu = document.getElementById("mobile-menu");
+        const icon = document.getElementById("mobile-menu-icon");
+        menu.classList.add("hidden");
+        icon.setAttribute("data-lucide", "menu");
+        lucide.createIcons();
+      }
+    });
+
+    // Mobile logout button
+    document.addEventListener("DOMContentLoaded", () => {
+      const mobileLogout = document.getElementById("mobile-logout");
+      if (mobileLogout) {
+        mobileLogout.addEventListener("click", () => {
+          const navLogout = document.getElementById("nav-logout");
+          if (navLogout) navLogout.click();
+        });
+      }
+    });
+  </script>
+</body>
+</html>

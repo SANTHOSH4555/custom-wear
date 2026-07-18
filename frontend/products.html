@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shop Collection | CUSTOM WEAR & CRADANCE</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: { blue: '#2563eb' }
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Firebase SDK v8 compat -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+</head>
+<body class="bg-gray-950 text-gray-100 min-h-screen pt-20">
+
+  <!-- Page Loader -->
+  <div id="page-loader">
+    <div class="flex flex-col items-center">
+      <div class="spinner mb-4"></div>
+      <h1 class="text-xl font-bold tracking-widest text-blue-500">EXPLORING COLLECTION</h1>
+    </div>
+  </div>
+
+  <!-- Navbar -->
+  <nav class="glass-nav fixed top-0 left-0 w-full z-50 transition duration-300">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-20">
+        <a href="index.html" class="flex items-center gap-3">
+          <img src="assets/images/brand_logo.jpeg" alt="Logo" class="h-10 w-10 rounded-full border border-blue-500">
+          <span class="font-extrabold text-xl tracking-wider text-blue-500">CW & CRADANCE</span>
+        </a>
+        <div class="hidden md:flex items-center space-x-6 text-sm font-medium">
+          <a href="index.html" class="hover:text-blue-400 transition">Home</a>
+          <a href="custom-wear.html" class="hover:text-blue-400 transition">CUSTOM WEAR</a>
+          <a href="cradance.html" class="hover:text-blue-400 transition">CRADANCE</a>
+          <a href="custom-printing.html" class="hover:text-blue-400 transition">Custom Printing</a>
+          <a href="products.html" class="text-blue-500 hover:text-blue-400 transition">Shop All</a>
+        </div>
+        <div class="flex items-center space-x-4">
+          <a href="cart.html" class="p-2 rounded-full hover:bg-gray-800 text-gray-400 hover:text-white transition relative">
+            <i data-lucide="shopping-bag" class="w-5 h-5"></i>
+            <span class="cart-count-badge absolute -top-1 -right-1 bg-blue-600 text-white rounded-full text-[10px] w-4 h-4 flex items-center justify-center font-bold hidden">0</span>
+          </a>
+          <a href="dashboard.html" class="p-2 rounded-full hover:bg-gray-800 text-gray-400 hover:text-white transition"><i data-lucide="user" class="w-5 h-5"></i></a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Layout Container -->
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    
+    <!-- Search and Sort Header -->
+    <div class="glass-card p-6 rounded-2xl mb-8 flex flex-col md:flex-row gap-4 items-center justify-between">
+      <!-- Search Input with Auto Suggest -->
+      <div class="relative w-full md:max-w-md">
+        <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+          <i data-lucide="search" class="w-5 h-5"></i>
+        </span>
+        <input type="text" id="search-input" placeholder="Search products, materials, hoodies..." class="glass-input pl-10 pr-4 py-3 rounded-xl w-full text-sm placeholder-gray-500 focus:outline-none">
+        
+        <!-- Suggestions container -->
+        <div id="suggestions-box" class="absolute left-0 top-full mt-2 w-full glass-card rounded-xl border border-gray-800 overflow-hidden z-20 hidden">
+          <!-- Dynamically filled -->
+        </div>
+      </div>
+
+      <!-- Sorting -->
+      <div class="flex items-center gap-2 w-full md:w-auto">
+        <label for="sort-select" class="text-xs text-gray-400 font-semibold shrink-0">SORT BY</label>
+        <select id="sort-select" class="glass-input px-4 py-3 rounded-xl text-xs font-semibold focus:outline-none bg-gray-900 border-gray-800 w-full md:w-48">
+          <option value="popularity">Popularity (In Stock)</option>
+          <option value="newest">Newest Drops</option>
+          <option value="price_asc">Price: Low to High</option>
+          <option value="price_desc">Price: High to Low</option>
+          <option value="rating">Customer Rating</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="flex flex-col lg:flex-row gap-8">
+      
+      <!-- Side Filtering Pane -->
+      <aside class="w-full lg:w-64 shrink-0 flex flex-col gap-6">
+        <div class="glass-card p-6 rounded-2xl border border-gray-800">
+          <div class="flex items-center justify-between mb-6 pb-4 border-b border-gray-800">
+            <h3 class="font-extrabold text-sm tracking-wider uppercase">Filters</h3>
+            <button onclick="clearFilters()" class="text-xs text-blue-400 hover:text-blue-300">Clear All</button>
+          </div>
+
+          <!-- Brand -->
+          <div class="mb-6">
+            <h4 class="text-xs font-bold text-gray-400 tracking-wider uppercase mb-3">Brand</h4>
+            <div class="flex flex-col gap-2 text-xs">
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" name="brand-filter" value="CUSTOM WEAR" class="rounded bg-gray-900 border-gray-800 text-blue-500 focus:ring-0">
+                <span>CUSTOM WEAR</span>
+              </label>
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" name="brand-filter" value="CRADANCE" class="rounded bg-gray-900 border-gray-800 text-blue-500 focus:ring-0">
+                <span>CRADANCE</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Gender -->
+          <div class="mb-6">
+            <h4 class="text-xs font-bold text-gray-400 tracking-wider uppercase mb-3">Gender</h4>
+            <div class="flex flex-col gap-2 text-xs">
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" name="gender-filter" value="Men" class="rounded bg-gray-900 border-gray-800 text-blue-500 focus:ring-0">
+                <span>Men</span>
+              </label>
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" name="gender-filter" value="Women" class="rounded bg-gray-900 border-gray-800 text-blue-500 focus:ring-0">
+                <span>Women</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Categories -->
+          <div class="mb-6">
+            <h4 class="text-xs font-bold text-gray-400 tracking-wider uppercase mb-3">Category</h4>
+            <div class="flex flex-col gap-2 text-xs" id="category-filter-box">
+              <!-- Dynamically populated categories -->
+            </div>
+          </div>
+
+          <!-- Price Range Slider -->
+          <div class="mb-6">
+            <h4 class="text-xs font-bold text-gray-400 tracking-wider uppercase mb-3">Max Price (Rs.)</h4>
+            <input type="range" id="price-range" min="200" max="2000" step="50" value="2000" class="w-full h-1 bg-gray-800 rounded-lg appearance-none cursor-pointer accent-blue-600">
+            <div class="flex justify-between text-[10px] text-gray-500 mt-2 font-bold">
+              <span>Rs. 200</span>
+              <span id="price-slider-value">Rs. 2000</span>
+            </div>
+          </div>
+
+          <!-- Sizes -->
+          <div class="mb-6">
+            <h4 class="text-xs font-bold text-gray-400 tracking-wider uppercase mb-3">Sizes</h4>
+            <div class="flex flex-wrap gap-2">
+              <button onclick="toggleSizeFilter('XS')" class="size-btn px-3 py-1 rounded bg-gray-900 border border-gray-800 text-xs font-bold hover:border-gray-600 transition">XS</button>
+              <button onclick="toggleSizeFilter('S')" class="size-btn px-3 py-1 rounded bg-gray-900 border border-gray-800 text-xs font-bold hover:border-gray-600 transition">S</button>
+              <button onclick="toggleSizeFilter('M')" class="size-btn px-3 py-1 rounded bg-gray-900 border border-gray-800 text-xs font-bold hover:border-gray-600 transition">M</button>
+              <button onclick="toggleSizeFilter('L')" class="size-btn px-3 py-1 rounded bg-gray-900 border border-gray-800 text-xs font-bold hover:border-gray-600 transition">L</button>
+              <button onclick="toggleSizeFilter('XL')" class="size-btn px-3 py-1 rounded bg-gray-900 border border-gray-800 text-xs font-bold hover:border-gray-600 transition">XL</button>
+              <button onclick="toggleSizeFilter('2XL')" class="size-btn px-3 py-1 rounded bg-gray-900 border border-gray-800 text-xs font-bold hover:border-gray-600 transition">2XL</button>
+            </div>
+          </div>
+
+          <!-- Rating -->
+          <div>
+            <h4 class="text-xs font-bold text-gray-400 tracking-wider uppercase mb-3">Rating</h4>
+            <label class="flex items-center gap-2 cursor-pointer text-xs">
+              <input type="checkbox" id="rating-filter" value="4" class="rounded bg-gray-900 border-gray-800 text-blue-500 focus:ring-0">
+              <span class="flex items-center gap-1 text-yellow-500">
+                4.0+ <i data-lucide="star" class="w-3.5 h-3.5 fill-current"></i>
+              </span>
+            </label>
+          </div>
+
+        </div>
+      </aside>
+
+      <!-- Products Grid Area -->
+      <section class="flex-1">
+        <div id="shop-products-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          <!-- Dynamically rendered -->
+          <div class="glass-card h-80 rounded-xl skeleton"></div>
+          <div class="glass-card h-80 rounded-xl skeleton"></div>
+          <div class="glass-card h-80 rounded-xl skeleton"></div>
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+  <!-- Quick View Modal Container -->
+  <div id="quickview-modal" class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/75 backdrop-blur-sm px-4 hidden">
+    <div class="glass-card max-w-2xl w-full rounded-2xl p-6 relative border border-gray-800 flex flex-col md:flex-row gap-6 max-h-[90vh] overflow-y-auto">
+      <button onclick="closeQuickView()" class="absolute top-4 right-4 p-2 rounded-full hover:bg-gray-800 transition"><i data-lucide="x" class="w-5 h-5"></i></button>
+      <div class="flex-1">
+        <img id="qv-image" src="" alt="" class="w-full h-64 object-cover rounded-xl border border-gray-800">
+      </div>
+      <div class="flex-1 flex flex-col justify-between">
+        <div>
+          <span id="qv-brand" class="text-[10px] tracking-widest font-black uppercase text-blue-400 bg-blue-600/10 px-2 py-1 rounded"></span>
+          <h2 id="qv-name" class="text-xl font-bold mt-2"></h2>
+          <p id="qv-category" class="text-xs text-gray-500 mt-1"></p>
+          <div class="flex items-center gap-1 mt-2 text-yellow-500">
+            <i data-lucide="star" class="w-4 h-4 fill-current"></i>
+            <span id="qv-rating" class="text-xs text-gray-300 font-semibold"></span>
+          </div>
+          <p id="qv-desc" class="text-xs text-gray-400 mt-4 leading-relaxed"></p>
+        </div>
+        
+        <div class="mt-6 pt-4 border-t border-gray-800 flex items-center justify-between">
+          <span id="qv-price" class="text-lg font-extrabold text-blue-400"></span>
+          <a id="qv-btn" href="" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-lg transition">View Details</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="bg-gray-950 border-t border-gray-900 py-8 text-center text-xs text-gray-500 mt-20">
+    &copy; 2026 CUSTOM WEAR & CRADANCE. All rights reserved.
+  </footer>
+
+  <script src="js/products-data.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/firebase-config.js"></script>
+  <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+  <script>
+    AOS.init({ duration: 800, once: true });
+    
+    let activeSizeFilter = "";
+    
+    document.addEventListener("DOMContentLoaded", () => {
+      // Parse parameters from query URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const genderParam = urlParams.get("gender");
+      const brandParam = urlParams.get("brand");
+      const categoryParam = urlParams.get("category");
+      
+      if (genderParam) {
+        const cb = document.querySelector(`input[name="gender-filter"][value="${genderParam}"]`);
+        if (cb) cb.checked = true;
+      }
+      if (brandParam) {
+        const cb = document.querySelector(`input[name="brand-filter"][value="${brandParam}"]`);
+        if (cb) cb.checked = true;
+      }
+      
+      initCategoriesFilter(categoryParam);
+      setupFiltersListeners();
+      applyFilters();
+      hidePageLoader();
+    });
+
+    function initCategoriesFilter(selectedCategory) {
+      const box = document.getElementById("category-filter-box");
+      if (!box || typeof PRODUCTS_DATA === 'undefined') return;
+      
+      // Get unique categories
+      const categories = [...new Set(PRODUCTS_DATA.map(p => p.category))];
+      box.innerHTML = "";
+      
+      categories.forEach(cat => {
+        const label = document.createElement("label");
+        label.className = "flex items-center gap-2 cursor-pointer";
+        const checked = (selectedCategory && selectedCategory.toLowerCase() === cat.toLowerCase()) ? "checked" : "";
+        label.innerHTML = `
+          <input type="checkbox" name="category-filter" value="${cat}" ${checked} class="rounded bg-gray-900 border-gray-800 text-blue-500 focus:ring-0">
+          <span>${cat}</span>
+        `;
+        box.appendChild(label);
+      });
+      lucide.createIcons();
+    }
+
+    function setupFiltersListeners() {
+      // Add event listeners
+      document.getElementById("search-input").addEventListener("input", handleSearch);
+      document.getElementById("sort-select").addEventListener("change", applyFilters);
+      document.getElementById("price-range").addEventListener("input", (e) => {
+        document.getElementById("price-slider-value").textContent = `Rs. ${e.target.value}`;
+        applyFilters();
+      });
+      
+      const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+      checkboxes.forEach(cb => cb.addEventListener("change", applyFilters));
+    }
+
+    function toggleSizeFilter(size) {
+      const btns = document.querySelectorAll(".size-btn");
+      btns.forEach(btn => {
+        if (btn.textContent === size) {
+          if (activeSizeFilter === size) {
+            btn.classList.remove("border-blue-500", "text-blue-400");
+            activeSizeFilter = "";
+          } else {
+            btn.classList.add("border-blue-500", "text-blue-400");
+            activeSizeFilter = size;
+          }
+        } else {
+          btn.classList.remove("border-blue-500", "text-blue-400");
+        }
+      });
+      applyFilters();
+    }
+
+    function clearFilters() {
+      document.getElementById("search-input").value = "";
+      document.getElementById("price-range").value = 2000;
+      document.getElementById("price-slider-value").textContent = "Rs. 2000";
+      
+      const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+      checkboxes.forEach(cb => cb.checked = false);
+      
+      const btns = document.querySelectorAll(".size-btn");
+      btns.forEach(btn => btn.classList.remove("border-blue-500", "text-blue-400"));
+      activeSizeFilter = "";
+      
+      applyFilters();
+    }
+
+    function handleSearch() {
+      const input = document.getElementById("search-input");
+      const val = input.value.toLowerCase().trim();
+      const suggestions = document.getElementById("suggestions-box");
+      
+      if (!val) {
+        suggestions.classList.add("hidden");
+        applyFilters();
+        return;
+      }
+      
+      // Auto-suggest logic
+      const matches = PRODUCTS_DATA.filter(p => p.name.toLowerCase().includes(val)).slice(0, 5);
+      if (matches.length > 0) {
+        suggestions.innerHTML = "";
+        matches.forEach(m => {
+          const s = document.createElement("div");
+          s.className = "px-4 py-3 hover:bg-gray-800/80 cursor-pointer text-xs flex justify-between border-b border-gray-800/20";
+          s.innerHTML = `<span>${m.name}</span><span class="text-blue-400 font-bold">${m.brand}</span>`;
+          s.addEventListener("click", () => {
+            input.value = m.name;
+            suggestions.classList.add("hidden");
+            applyFilters();
+          });
+          suggestions.appendChild(s);
+        });
+        suggestions.classList.remove("hidden");
+      } else {
+        suggestions.classList.add("hidden");
+      }
+      
+      applyFilters();
+    }
+
+    // Close suggestions box on click outside
+    document.addEventListener("click", (e) => {
+      const box = document.getElementById("suggestions-box");
+      if (box && !box.contains(e.target) && e.target.id !== "search-input") {
+        box.classList.add("hidden");
+      }
+    });
+
+    function applyFilters() {
+      const grid = document.getElementById("shop-products-grid");
+      if (!grid || typeof PRODUCTS_DATA === 'undefined') return;
+      
+      const search = document.getElementById("search-input").value.toLowerCase();
+      const maxPrice = parseInt(document.getElementById("price-range").value);
+      const ratingActive = document.getElementById("rating-filter")?.checked;
+      
+      // Selected Brands
+      const brandCbs = document.querySelectorAll('input[name="brand-filter"]:checked');
+      const selectedBrands = Array.from(brandCbs).map(cb => cb.value.toLowerCase());
+      
+      // Selected Genders
+      const genderCbs = document.querySelectorAll('input[name="gender-filter"]:checked');
+      const selectedGenders = Array.from(genderCbs).map(cb => cb.value.toLowerCase());
+      
+      // Selected Categories
+      const catCbs = document.querySelectorAll('input[name="category-filter"]:checked');
+      const selectedCats = Array.from(catCbs).map(cb => cb.value.toLowerCase());
+      
+      let filtered = PRODUCTS_DATA.filter(p => {
+        // Search
+        if (search && !p.name.toLowerCase().includes(search) && !p.description.toLowerCase().includes(search) && !p.category.toLowerCase().includes(search)) {
+          return false;
+        }
+        // Max Price
+        if (p.prices.plain > maxPrice) return false;
+        // Rating
+        if (ratingActive && p.rating < 4.0) return false;
+        // Brand
+        if (selectedBrands.length > 0 && !selectedBrands.includes(p.brand.toLowerCase())) return false;
+        // Gender
+        if (selectedGenders.length > 0 && !selectedGenders.includes(p.gender.toLowerCase())) return false;
+        // Category
+        if (selectedCats.length > 0 && !selectedCats.includes(p.category.toLowerCase())) return false;
+        // Size
+        if (activeSizeFilter && !p.sizes.includes(activeSizeFilter)) return false;
+        
+        return true;
+      });
+      
+      // Sorting
+      const sortBy = document.getElementById("sort-select").value;
+      if (sortBy === "newest") {
+        filtered.reverse();
+      } else if (sortBy === "price_asc") {
+        filtered.sort((a, b) => a.prices.plain - b.prices.plain);
+      } else if (sortBy === "price_desc") {
+        filtered.sort((a, b) => b.prices.plain - a.prices.plain);
+      } else if (sortBy === "rating") {
+        filtered.sort((a, b) => b.rating - a.rating);
+      } else { // popularity
+        filtered.sort((a, b) => b.stock - a.stock);
+      }
+      
+      renderProductsGrid(filtered);
+    }
+
+    function renderProductsGrid(products) {
+      const grid = document.getElementById("shop-products-grid");
+      grid.innerHTML = "";
+      
+      if (products.length === 0) {
+        grid.innerHTML = `
+          <div class="col-span-full py-20 text-center flex flex-col items-center">
+            <i data-lucide="frown" class="w-12 h-12 text-gray-500 mb-4 animate-bounce"></i>
+            <h3 class="text-lg font-bold text-gray-400">No products found matching filters</h3>
+            <p class="text-xs text-gray-600 mt-1">Try widening your price range or selection criteria.</p>
+          </div>
+        `;
+        lucide.createIcons();
+        return;
+      }
+      
+      products.forEach((p, idx) => {
+        const card = document.createElement("div");
+        card.className = "glass-card rounded-2xl overflow-hidden p-4 flex flex-col justify-between group relative";
+        card.setAttribute("data-aos", "fade-up");
+        card.setAttribute("data-aos-delay", `${(idx % 6) * 50}`);
+        
+        card.innerHTML = `
+          <div onclick="window.location.href='product-details.html?id=${p.id}'" class="zoom-wrapper rounded-xl aspect-[3/4] relative bg-gray-950/40 mb-4 flex items-center justify-center overflow-hidden cursor-pointer">
+            <img src="${p.cover_image || 'assets/images/brand_logo.jpeg'}" alt="${p.name}" class="w-full h-full object-cover">
+            <span class="absolute top-2 left-2 text-[9px] uppercase font-black px-2 py-1 rounded ${
+              p.brand === 'CRADANCE' ? 'bg-yellow-600 text-white' : 'bg-blue-600 text-white'
+            } tracking-widest shadow-md">${p.brand}</span>
+          </div>
+          <div>
+            <h4 onclick="window.location.href='product-details.html?id=${p.id}'" class="font-bold text-sm tracking-wide text-white group-hover:text-blue-400 transition truncate cursor-pointer">${p.name}</h4>
+            <div class="flex items-center justify-between mt-2">
+              <span class="text-xs text-gray-500">${p.gender}'s ${p.category}</span>
+              <span class="text-sm font-extrabold text-blue-400">Rs. ${p.prices.plain}</span>
+            </div>
+          </div>
+          <div class="mt-4 pt-3 border-t border-gray-800/40 flex items-center justify-between">
+            <button onclick="openQuickView('${p.id}')" class="text-xs text-gray-400 hover:text-white transition flex items-center gap-1">
+              <i data-lucide="eye" class="w-3.5 h-3.5"></i> Quick View
+            </button>
+            <button onclick="event.stopPropagation(); toggleWishlist('${p.id}'); showToast('Wishlist updated!', 'success');" class="text-gray-400 hover:text-red-500 transition">
+              <i data-lucide="heart" class="w-4 h-4"></i>
+            </button>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+      lucide.createIcons();
+    }
+
+    // Quick View Logic
+    function openQuickView(id) {
+      const p = PRODUCTS_DATA.find(x => x.id === id);
+      if (!p) return;
+      
+      document.getElementById("qv-image").src = p.cover_image || 'assets/images/brand_logo.jpeg';
+      document.getElementById("qv-brand").textContent = p.brand;
+      document.getElementById("qv-name").textContent = p.name;
+      document.getElementById("qv-category").textContent = `${p.gender}'s ${p.category}`;
+      document.getElementById("qv-rating").textContent = `${p.rating} Stars | ${p.stock} In Stock`;
+      document.getElementById("qv-desc").textContent = p.description;
+      document.getElementById("qv-price").textContent = `Rs. ${p.prices.plain}`;
+      document.getElementById("qv-btn").href = `product-details.html?id=${p.id}`;
+      
+      const modal = document.getElementById("quickview-modal");
+      modal.classList.remove("hidden");
+    }
+
+    function closeQuickView() {
+      const modal = document.getElementById("quickview-modal");
+      modal.classList.add("hidden");
+    }
+  </script>
+</body>
+</html>
