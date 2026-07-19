@@ -7,8 +7,8 @@ const firebaseConfig = {
   authDomain: "project-00cb5ede-0325-438b-947.firebaseapp.com",
   projectId: "project-00cb5ede-0325-438b-947",
   storageBucket: "project-00cb5ede-0325-438b-947.firebasestorage.app",
-  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",  // Firebase Console → Project Settings → Cloud Messaging tab
-  appId: "YOUR_APP_ID"                            // Firebase Console → Project Settings → Your Apps section
+  messagingSenderId: "445453811210",  // Firebase Console → Project Settings → Cloud Messaging tab
+  appId: "1:445453811210:web:bb7b6733dcb0fef956e9f3"                            // Firebase Console → Project Settings → Your Apps section
 };
 
 // ============================================================
