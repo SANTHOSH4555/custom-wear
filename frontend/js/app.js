@@ -1,4 +1,4 @@
-const API_BASE_URL = "53e9219cf2a50c3276b8e9764a46015c";
+const API_BASE_URL = "https://custom-wear.onrender.com";
 
 // Initialize system states
 document.addEventListener("DOMContentLoaded", () => {
@@ -197,7 +197,7 @@ function addToCart(item) {
   
   // Sync with user account if logged in
   if (getAuthToken()) {
-    apiRequest("/cart", "POST", { items: cart }).catch(err => console.error("Sync cart error", err));
+    apiRequest("/api/cart", "POST", { items: cart }).catch(err => console.error("Sync cart error", err));
   }
 }
 
@@ -225,7 +225,7 @@ function toggleWishlist(productId) {
   saveLocalWishlist(list);
   
   if (getAuthToken()) {
-    apiRequest("/wishlist", "POST", { product_ids: list }).catch(err => console.error("Sync wishlist error", err));
+    apiRequest("/api/wishlist", "POST", { product_ids: list }).catch(err => console.error("Sync wishlist error", err));
   }
   return added;
 }
