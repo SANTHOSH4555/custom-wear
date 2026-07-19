@@ -13,9 +13,15 @@
   --glass-border-light: rgba(0, 0, 0, 0.06);
 }
 
+html {
+  overflow-x: hidden;
+  max-width: 100vw;
+}
+
 body {
   font-family: var(--font-body);
   overflow-x: hidden;
+  max-width: 100vw;
   transition: background-color 0.3s, color 0.3s;
 }
 
@@ -217,10 +223,14 @@ h1, h2, h3, h4, h5, h6 {
 .brand-hub {
   height: 80vh;
   display: flex;
+  width: 100%;
+  max-width: 100vw;
+  overflow: hidden;
 }
 
 .brand-pane {
   flex: 1;
+  min-width: 0;
   transition: flex 0.6s cubic-bezier(0.25, 1, 0.5, 1), filter 0.6s;
   display: flex;
   flex-direction: column;
@@ -275,11 +285,15 @@ h1, h2, h3, h4, h5, h6 {
     flex-direction: column;
     height: auto;
     min-height: 100svh;
+    width: 100vw;
+    max-width: 100vw;
   }
 
   .brand-pane {
     min-height: 50svh;
     flex: none;
+    width: 100%;
+    max-width: 100vw;
   }
 
   .brand-pane:hover {
@@ -287,8 +301,19 @@ h1, h2, h3, h4, h5, h6 {
   }
 
   /* Prevent navbar overflow on small screens */
-  body {
+  html, body {
     overflow-x: hidden;
+    max-width: 100vw;
+  }
+
+  /* Prevent large text from causing overflow */
+  .brand-pane-content h2 {
+    font-size: clamp(2rem, 10vw, 3.5rem);
+    word-break: break-word;
+  }
+
+  .brand-pane-content p {
+    font-size: clamp(0.9rem, 4vw, 1.25rem);
   }
 }
 
