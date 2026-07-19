@@ -289,7 +289,7 @@
 
       // Create update profile address on backend if user didn't have one
       const user = getCurrentUser();
-      if (user && user.addresses.length === 0) {
+      if (user && (!user.addresses || user.addresses.length === 0)) {
         try {
           await apiRequest("/auth/profile", "PUT", { 
             phone: shipAddress.phone,

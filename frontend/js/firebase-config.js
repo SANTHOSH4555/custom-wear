@@ -34,18 +34,18 @@ if (typeof firebase !== 'undefined') {
         // Firebase session is active: refresh backend JWT silently
         user.getIdToken().then(function(idToken) {
           // Only refresh if we don't already have a local JWT
-          const existing = localStorage.getItem("cw_token");
+          const existing = localStorage.getItem("auth_token");
           if (!existing) {
             apiRequest("/api/auth/google-login", "POST", {
               email: user.email,
               name: user.displayName || user.email.split("@")[0]
             }).then(data => {
               if (data && data.token) {
-                localStorage.setItem("cw_token", data.token);
-                localStorage.setItem("cw_user", JSON.stringify(data.user));
+                localStorage.setItem("auth_token", data.token);
+                localStorage.setItem("user", JSON.stringify(data.user));
                 console.log("[Firebase] ↺ Session restored for:", user.email);
                 // Trigger navbar re-render if available
-                if (typeof updateAuthUI === "function") updateAuthUI();
+                if (typeof syncNavbarAuth === "function") syncNavbarAuth();
               }
             }).catch(() => {});
           }
@@ -152,7 +152,7 @@ async function performLogout() {
       console.warn("[Firebase] Signout error:", e.message);
     }
   }
-  localStorage.removeItem("cw_token");
-  localStorage.removeItem("cw_user");
+  localStorage.removeItem("auth_token");
+  localStorage.removeItem("user");
   window.location.href = "index.html";
 }

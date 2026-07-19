@@ -138,8 +138,14 @@ async function apiRequest(endpoint, method = "GET", body = null) {
     config.body = JSON.stringify(body);
   }
   
+  // Auto-prefix with /api if not present
+  let urlPath = endpoint;
+  if (!urlPath.startsWith("/api")) {
+    urlPath = "/api" + (urlPath.startsWith("/") ? "" : "/") + urlPath;
+  }
+  
   try {
-    const res = await fetch(`${API_BASE_URL}${endpoint}`, config);
+    const res = await fetch(`${API_BASE_URL}${urlPath}`, config);
     const data = await res.json();
     if (!res.ok) {
       throw new Error(data.message || "Something went wrong!");
