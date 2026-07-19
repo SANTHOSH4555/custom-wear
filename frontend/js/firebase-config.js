@@ -7,8 +7,8 @@ const firebaseConfig = {
   authDomain: "project-00cb5ede-0325-438b-947.firebaseapp.com",
   projectId: "project-00cb5ede-0325-438b-947",
   storageBucket: "project-00cb5ede-0325-438b-947.firebasestorage.app",
-  messagingSenderId: "445453811210",  // Firebase Console → Project Settings → Cloud Messaging tab
-  appId: "1:445453811210:web:bb7b6733dcb0fef956e9f3"                            // Firebase Console → Project Settings → Your Apps section
+  messagingSenderId: "445453811210",
+  appId: "1:445453811210:web:bb7b6733dcb0fef956e9f3"
 };
 
 // ============================================================
@@ -36,7 +36,7 @@ if (typeof firebase !== 'undefined') {
           // Only refresh if we don't already have a local JWT
           const existing = localStorage.getItem("cw_token");
           if (!existing) {
-            apiRequest("/auth/google-login", "POST", {
+            apiRequest("/api/auth/google-login", "POST", {
               email: user.email,
               name: user.displayName || user.email.split("@")[0]
             }).then(data => {
@@ -72,7 +72,7 @@ async function performLogin(email, password) {
   if (firebaseInitialized) {
     try {
       const userCredential = await firebase.auth().signInWithEmailAndPassword(email, password);
-      const data = await apiRequest("/auth/google-login", "POST", {
+      const data = await apiRequest("/api/auth/google-login", "POST", {
         email: userCredential.user.email,
         name: userCredential.user.displayName || email.split("@")[0]
       });
@@ -84,7 +84,7 @@ async function performLogin(email, password) {
     }
   }
   // Local Flask JWT login
-  return await apiRequest("/auth/login", "POST", { email, password });
+  return await apiRequest("/api/auth/login", "POST", { email, password });
 }
 
 /**
@@ -96,7 +96,7 @@ async function performRegister(name, email, password) {
     try {
       const userCredential = await firebase.auth().createUserWithEmailAndPassword(email, password);
       await userCredential.user.updateProfile({ displayName: name });
-      const data = await apiRequest("/auth/google-login", "POST", { email, name });
+      const data = await apiRequest("/api/auth/google-login", "POST", { email, name });
       return data;
     } catch (e) {
       if (e.code && e.code.startsWith("auth/")) throw e;
@@ -104,7 +104,7 @@ async function performRegister(name, email, password) {
     }
   }
   // Local Flask register
-  return await apiRequest("/auth/register", "POST", { name, email, password });
+  return await apiRequest("/api/auth/register", "POST", { name, email, password });
 }
 
 /**
@@ -118,7 +118,7 @@ async function performGoogleLogin() {
       provider.addScope("profile");
       provider.addScope("email");
       const result = await firebase.auth().signInWithPopup(provider);
-      const data = await apiRequest("/auth/google-login", "POST", {
+      const data = await apiRequest("/api/auth/google-login", "POST", {
         email: result.user.email,
         name: result.user.displayName || result.user.email.split("@")[0]
       });
@@ -135,7 +135,7 @@ async function performGoogleLogin() {
   // Simulation fallback (only in dev/demo mode)
   console.warn("[Firebase] Not initialized — simulating Google Login for demo.");
   if (typeof showToast === "function") showToast("Firebase not set up. Running in demo mode.", "warning");
-  return await apiRequest("/auth/google-login", "POST", {
+  return await apiRequest("/api/auth/google-login", "POST", {
     email: "demo.user@gmail.com",
     name: "Demo User"
   });
