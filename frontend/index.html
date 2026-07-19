@@ -74,7 +74,7 @@
         </div>
 
         <!-- Right Action Icons + Hamburger -->
-        <div class="flex items-center space-x-1 sm:space-x-3">
+        <div class="flex items-center flex-nowrap space-x-1 sm:space-x-3">
           <!-- Search -->
           <a href="products.html" class="p-2 rounded-full hover:bg-gray-800 text-gray-400 hover:text-white transition" title="Search">
             <i data-lucide="search" class="w-5 h-5"></i>
@@ -87,23 +87,26 @@
           </a>
 
           <!-- Wishlist (desktop only) -->
-          <a href="dashboard.html?tab=wishlist" class="hidden sm:block p-2 rounded-full hover:bg-gray-800 text-gray-400 hover:text-white transition" title="Wishlist">
+          <a href="dashboard.html?tab=wishlist" class="hidden sm:flex p-2 rounded-full hover:bg-gray-800 text-gray-400 hover:text-white transition" title="Wishlist">
             <i data-lucide="heart" class="w-5 h-5"></i>
           </a>
 
           <!-- Theme Toggle (desktop only) -->
-          <button id="theme-toggle" class="hidden sm:block p-2 rounded-full hover:bg-gray-800 text-gray-400 hover:text-white transition" title="Toggle Theme">
+          <button id="theme-toggle" class="hidden sm:flex p-2 rounded-full hover:bg-gray-800 text-gray-400 hover:text-white transition" title="Toggle Theme">
             <i data-lucide="sun" class="w-5 h-5 block dark:hidden"></i>
             <i data-lucide="moon" class="w-5 h-5 hidden dark:block"></i>
           </button>
 
-          <!-- Profile / Login (desktop only) -->
-          <div class="hidden sm:block relative auth-guest">
-            <a href="login.html" class="px-4 py-2 text-xs font-semibold tracking-wider rounded-lg bg-blue-600 hover:bg-blue-700 text-white transition">
+          <!-- Profile / Login -->
+          <div class="auth-guest">
+            <a href="login.html" class="hidden sm:inline-flex px-4 py-2 text-xs font-semibold tracking-wider rounded-lg bg-blue-600 hover:bg-blue-700 text-white transition">
               LOGIN
             </a>
+            <a href="login.html" class="sm:hidden p-2 rounded-full hover:bg-gray-800 text-gray-400 hover:text-white transition inline-flex" title="Login">
+              <i data-lucide="log-in" class="w-5 h-5"></i>
+            </a>
           </div>
-          <div class="hidden sm:flex relative auth-user items-center gap-2">
+          <div class="auth-user flex items-center flex-nowrap gap-0 sm:gap-2">
             <a href="dashboard.html" class="p-2 rounded-full hover:bg-gray-800 text-gray-400 hover:text-white transition" title="Dashboard">
               <i data-lucide="user" class="w-5 h-5"></i>
             </a>
