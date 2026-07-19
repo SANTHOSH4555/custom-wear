@@ -177,7 +177,7 @@
         document.getElementById("res-destination").textContent = `${order.shipping_address.city}, ${order.shipping_address.state}`;
         document.getElementById("res-payment-status").textContent = order.payment_status;
         document.getElementById("res-payment-status").className = `font-extrabold ${order.payment_status === 'Paid' ? 'text-green-400' : 'text-yellow-500'}`;
-        document.getElementById("res-total").textContent = `Rs. ${order.pricing.grandTotal.toFixed(2)}`;
+        document.getElementById("res-total").textContent = `Rs. ${order.pricing.grand_total.toFixed(2)}`;
 
         // Populate Items list
         const itemsContainer = document.getElementById("res-items");

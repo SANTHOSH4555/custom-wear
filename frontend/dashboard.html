@@ -279,7 +279,7 @@
       o.items.forEach((item, index) => {
         message += `${index + 1}. *${item.name}* (x${item.quantity}) - Size: ${item.size} - Color: ${item.color}\n`;
       });
-      message += `\n*Total Amount:* Rs. ${o.pricing.grandTotal}\n`;
+      message += `\n*Total Amount:* Rs. ${o.pricing.grand_total}\n`;
       message += `*Status:* ${o.status}\n`;
       message += `*Payment:* ${o.payment_status}`;
       return `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
@@ -350,7 +350,7 @@
               </div>
               <div class="text-right">
                 <span class="text-[9px] text-gray-500 font-bold uppercase tracking-widest">Total Bill</span>
-                <h4 class="font-extrabold text-xs text-white mt-0.5">Rs. ${o.pricing.grandTotal}</h4>
+                <h4 class="font-extrabold text-xs text-white mt-0.5">Rs. ${o.pricing.grand_total}</h4>
               </div>
             </div>
 

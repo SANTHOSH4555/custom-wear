@@ -364,7 +364,7 @@
         message += `   - Price: Rs. ${item.price * item.quantity}\n\n`;
       });
       
-      message += `*Total Amount:* Rs. ${order.pricing.grandTotal.toFixed(2)}\n`;
+      message += `*Total Amount:* Rs. ${order.pricing.grand_total.toFixed(2)}\n`;
       message += `*Payment Method:* UPI\n`;
       message += `*Payment Status:* Paid\n\n`;
       message += `Please process my order. Thank you!`;
@@ -389,7 +389,7 @@
         
         // Open success view overlay
         document.getElementById("success-order-id").textContent = generatedOrder.id;
-        document.getElementById("success-amount").textContent = `Rs. ${generatedOrder.pricing.grandTotal.toFixed(2)}`;
+        document.getElementById("success-amount").textContent = `Rs. ${generatedOrder.pricing.grand_total.toFixed(2)}`;
         
         // Generate WhatsApp link
         const waLink = getWhatsAppLink(generatedOrder);
