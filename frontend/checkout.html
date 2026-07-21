@@ -135,36 +135,67 @@
     </div>
   </main>
 
-  <!-- UPI Payment Simulation Modal -->
+  <!-- UPI Payment Modal -->
   <div id="upi-payment-modal" class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 backdrop-blur-sm px-4 hidden">
-    <div class="glass-card max-w-sm w-full rounded-2xl p-6 relative border border-gray-800 flex flex-col items-center text-center">
-      <h3 class="font-extrabold text-sm tracking-wider uppercase mb-2">UPI Transaction Portal</h3>
-      <span id="pay-order-id" class="text-[9px] text-gray-500 font-bold uppercase tracking-widest mb-6">Order ID: ORD-12345</span>
+    <div class="glass-card max-w-sm w-full rounded-2xl p-6 relative border border-gray-700 flex flex-col items-center text-center" style="background: linear-gradient(135deg, rgba(15,23,42,0.98) 0%, rgba(17,24,39,0.98) 100%); box-shadow: 0 25px 60px rgba(0,0,0,0.7), 0 0 0 1px rgba(99,102,241,0.15);">
       
+      <!-- Header -->
+      <div class="flex items-center gap-2 mb-1">
+        <div class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></div>
+        <h3 class="font-extrabold text-sm tracking-wider uppercase text-white">UPI Payment Portal</h3>
+      </div>
+      <span id="pay-order-id" class="text-[9px] text-indigo-400 font-bold uppercase tracking-widest mb-4">Order ID: ORD-12345</span>
+
+      <!-- Amount Badge -->
+      <div id="pay-amount-badge" class="mb-4 px-5 py-2 rounded-full text-sm font-black text-white" style="background: linear-gradient(135deg, #4f46e5, #7c3aed); box-shadow: 0 4px 15px rgba(79,70,229,0.4);">Pay Rs. 0</div>
+
       <!-- Scannable QR -->
-      <div class="bg-white p-3 rounded-xl shadow-lg border border-gray-100 mb-6 relative">
-        <img id="upi-qr-image" src="" alt="UPI Pay QR" class="w-48 h-48 object-contain">
-        <div class="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-blue-600 text-white rounded px-2.5 py-0.5 text-[9px] font-bold shadow tracking-widest uppercase">
-          7708374473
+      <div class="bg-white p-3 rounded-2xl shadow-2xl border-2 border-indigo-200 mb-4 relative">
+        <img id="upi-qr-image" src="" alt="UPI Pay QR" class="w-44 h-44 object-contain">
+        <div class="absolute -bottom-3 left-1/2 -translate-x-1/2 bg-indigo-600 text-white rounded-full px-3 py-1 text-[9px] font-bold shadow-lg tracking-widest uppercase whitespace-nowrap">
+          📱 7708374473
         </div>
       </div>
-      
-      <p class="text-xs text-gray-400 max-w-[250px] leading-relaxed mb-6">
-        Scan the QR code above with Google Pay, PhonePe, Paytm, or SuperMoney to pay.
+
+      <p class="text-[10px] text-gray-500 max-w-[240px] leading-relaxed mb-4 mt-1">
+        Scan QR or tap an app below to pay directly.
       </p>
 
-      <!-- App links simulation -->
-      <div class="grid grid-cols-2 gap-2 w-full mb-6 text-[10px] font-bold">
-        <button onclick="simulateAppClick('Google Pay')" class="flex items-center justify-center gap-1.5 p-2 bg-gray-900 border border-gray-800 hover:border-gray-600 rounded-lg transition"><i data-lucide="smartphone" class="w-3.5 h-3.5"></i> Google Pay</button>
-        <button onclick="simulateAppClick('PhonePe')" class="flex items-center justify-center gap-1.5 p-2 bg-gray-900 border border-gray-800 hover:border-gray-600 rounded-lg transition"><i data-lucide="smartphone" class="w-3.5 h-3.5"></i> PhonePe</button>
-        <button onclick="simulateAppClick('Paytm')" class="flex items-center justify-center gap-1.5 p-2 bg-gray-900 border border-gray-800 hover:border-gray-600 rounded-lg transition"><i data-lucide="smartphone" class="w-3.5 h-3.5"></i> Paytm</button>
-        <button onclick="simulateAppClick('SuperMoney')" class="flex items-center justify-center gap-1.5 p-2 bg-gray-900 border border-gray-800 hover:border-gray-600 rounded-lg transition"><i data-lucide="smartphone" class="w-3.5 h-3.5"></i> SuperMoney</button>
+      <!-- Real UPI App Deep Links -->
+      <div class="grid grid-cols-2 gap-2 w-full mb-4">
+        <a id="gpay-link" href="#" onclick="openUpiApp('gpay', event)" class="upi-app-btn flex items-center justify-center gap-2 py-3 px-2 rounded-xl text-[11px] font-bold text-white transition-all duration-200 cursor-pointer" style="background: linear-gradient(135deg, #1a73e8, #0d47a1); box-shadow: 0 4px 12px rgba(26,115,232,0.35);">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12l-6.869 4.326-2.96-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.829.941z"/></svg>
+          Google Pay
+        </a>
+        <a id="phonepe-link" href="#" onclick="openUpiApp('phonepe', event)" class="upi-app-btn flex items-center justify-center gap-2 py-3 px-2 rounded-xl text-[11px] font-bold text-white transition-all duration-200 cursor-pointer" style="background: linear-gradient(135deg, #5f259f, #3d1068); box-shadow: 0 4px 12px rgba(95,37,159,0.35);">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><circle cx="12" cy="12" r="12"/><path d="M16.5 8.5h-2.7l-3.8 4.5V8.5H8.5V15h2l.8-1h2.2c1.1 0 2-.9 2-2v-1.5c0-.55-.45-1-1-1z" fill="#5f259f"/></svg>
+          PhonePe
+        </a>
+        <a id="paytm-link" href="#" onclick="openUpiApp('paytm', event)" class="upi-app-btn flex items-center justify-center gap-2 py-3 px-2 rounded-xl text-[11px] font-bold text-white transition-all duration-200 cursor-pointer" style="background: linear-gradient(135deg, #00baf2, #0082c3); box-shadow: 0 4px 12px rgba(0,186,242,0.35);">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><rect width="24" height="24" rx="4" fill="#00baf2"/><text x="3" y="17" font-size="11" font-weight="bold" fill="white" font-family="Arial">P</text></svg>
+          Paytm
+        </a>
+        <a id="bhim-link" href="#" onclick="openUpiApp('bhim', event)" class="upi-app-btn flex items-center justify-center gap-2 py-3 px-2 rounded-xl text-[11px] font-bold text-white transition-all duration-200 cursor-pointer" style="background: linear-gradient(135deg, #ff6600, #cc4400); box-shadow: 0 4px 12px rgba(255,102,0,0.35);">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><circle cx="12" cy="12" r="12" fill="#ff6600"/><text x="6" y="16" font-size="9" font-weight="bold" fill="white" font-family="Arial">BHIM</text></svg>
+          BHIM UPI
+        </a>
       </div>
 
-      <!-- Simulator Button -->
-      <button onclick="confirmSimulatedPayment()" class="w-full py-3 bg-green-600 hover:bg-green-700 text-white font-bold rounded-xl text-xs transition shadow-lg flex items-center justify-center gap-2">
-        <i data-lucide="check-circle" class="w-4 h-4"></i> Simulate Payment Success
+      <!-- Step indicator shown after app click -->
+      <div id="payment-waiting" class="hidden w-full mb-3 p-3 rounded-xl text-[10px] text-center" style="background: rgba(99,102,241,0.1); border: 1px solid rgba(99,102,241,0.3);">
+        <div class="flex items-center justify-center gap-2 text-indigo-300 font-semibold">
+          <div class="w-3 h-3 border-2 border-indigo-400 border-t-transparent rounded-full animate-spin"></div>
+          Waiting for payment confirmation...
+        </div>
+        <p class="text-gray-500 mt-1">Complete payment in your UPI app, then tap below.</p>
+      </div>
+
+      <!-- I've Paid Confirmation Button -->
+      <button id="ive-paid-btn" onclick="confirmPaymentDone()" class="w-full py-3.5 text-white font-black rounded-xl text-xs transition-all duration-300 flex items-center justify-center gap-2 shadow-xl" style="background: linear-gradient(135deg, #16a34a, #15803d); box-shadow: 0 6px 20px rgba(22,163,74,0.4);">
+        <i data-lucide="check-circle-2" class="w-4 h-4"></i> I've Completed Payment
       </button>
+
+      <p class="text-[9px] text-gray-600 mt-2">After payment, tap above to confirm & notify seller via WhatsApp</p>
     </div>
   </div>
 
@@ -315,117 +346,173 @@
         // Fetch UPI payment details
         const payDetails = await apiRequest(`/orders/${generatedOrder.id}/pay`, "POST");
         
+        // Store UPI deep link globally for app buttons
+        currentUpiLink = payDetails.upi_link;
+        
         // Update UI
         document.getElementById("pay-order-id").textContent = `Order ID: ${generatedOrder.id}`;
         document.getElementById("upi-qr-image").src = payDetails.qr_code_url;
+        document.getElementById("pay-amount-badge").textContent = `Pay Rs. ${generatedOrder.pricing.grand_total.toFixed(2)}`;
+        
+        // Reset payment state
+        paymentAppClicked = false;
+        document.getElementById("payment-waiting").classList.add("hidden");
+        const ivePaidBtn = document.getElementById("ive-paid-btn");
+        ivePaidBtn.style.transform = "";
         
         // Show UPI QR Modal
         hidePageLoader();
         document.getElementById("upi-payment-modal").classList.remove("hidden");
+        lucide.createIcons();
       } catch (err) {
         hidePageLoader();
         showToast(err.message, "error");
       }
     }
 
-    function simulateAppClick(app) {
-      showToast(`Redirecting to ${app} UPI App (Simulation)...`, "success");
-      // Simulate confirmation automatically after 2s
+    // Store UPI link globally
+    let currentUpiLink = null;
+    let paymentAppClicked = false;
+
+    function openUpiApp(app, event) {
+      event.preventDefault();
+      if (!currentUpiLink) {
+        showToast("Payment details not loaded yet. Please wait.", "error");
+        return;
+      }
+
+      // Build per-app deep link using the universal UPI scheme
+      let deepLink = currentUpiLink;
+
+      // App-specific intent URIs (Android deep links)
+      const appSchemes = {
+        gpay:    currentUpiLink.replace("upi://", "tez://"),  // Google Pay uses tez://
+        phonepe: currentUpiLink,  // PhonePe supports standard upi://
+        paytm:   currentUpiLink,  // Paytm supports standard upi://
+        bhim:    currentUpiLink   // BHIM supports standard upi://
+      };
+
+      deepLink = appSchemes[app] || currentUpiLink;
+
+      showToast(`Opening ${app === 'gpay' ? 'Google Pay' : app === 'phonepe' ? 'PhonePe' : app === 'paytm' ? 'Paytm' : 'BHIM UPI'}...`, "success");
+
+      // Attempt to open the UPI app via deep link
+      window.location.href = deepLink;
+
+      // After redirect attempt, show the waiting + "I've Paid" state
+      paymentAppClicked = true;
       setTimeout(() => {
-        confirmSimulatedPayment();
-      }, 2000);
+        document.getElementById("payment-waiting").classList.remove("hidden");
+        const ivePaidBtn = document.getElementById("ive-paid-btn");
+        ivePaidBtn.style.background = "linear-gradient(135deg, #15803d, #166534)";
+        ivePaidBtn.style.boxShadow = "0 6px 25px rgba(22,163,74,0.55)";
+        ivePaidBtn.style.transform = "scale(1.02)";
+      }, 1500);
     }
 
-    function getWhatsAppLink(order) {
-      const number = "917708374473";
-      let message = `*NEW ORDER CONFIRMED!* 🛍️\n\n`;
-      message += `*Order ID:* ${order.id}\n`;
-      message += `*Customer:* ${order.shipping_address.name}\n`;
-      message += `*Phone:* ${order.shipping_address.phone}\n`;
-      message += `*Email:* ${order.shipping_address.email}\n\n`;
-      
-      message += `*Shipping Address:*\n`;
-      message += `${order.shipping_address.address}, ${order.shipping_address.city}, ${order.shipping_address.district}, ${order.shipping_address.state} - ${order.shipping_address.pin}\n\n`;
-      
-      message += `*Items Ordered:*\n`;
-      order.items.forEach((item, index) => {
-        message += `${index + 1}. *${item.name}* (x${item.quantity})\n`;
-        message += `   - Size: ${item.size}\n`;
-        message += `   - Color: ${item.color}\n`;
+    function buildWhatsAppMessage(order) {
+      const now = new Date();
+      const dateStr = now.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
+      const timeStr = now.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" });
+
+      let msg = `🛍️ *NEW ORDER RECEIVED!*\n`;
+      msg += `━━━━━━━━━━━━━━━━━━━━━\n\n`;
+      msg += `📦 *Order ID:* \`${order.id}\`\n`;
+      msg += `📅 *Date & Time:* ${dateStr} at ${timeStr}\n\n`;
+
+      msg += `👤 *CUSTOMER DETAILS*\n`;
+      msg += `Name: ${order.shipping_address.name}\n`;
+      msg += `Phone: ${order.shipping_address.phone}\n`;
+      msg += `Email: ${order.shipping_address.email}\n\n`;
+
+      msg += `📍 *SHIPPING ADDRESS*\n`;
+      msg += `${order.shipping_address.address}\n`;
+      msg += `${order.shipping_address.city}, ${order.shipping_address.district}\n`;
+      msg += `${order.shipping_address.state} - ${order.shipping_address.pin}\n\n`;
+
+      msg += `🛒 *ITEMS ORDERED*\n`;
+      msg += `━━━━━━━━━━━━━━━━━━━━━\n`;
+      order.items.forEach((item, idx) => {
+        msg += `\n${idx + 1}. *${item.name}*\n`;
+        msg += `   Qty: ${item.quantity} | Size: ${item.size} | Color: ${item.color}\n`;
+        if (item.print_style) msg += `   Print: ${item.print_style}\n`;
+        if (item.gsm) msg += `   GSM: ${item.gsm}\n`;
         if (item.customization) {
-          message += `   - Custom Type: ${item.customization.type}\n`;
-          if (item.customization.text) {
-            message += `   - Custom Text: "${item.customization.text}"\n`;
-          }
-          if (item.customization.image_uploaded === "Yes (Custom Graphic)") {
-            message += `   - Custom Graphic: Uploaded\n`;
-          }
+          msg += `   🎨 Custom Type: ${item.customization.type}\n`;
+          if (item.customization.text) msg += `   Custom Text: "${item.customization.text}"\n`;
+          if (item.customization.image_uploaded === "Yes (Custom Graphic)") msg += `   Custom Graphic: ✅ Uploaded\n`;
         }
-        message += `   - Price: Rs. ${item.price * item.quantity}\n\n`;
+        msg += `   💰 Price: Rs. ${(item.price * item.quantity).toFixed(2)}\n`;
       });
-      
-      message += `*Total Amount:* Rs. ${order.pricing.grand_total.toFixed(2)}\n`;
-      message += `*Payment Method:* UPI\n`;
-      message += `*Payment Status:* Paid\n\n`;
-      message += `Please process my order. Thank you!`;
-      
-      return `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
+
+      msg += `\n━━━━━━━━━━━━━━━━━━━━━\n`;
+      msg += `*BILL SUMMARY*\n`;
+      if (order.pricing.discount > 0) msg += `Discount: -Rs. ${order.pricing.discount.toFixed(2)}\n`;
+      if (order.pricing.shipping > 0) msg += `Shipping: Rs. ${order.pricing.shipping.toFixed(2)}\n`;
+      msg += `✅ *Total Paid: Rs. ${order.pricing.grand_total.toFixed(2)}*\n`;
+      msg += `💳 Payment: UPI | Status: *PAID*\n`;
+      msg += `━━━━━━━━━━━━━━━━━━━━━\n`;
+      msg += `Please confirm and process this order. Thank you! 🙏`;
+
+      return msg;
     }
 
-    async function confirmSimulatedPayment() {
+    async function confirmPaymentDone() {
       if (!generatedOrder) return;
-      
+
       showPageLoader();
       try {
-        const response = await apiRequest(`/orders/${generatedOrder.id}/pay`, "POST", { 
-          simulate_success: true 
-        });
-        
-        // Success flow
-        saveLocalCart([]); // Clear local cart
-        
+        // Mark order as paid in backend
+        await apiRequest(`/orders/${generatedOrder.id}/pay`, "POST", { simulate_success: true });
+
+        saveLocalCart([]);
         hidePageLoader();
         document.getElementById("upi-payment-modal").classList.add("hidden");
-        
-        // Open success view overlay
+
+        // Fill success overlay
         document.getElementById("success-order-id").textContent = generatedOrder.id;
         document.getElementById("success-amount").textContent = `Rs. ${generatedOrder.pricing.grand_total.toFixed(2)}`;
-        
-        // Generate WhatsApp link
-        const waLink = getWhatsAppLink(generatedOrder);
-        
-        // Ensure success container has a button to manually notify if popups are blocked
+
+        // Build WhatsApp owner notification link
+        const ownerNumber = "917708374473";
+        const waMessage = buildWhatsAppMessage(generatedOrder);
+        const waLink = `https://wa.me/${ownerNumber}?text=${encodeURIComponent(waMessage)}`;
+
+        // Inject WhatsApp button into success overlay
         const successContainer = document.getElementById("success-overlay").firstElementChild;
         let waBtn = document.getElementById("whatsapp-notify-btn");
         if (!waBtn) {
           waBtn = document.createElement("a");
           waBtn.id = "whatsapp-notify-btn";
-          waBtn.className = "w-full py-4 bg-green-600 hover:bg-green-700 text-white font-bold rounded-xl text-sm transition shadow-lg flex items-center justify-center gap-2 mb-3 cursor-pointer";
-          waBtn.innerHTML = `<i data-lucide="message-square" class="w-5 h-5"></i> Send Order Details to Seller`;
+          waBtn.className = "w-full py-4 text-white font-bold rounded-xl text-sm transition shadow-lg flex items-center justify-center gap-2 mb-3 cursor-pointer";
+          waBtn.style.cssText = "background: linear-gradient(135deg, #25d366, #128c7e); box-shadow: 0 6px 20px rgba(37,211,102,0.4);";
+          waBtn.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg> Notify Seller via WhatsApp`;
           const trackBtn = successContainer.querySelector("button");
           successContainer.insertBefore(waBtn, trackBtn);
-          lucide.createIcons();
         }
         waBtn.href = waLink;
         waBtn.target = "_blank";
-        
-        // Update track order button to point to the new public tracker
+
+        // Update track order button
         const trackBtn = successContainer.querySelector("button");
         if (trackBtn) {
           trackBtn.onclick = () => {
             window.location.href = `track-order.html?id=${generatedOrder.id}&contact=${encodeURIComponent(generatedOrder.shipping_address.email)}`;
           };
         }
-        
+
         document.getElementById("success-overlay").classList.remove("hidden");
-        
-        // Auto-redirect/open tab after rendering overlay
+        lucide.createIcons();
+
+        // AUTO open WhatsApp to notify owner
         setTimeout(() => {
           window.open(waLink, "_blank");
-        }, 100);
+        }, 800);
+
+        showToast("Order confirmed! Notifying seller via WhatsApp... ✅", "success");
       } catch (err) {
         hidePageLoader();
-        showToast(err.message, "error");
+        showToast(err.message || "Payment confirmation failed.", "error");
       }
     }
   </script>
