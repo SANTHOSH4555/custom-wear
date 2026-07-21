@@ -72,6 +72,10 @@ const PRODUCTS_DATA = [
       {
         "name": "Navy Blue",
         "image": "assets/images/cw-m-bomber-jackets_navy-blue.jpeg"
+      },
+      {
+        "name": "Black",
+        "image": "assets/images/cw-m-bomber-jackets_black.jpeg"
       }
     ],
     "sizes": [
