@@ -591,6 +591,14 @@ const PRODUCTS_DATA = [
       "Fit Type": "Premium Streetwear Fit"
     },
     "description": "Crafted from 100% genuine Supima cotton. Heavyweight 240 GSM, combed and ring-spun interlock knit. Featuring a luxurious bio-washed finish for unmatched softness and long-lasting fabric integrity.",
+    "wash_care": [
+      "Machine wash cold (30°C)",
+      "Wash inside out with similar colors",
+      "Do not bleach",
+      "Tumble dry low or line dry",
+      "Warm iron if needed (avoid printed areas)",
+      "Do not dry clean"
+    ],
     "rating": 4.9,
     "stock": 80
   }

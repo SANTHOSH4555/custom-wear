@@ -77,7 +77,7 @@
 
       <!-- Right Column: Interactive Selectors -->
       <div class="flex-1 flex flex-col justify-between">
-        
+      
         <div>
           <!-- Brand Badge -->
           <span id="product-brand" class="text-xs font-black uppercase text-blue-400 tracking-wider bg-blue-600/10 px-3 py-1.5 rounded-full inline-block mb-3"></span>
@@ -170,6 +170,16 @@
       <h2 class="text-xl font-bold mb-6 border-b border-gray-800 pb-2">Technical Specifications</h2>
       <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 bg-gray-900/40 p-6 rounded-2xl border border-gray-800/60" id="specifications-box">
         <!-- JS Injected -->
+      </div>
+    </section>
+
+    <!-- Wash Care Section -->
+    <section class="mb-16" id="wash-care-section" style="display:none;">
+      <h2 class="text-xl font-bold mb-6 border-b border-gray-800 pb-2">Wash & Care Instructions</h2>
+      <div class="bg-gray-900/40 p-6 rounded-2xl border border-gray-800/60">
+        <ul id="wash-care-list" class="flex flex-col gap-3">
+          <!-- JS Injected -->
+        </ul>
       </div>
     </section>
 
@@ -349,6 +359,23 @@
         item.innerHTML = `<span class="text-[10px] text-gray-500 uppercase font-black tracking-widest">${k}</span><span class="text-xs font-semibold mt-1 text-white">${v}</span>`;
         specsBox.appendChild(item);
       });
+
+      // Wash Care Instructions
+      const washSection = document.getElementById("wash-care-section");
+      const washList = document.getElementById("wash-care-list");
+      if (currentProduct.wash_care && currentProduct.wash_care.length > 0) {
+        washSection.style.display = "";
+        washList.innerHTML = "";
+        const icons = ["droplets", "rotate-ccw", "ban", "wind", "thermometer", "x-circle"];
+        currentProduct.wash_care.forEach((instruction, i) => {
+          const li = document.createElement("li");
+          li.className = "flex items-center gap-3 text-sm text-gray-300";
+          li.innerHTML = `<i data-lucide="${icons[i] || 'check'}" class="w-4 h-4 text-blue-400 shrink-0"></i><span>${instruction}</span>`;
+          washList.appendChild(li);
+        });
+      } else {
+        washSection.style.display = "none";
+      }
 
       // Hide or show Auth form for reviews
       const addReviewSec = document.getElementById("add-review-section");
