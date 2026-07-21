@@ -26,6 +26,10 @@ const PRODUCTS_DATA = [
       {
         "name": "Olive Green",
         "image": "assets/images/cw-m-3-4th-oversized-t-shirts_olive-green.jpeg"
+      },
+      {
+        "name": "Black",
+        "image": "assets/images/cw-m-3-4th-oversized-t-shirts_black.jpeg"
       }
     ],
     "sizes": [
@@ -126,6 +130,10 @@ const PRODUCTS_DATA = [
       {
         "name": "White",
         "image": "assets/images/cw-m-mens-long-sleevet-t-shirt_white.jpeg"
+      },
+      {
+        "name": "Black",
+        "image": "assets/images/cw-m-mens-long-sleevet-t-shirt_black.jpeg"
       }
     ],
     "sizes": [
@@ -195,6 +203,10 @@ const PRODUCTS_DATA = [
       {
         "name": "White",
         "image": "assets/images/cw-m-mens-round-neck-t-shirt_white.png"
+      },
+      {
+        "name": "Black",
+        "image": "assets/images/cw-m-mens-round-neck-t-shirt_black.jpeg"
       }
     ],
     "sizes": [
@@ -249,6 +261,10 @@ const PRODUCTS_DATA = [
       {
         "name": "Olive Green",
         "image": "assets/images/cw-m-normal-hoodie_olive-green.jpeg"
+      },
+      {
+        "name": "Black",
+        "image": "assets/images/cw-m-normal-hoodie_black.jpeg"
       }
     ],
     "sizes": [
@@ -303,6 +319,10 @@ const PRODUCTS_DATA = [
       {
         "name": "White",
         "image": "assets/images/cw-m-oversized-hoodies_white.jpeg"
+      },
+      {
+        "name": "Black",
+        "image": "assets/images/cw-m-oversized-hoodies_black.jpeg"
       }
     ],
     "sizes": [
@@ -353,6 +373,10 @@ const PRODUCTS_DATA = [
       {
         "name": "Navy Blue",
         "image": "assets/images/cw-m-sweat-shirt_navy-blue.jpeg"
+      },
+      {
+        "name": "Black",
+        "image": "assets/images/cw-m-sweat-shirt_black.jpeg"
       }
     ],
     "sizes": [
