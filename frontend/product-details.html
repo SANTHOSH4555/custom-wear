@@ -154,10 +154,11 @@
           <!-- Color selection -->
           <div class="mb-6">
             <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">Color: <span id="selected-color-name" class="text-white normal-case font-medium ml-1"></span></h3>
-            <div class="flex items-center gap-3 overflow-x-auto pb-1" id="color-circles-container">
+            <div class="flex items-center gap-4 overflow-x-auto py-3 px-2" id="color-circles-container">
               <!-- JS Injected Circles -->
             </div>
           </div>
+
 
           <!-- Size Selection -->
           <div class="mb-6">
@@ -390,8 +391,8 @@
       currentProduct.colors.forEach((c, idx) => {
         const hex = COLOR_HEX_MAP[c.name] || "#3b82f6";
         const item = document.createElement("button");
-        item.className = `w-10 h-10 rounded-full border-2 transition-all duration-200 hover:scale-110 focus:outline-none relative flex items-center justify-center shrink-0 ${
-          c.name === selectedColor ? 'border-blue-500 ring-2 ring-blue-500/50 scale-110' : 'border-gray-700 hover:border-gray-400'
+        item.className = `w-9 h-9 rounded-full border-2 transition-all duration-200 focus:outline-none shrink-0 ${
+          c.name === selectedColor ? 'border-blue-500 ring-2 ring-blue-500 ring-offset-2 ring-offset-gray-950 scale-105' : 'border-gray-700 hover:border-gray-400'
         }`;
         item.style.backgroundColor = hex;
         item.title = c.name;
@@ -401,11 +402,11 @@
           document.getElementById("main-product-image").src = c.image;
           
           document.querySelectorAll("#color-circles-container button").forEach(sw => {
-            sw.classList.remove("border-blue-500", "ring-2", "ring-blue-500/50", "scale-110");
+            sw.classList.remove("border-blue-500", "ring-2", "ring-blue-500", "ring-offset-2", "ring-offset-gray-950", "scale-105");
             sw.classList.add("border-gray-700");
           });
           item.classList.remove("border-gray-700");
-          item.classList.add("border-blue-500", "ring-2", "ring-blue-500/50", "scale-110");
+          item.classList.add("border-blue-500", "ring-2", "ring-blue-500", "ring-offset-2", "ring-offset-gray-950", "scale-105");
 
           // Sync gallery thumbnails under main photo
           document.querySelectorAll("#product-thumbnails button").forEach((t, tIdx) => {
