@@ -46,8 +46,11 @@
           <a href="index.html" class="hover:text-blue-400 transition">Home</a>
           <a href="custom-wear.html" class="hover:text-blue-400 transition">CUSTOM WEAR</a>
           <a href="cradance.html" class="hover:text-blue-400 transition">CRADANCE</a>
-          <a href="custom-printing.html" class="hover:text-blue-400 transition">Custom Printing</a>
+          <a href="custom-printing.html" class="hover:text-blue-400 transition flex items-center gap-1">
+            <i data-lucide="sparkles" class="w-4 h-4 text-amber-400"></i> Custom Printing
+          </a>
           <a href="products.html" class="hover:text-blue-400 transition">Shop All</a>
+          <a href="contact.html" class="hover:text-blue-400 transition">Contact Us</a>
         </div>
         <div class="flex items-center space-x-4">
           <a href="cart.html" class="p-2 rounded-full hover:bg-gray-800 text-gray-400 hover:text-white transition relative">
@@ -55,10 +58,27 @@
             <span class="cart-count-badge absolute -top-1 -right-1 bg-blue-600 text-white rounded-full text-[10px] w-4 h-4 flex items-center justify-center font-bold hidden">0</span>
           </a>
           <a href="dashboard.html" class="p-2 rounded-full hover:bg-gray-800 text-gray-400 hover:text-white transition"><i data-lucide="user" class="w-5 h-5"></i></a>
+          <button id="mobile-menu-btn" onclick="toggleMobileMenu()" class="lg:hidden p-2 rounded-xl hover:bg-gray-800 text-gray-400 hover:text-white transition ml-1" aria-label="Open menu">
+            <i data-lucide="menu" class="w-6 h-6" id="mobile-menu-icon"></i>
+          </button>
         </div>
       </div>
     </div>
+    <!-- Mobile Menu Drawer -->
+    <div id="mobile-menu" class="lg:hidden hidden bg-gray-950/95 backdrop-blur-xl border-t border-gray-800/60">
+      <div class="px-4 pt-3 pb-5 space-y-3 font-medium text-sm">
+        <a href="index.html" class="block py-2 px-3 rounded-lg hover:bg-gray-800/60 text-gray-200">Home</a>
+        <a href="custom-wear.html" class="block py-2 px-3 rounded-lg hover:bg-gray-800/60 text-gray-200">CUSTOM WEAR</a>
+        <a href="cradance.html" class="block py-2 px-3 rounded-lg hover:bg-gray-800/60 text-gray-200">CRADANCE</a>
+        <a href="custom-printing.html" class="block py-2 px-3 rounded-lg hover:bg-gray-800/60 text-blue-400 font-semibold flex items-center gap-2">
+          <i data-lucide="sparkles" class="w-4 h-4 text-amber-400"></i> Custom Printing Canvas
+        </a>
+        <a href="products.html" class="block py-2 px-3 rounded-lg hover:bg-gray-800/60 text-gray-200">Shop All</a>
+        <a href="contact.html" class="block py-2 px-3 rounded-lg hover:bg-gray-800/60 text-gray-200">Contact Us</a>
+      </div>
+    </div>
   </nav>
+
 
   <!-- Product Details Layout -->
   <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
@@ -68,6 +88,16 @@
       <div class="flex-1 flex flex-col gap-4">
         <div class="zoom-wrapper aspect-[3/4] rounded-2xl bg-gray-900 border border-gray-800 overflow-hidden relative flex items-center justify-center">
           <img id="main-product-image" src="" alt="Main Product" class="w-full h-full object-cover" onerror="if(currentProduct && currentProduct.cover_image && this.src !== currentProduct.cover_image){ this.src=currentProduct.cover_image; } else { this.src='assets/images/brand_logo.jpeg'; }">
+          <!-- Swipe hint — only visible on touch, fades out after first swipe -->
+          <div id="swipe-hint" class="absolute inset-0 flex items-center justify-between px-4 pointer-events-none lg:hidden" style="opacity:1; transition:opacity 0.4s;">
+            <div class="flex items-center justify-center rounded-full" style="width:36px;height:36px;background:rgba(0,0,0,0.45);backdrop-filter:blur(6px);">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+            </div>
+            <span class="text-[10px] font-bold text-white/70 tracking-widest uppercase absolute left-1/2 -translate-x-1/2 bottom-3" style="text-shadow:0 1px 4px rgba(0,0,0,0.8);">Swipe for colours</span>
+            <div class="flex items-center justify-center rounded-full" style="width:36px;height:36px;background:rgba(0,0,0,0.45);backdrop-filter:blur(6px);">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+            </div>
+          </div>
         </div>
         <!-- Thumbnails of alternate colors -->
         <div id="product-thumbnails" class="flex gap-3 overflow-x-auto py-2">
@@ -226,12 +256,27 @@
       </div>
     </section>
 
-  </main>
+  <!-- Mobile sticky CTA bar -->
+  <div class="mobile-cta-bar lg:hidden">
+    <div class="flex-1 min-w-0">
+      <div class="text-[10px] text-gray-500 uppercase font-bold tracking-wider">Price</div>
+      <div id="mobile-live-price" class="text-base font-black text-white">Rs. 0</div>
+    </div>
+    <div class="flex items-center gap-2">
+      <button onclick="triggerAddToCart()" class="p-3.5 rounded-xl font-bold text-xs bg-gray-900 border border-gray-800 text-white flex items-center justify-center">
+        <i data-lucide="shopping-bag" class="w-4 h-4"></i>
+      </button>
+      <button onclick="triggerBuyNow()" class="px-5 py-3.5 rounded-xl font-bold text-xs text-white flex items-center justify-center gap-1.5" style="background:var(--accent); box-shadow:0 4px 16px rgba(124,58,237,0.4);">
+        <i data-lucide="credit-card" class="w-4 h-4"></i> Buy Now
+      </button>
+    </div>
+  </div>
 
   <!-- Footer -->
   <footer class="bg-gray-950 border-t border-gray-900 py-8 text-center text-xs text-gray-500 mt-20">
     &copy; 2026 CUSTOM WEAR & CRADANCE. All rights reserved.
   </footer>
+
 
   <script src="js/products-data.js"></script>
   <script src="js/app.js"></script>
@@ -398,11 +443,78 @@
         addReviewSec.style.display = "none";
       }
 
+      // Render photo gallery thumbnails
+      const thumbContainer = document.getElementById("product-thumbnails");
+      if (thumbContainer && currentProduct.colors) {
+        thumbContainer.innerHTML = "";
+        currentProduct.colors.forEach((c, idx) => {
+          const thumb = document.createElement("button");
+          thumb.className = `w-14 h-16 rounded-xl overflow-hidden border-2 shrink-0 transition ${c.name === selectedColor ? 'border-blue-500 ring-2 ring-blue-500/40' : 'border-gray-800 hover:border-gray-600'}`;
+          thumb.innerHTML = `<img src="${c.image}" alt="${c.name}" class="w-full h-full object-cover">`;
+          thumb.addEventListener("click", () => {
+            selectedColor = c.name;
+            document.getElementById("selected-color-name").textContent = selectedColor;
+            document.getElementById("main-product-image").src = c.image;
+            document.querySelectorAll("#product-thumbnails button").forEach(b => b.classList.remove("border-blue-500", "ring-2", "ring-blue-500/40"));
+            thumb.classList.add("border-blue-500", "ring-2", "ring-blue-500/40");
+          });
+          thumbContainer.appendChild(thumb);
+        });
+      }
+
+      // Initialize image swipe gesture
+      initImageSwipe();
+
       // Initial review items fetch
       fetchReviews();
 
       updatePrice();
-      lucide.createIcons();
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function initImageSwipe() {
+      const img = document.getElementById("main-product-image");
+      if (!img) return;
+      let touchStartX = 0;
+      let touchEndX = 0;
+
+      img.addEventListener("touchstart", (e) => {
+        touchStartX = e.changedTouches[0].screenX;
+      }, { passive: true });
+
+      img.addEventListener("touchend", (e) => {
+        touchEndX = e.changedTouches[0].screenX;
+        if (!currentProduct || !currentProduct.colors || currentProduct.colors.length <= 1) return;
+        const diff = touchEndX - touchStartX;
+        if (Math.abs(diff) < 40) return;
+
+        const currentIdx = currentProduct.colors.findIndex(c => c.name === selectedColor);
+        let nextIdx = currentIdx;
+        if (diff < 0) {
+          nextIdx = (currentIdx + 1) % currentProduct.colors.length;
+        } else {
+          nextIdx = (currentIdx - 1 + currentProduct.colors.length) % currentProduct.colors.length;
+        }
+
+        const nextColor = currentProduct.colors[nextIdx];
+        if (nextColor) {
+          selectedColor = nextColor.name;
+          document.getElementById("selected-color-name").textContent = selectedColor;
+          img.src = nextColor.image;
+
+          document.querySelectorAll(".color-swatch-thumb").forEach((sw, idx) => {
+            if (idx === nextIdx) {
+              sw.classList.add("border-blue-500", "ring-2", "ring-blue-500/50", "scale-105");
+              sw.classList.remove("border-gray-700");
+            } else {
+              sw.classList.remove("border-blue-500", "ring-2", "ring-blue-500/50", "scale-105");
+              sw.classList.add("border-gray-700");
+            }
+          });
+          const hint = document.getElementById("swipe-hint");
+          if (hint) hint.style.opacity = "0";
+        }
+      }, { passive: true });
     }
 
     function selectPrintStyle(style) {
@@ -432,13 +544,18 @@
         }
       }
       
-      document.getElementById("live-price").textContent = `Rs. ${price}`;
+      const totalPrice = price * quantity;
+      document.getElementById("live-price").textContent = `Rs. ${totalPrice}`;
+      const mobPrice = document.getElementById("mobile-live-price");
+      if (mobPrice) mobPrice.textContent = `Rs. ${totalPrice}`;
     }
 
     function adjustQty(amount) {
       quantity = Math.max(1, quantity + amount);
       document.getElementById("qty-value").textContent = quantity;
+      updatePrice();
     }
+
 
     function triggerAddToCart() {
       if (!currentProduct) return;

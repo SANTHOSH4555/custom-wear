@@ -42,12 +42,38 @@
           <img src="assets/images/brand_logo.jpeg" alt="Logo" class="h-10 w-10 rounded-full border border-blue-500">
           <span class="font-extrabold text-xl tracking-wider text-blue-500">CW & CRADANCE</span>
         </a>
+        <div class="hidden md:flex items-center space-x-6 text-sm font-medium">
+          <a href="index.html" class="hover:text-blue-400 transition">Home</a>
+          <a href="custom-wear.html" class="hover:text-blue-400 transition">CUSTOM WEAR</a>
+          <a href="cradance.html" class="hover:text-blue-400 transition">CRADANCE</a>
+          <a href="custom-printing.html" class="hover:text-blue-400 transition flex items-center gap-1">
+            <i data-lucide="sparkles" class="w-4 h-4 text-amber-400"></i> Custom Printing
+          </a>
+          <a href="products.html" class="hover:text-blue-400 transition">Shop All</a>
+        </div>
         <div class="flex items-center space-x-4">
           <a href="index.html" class="hover:text-blue-400 text-xs font-bold transition">Back to Home</a>
+          <button id="mobile-menu-btn" onclick="toggleMobileMenu()" class="lg:hidden p-2 rounded-xl hover:bg-gray-800 text-gray-400 hover:text-white transition ml-1" aria-label="Open menu">
+            <i data-lucide="menu" class="w-6 h-6" id="mobile-menu-icon"></i>
+          </button>
         </div>
       </div>
     </div>
+    <!-- Mobile Menu Drawer -->
+    <div id="mobile-menu" class="lg:hidden hidden bg-gray-950/95 backdrop-blur-xl border-t border-gray-800/60">
+      <div class="px-4 pt-3 pb-5 space-y-3 font-medium text-sm">
+        <a href="index.html" class="block py-2 px-3 rounded-lg hover:bg-gray-800/60 text-gray-200">Home</a>
+        <a href="custom-wear.html" class="block py-2 px-3 rounded-lg hover:bg-gray-800/60 text-gray-200">CUSTOM WEAR</a>
+        <a href="cradance.html" class="block py-2 px-3 rounded-lg hover:bg-gray-800/60 text-gray-200">CRADANCE</a>
+        <a href="custom-printing.html" class="block py-2 px-3 rounded-lg hover:bg-gray-800/60 text-blue-400 font-semibold flex items-center gap-2">
+          <i data-lucide="sparkles" class="w-4 h-4 text-amber-400"></i> Custom Printing Canvas
+        </a>
+        <a href="products.html" class="block py-2 px-3 rounded-lg hover:bg-gray-800/60 text-gray-200">Shop All</a>
+        <a href="contact.html" class="block py-2 px-3 rounded-lg hover:bg-gray-800/60 text-gray-200">Contact Us</a>
+      </div>
+    </div>
   </nav>
+
 
   <!-- Login/Register Card -->
   <main class="max-w-md w-full px-4 py-10" data-aos="zoom-in">

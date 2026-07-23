@@ -386,7 +386,75 @@ button:active, [role="button"]:active {
 
 @media (max-width: 1023px) {
   .mobile-cta-bar { display: flex; gap: 10px; align-items: center; }
-  body { padding-bottom: 78px; }
+  body:has(.mobile-cta-bar), body.has-mobile-cta { padding-bottom: 78px; }
+}
+
+/* Touch-optimized resize handles for Canvas customizer */
+.resize-handle {
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  background: var(--accent);
+  border: 2px solid white;
+  border-radius: 50%;
+  bottom: -12px;
+  right: -12px;
+  cursor: se-resize;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  touch-action: none;
+}
+.resize-handle::after {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid white;
+  border-bottom: 2px solid white;
+}
+
+/* Canvas Mobile Quick Controls Toolbar */
+.canvas-mobile-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  overflow-x: auto;
+  padding: 8px 12px;
+  background: rgba(17, 17, 24, 0.92);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border-mid);
+  border-radius: 16px;
+  width: 100%;
+  max-width: 512px;
+  margin-top: 10px;
+}
+.canvas-mobile-toolbar button {
+  min-height: 38px;
+  padding: 0 10px;
+  font-size: 11px;
+  font-weight: 700;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #e2e8f0;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.15s ease;
+}
+.canvas-mobile-toolbar button:active {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: #fff;
+}
+.canvas-mobile-toolbar button.active {
+  background: var(--accent);
+  border-color: var(--accent-mid);
+  color: #fff;
 }
 
 /* Slide-in filter drawer */
@@ -432,7 +500,7 @@ button:active, [role="button"]:active {
   .brand-pane-content p  { font-size: clamp(0.9rem, 4vw, 1.25rem); }
 }
 
-@media (max-width: 1023px) { #canvas-workspace { min-height: 300px; } }
+@media (max-width: 1023px) { #canvas-workspace { min-height: 280px; } }
 
 @media (hover: none) {
   .glass-card:hover { transform: none; box-shadow: 0 4px 32px rgba(0,0,0,0.5); }
@@ -442,6 +510,7 @@ button:active, [role="button"]:active {
 #mobile-menu {
   animation-duration: 0.2s;
   animation-timing-function: ease-out;
+  transition: max-height 0.3s ease, opacity 0.3s ease;
 }
 
 /* Order tracker */
@@ -472,3 +541,4 @@ button:active, [role="button"]:active {
 #garment-picker-grid::-webkit-scrollbar-thumb:hover {
   background: var(--accent);
 }
+

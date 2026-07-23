@@ -696,29 +696,6 @@
       lucide.createIcons();
     }
 
-    // Mobile menu toggle
-    function toggleMobileMenu() {
-      const menu = document.getElementById("mobile-menu");
-      const icon = document.getElementById("mobile-menu-icon");
-      const isHidden = menu.classList.toggle("hidden");
-      if (isHidden) {
-        icon.setAttribute("data-lucide", "menu");
-      } else {
-        icon.setAttribute("data-lucide", "x");
-      }
-      lucide.createIcons();
-    }
-
-    // Close mobile menu on resize above lg
-    window.addEventListener("resize", () => {
-      if (window.innerWidth >= 1024) {
-        const menu = document.getElementById("mobile-menu");
-        const icon = document.getElementById("mobile-menu-icon");
-        menu.classList.add("hidden");
-        icon.setAttribute("data-lucide", "menu");
-        lucide.createIcons();
-      }
-    });
 
     // Mobile logout button
     document.addEventListener("DOMContentLoaded", () => {

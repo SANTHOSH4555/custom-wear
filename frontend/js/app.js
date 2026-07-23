@@ -295,3 +295,35 @@ function saveShippingAddress(addr) {
 function getSavedAddresses() {
   return JSON.parse(localStorage.getItem("saved_addresses") || "[]");
 }
+
+// ─── Mobile Navigation Menu ─────────────────────────────────────────────
+function toggleMobileMenu() {
+  const menu = document.getElementById("mobile-menu");
+  const icon = document.getElementById("mobile-menu-icon");
+  if (!menu) return;
+  const isHidden = menu.classList.toggle("hidden");
+  if (icon) {
+    icon.setAttribute("data-lucide", isHidden ? "menu" : "x");
+    if (window.lucide && typeof window.lucide.createIcons === "function") {
+      window.lucide.createIcons();
+    }
+  }
+}
+
+// Close mobile menu on resize above lg (1024px)
+window.addEventListener("resize", () => {
+  if (window.innerWidth >= 1024) {
+    const menu = document.getElementById("mobile-menu");
+    const icon = document.getElementById("mobile-menu-icon");
+    if (menu && !menu.classList.contains("hidden")) {
+      menu.classList.add("hidden");
+      if (icon) {
+        icon.setAttribute("data-lucide", "menu");
+        if (window.lucide && typeof window.lucide.createIcons === "function") {
+          window.lucide.createIcons();
+        }
+      }
+    }
+  }
+});
+

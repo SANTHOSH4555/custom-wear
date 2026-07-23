@@ -132,8 +132,11 @@
           <a href="index.html" class="hover:text-blue-400 transition">Home</a>
           <a href="custom-wear.html" class="hover:text-blue-400 transition">CUSTOM WEAR</a>
           <a href="cradance.html" class="hover:text-blue-400 transition">CRADANCE</a>
-          <a href="custom-printing.html" class="text-blue-500 hover:text-blue-400 transition">Custom Printing</a>
+          <a href="custom-printing.html" class="text-blue-500 hover:text-blue-400 transition flex items-center gap-1">
+            <i data-lucide="sparkles" class="w-4 h-4 text-amber-400"></i> Custom Printing
+          </a>
           <a href="products.html" class="hover:text-blue-400 transition">Shop All</a>
+          <a href="contact.html" class="hover:text-blue-400 transition">Contact Us</a>
         </div>
         <div class="flex items-center space-x-4">
           <a href="cart.html" class="p-2 rounded-full hover:bg-gray-800 text-gray-400 hover:text-white transition relative">
@@ -141,10 +144,27 @@
             <span class="cart-count-badge absolute -top-1 -right-1 bg-blue-600 text-white rounded-full text-[10px] w-4 h-4 flex items-center justify-center font-bold hidden">0</span>
           </a>
           <a href="dashboard.html" class="p-2 rounded-full hover:bg-gray-800 text-gray-400 hover:text-white transition"><i data-lucide="user" class="w-5 h-5"></i></a>
+          <button id="mobile-menu-btn" onclick="toggleMobileMenu()" class="lg:hidden p-2 rounded-xl hover:bg-gray-800 text-gray-400 hover:text-white transition ml-1" aria-label="Open menu">
+            <i data-lucide="menu" class="w-6 h-6" id="mobile-menu-icon"></i>
+          </button>
         </div>
       </div>
     </div>
+    <!-- Mobile Menu Drawer -->
+    <div id="mobile-menu" class="lg:hidden hidden bg-gray-950/95 backdrop-blur-xl border-t border-gray-800/60">
+      <div class="px-4 pt-3 pb-5 space-y-3 font-medium text-sm">
+        <a href="index.html" class="block py-2 px-3 rounded-lg hover:bg-gray-800/60 text-gray-200">Home</a>
+        <a href="custom-wear.html" class="block py-2 px-3 rounded-lg hover:bg-gray-800/60 text-gray-200">CUSTOM WEAR</a>
+        <a href="cradance.html" class="block py-2 px-3 rounded-lg hover:bg-gray-800/60 text-gray-200">CRADANCE</a>
+        <a href="custom-printing.html" class="block py-2 px-3 rounded-lg hover:bg-gray-800/60 text-blue-400 font-semibold flex items-center gap-2">
+          <i data-lucide="sparkles" class="w-4 h-4 text-amber-400"></i> Custom Printing Canvas
+        </a>
+        <a href="products.html" class="block py-2 px-3 rounded-lg hover:bg-gray-800/60 text-gray-200">Shop All</a>
+        <a href="contact.html" class="block py-2 px-3 rounded-lg hover:bg-gray-800/60 text-gray-200">Contact Us</a>
+      </div>
+    </div>
   </nav>
+
 
   <!-- Main Canvas Designer Container -->
   <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -229,8 +249,22 @@
 
           </div>
         </div>
-        <p class="text-[10px] text-gray-500 mt-4 font-bold flex items-center gap-1">
-          <i data-lucide="info" class="w-3.5 h-3.5"></i> Drag handles to position, resize, or rotate text/graphics on the garment.
+        
+        <!-- Mobile Canvas Quick Toolbar -->
+        <div class="canvas-mobile-toolbar mt-3">
+          <button onclick="setActiveLayer('text')" id="tb-layer-text" class="active"><i data-lucide="type" class="w-3.5 h-3.5"></i> Text</button>
+          <button onclick="setActiveLayer('image')" id="tb-layer-image"><i data-lucide="image" class="w-3.5 h-3.5"></i> Image</button>
+          <div class="h-4 w-[1px] bg-gray-800 shrink-0 my-auto"></div>
+          <button onclick="adjustActiveScale(1.15)" title="Increase Size"><i data-lucide="zoom-in" class="w-3.5 h-3.5"></i> Size +</button>
+          <button onclick="adjustActiveScale(0.85)" title="Decrease Size"><i data-lucide="zoom-out" class="w-3.5 h-3.5"></i> Size -</button>
+          <button onclick="stepRotate(-15)" title="Rotate Counterclockwise"><i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> -15°</button>
+          <button onclick="stepRotate(15)" title="Rotate Clockwise"><i data-lucide="rotate-cw" class="w-3.5 h-3.5"></i> +15°</button>
+          <button onclick="centerActiveLayer()" title="Center horizontally"><i data-lucide="align-center" class="w-3.5 h-3.5"></i> Center</button>
+          <button onclick="resetActiveLayer()" class="text-red-400 hover:text-red-300" title="Clear layer"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Clear</button>
+        </div>
+
+        <p class="text-[10px] text-gray-500 mt-3 font-bold flex items-center gap-1">
+          <i data-lucide="info" class="w-3.5 h-3.5"></i> Drag handles or use quick buttons to edit text & graphics on garment.
         </p>
       </section>
 
@@ -301,6 +335,22 @@
     </div>
   </main>
 
+  <!-- Mobile sticky CTA bar -->
+  <div class="mobile-cta-bar lg:hidden">
+    <div class="flex-1 min-w-0">
+      <div class="text-[10px] text-gray-500 uppercase font-bold tracking-wider">Custom Item</div>
+      <div id="mobile-price-total" class="text-base font-black text-white">Rs. 0</div>
+    </div>
+    <button onclick="addCustomProductToCart()" class="flex-1 py-3.5 rounded-xl font-bold text-sm text-white flex items-center justify-center gap-2" style="background:var(--accent); box-shadow:0 4px 16px rgba(124,58,237,0.4);">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+      Add To Cart
+    </button>
+  </div>
+
+
+    </div>
+  </main>
+
   <!-- Footer -->
   <footer class="bg-gray-950 border-t border-gray-900 py-8 text-center text-xs text-gray-500 mt-20">
     &copy; 2026 CUSTOM WEAR & CRADANCE. All rights reserved.
@@ -350,8 +400,63 @@
       if (activeEl) {
         activeEl.classList.add("active");
         const currentRot = layerId === "text" ? textState.rotation : imageState.rotation;
-        document.getElementById("rotation-range").value = currentRot;
+        const rotInput = document.getElementById("rotation-range");
+        if (rotInput) rotInput.value = currentRot;
       }
+
+      // Update mobile toolbar button states
+      const tbText = document.getElementById("tb-layer-text");
+      const tbImage = document.getElementById("tb-layer-image");
+      if (tbText && tbImage) {
+        if (layerId === "text") {
+          tbText.classList.add("active");
+          tbImage.classList.remove("active");
+        } else {
+          tbImage.classList.add("active");
+          tbText.classList.remove("active");
+        }
+      }
+    }
+
+    // ── Mobile Toolbar Helpers ──
+    function adjustActiveScale(factor) {
+      const layer = document.getElementById(`${activeLayer}-layer`);
+      const state = activeLayer === "text" ? textState : imageState;
+      if (!layer) return;
+      state.width = Math.min(Math.max(40, Math.round(state.width * factor)), 260);
+      state.height = Math.min(Math.max(40, Math.round(state.height * factor)), 260);
+      layer.style.width = `${state.width}px`;
+      layer.style.height = `${state.height}px`;
+    }
+
+    function stepRotate(deg) {
+      const state = activeLayer === "text" ? textState : imageState;
+      let newRot = (state.rotation + deg) % 360;
+      if (newRot < 0) newRot += 360;
+      rotateDesign(newRot);
+      const rotInput = document.getElementById("rotation-range");
+      if (rotInput) rotInput.value = newRot;
+    }
+
+    function centerActiveLayer() {
+      const layer = document.getElementById(`${activeLayer}-layer`);
+      const state = activeLayer === "text" ? textState : imageState;
+      if (!layer) return;
+      state.left = 35;
+      layer.style.left = "35%";
+    }
+
+    function resetActiveLayer() {
+      if (activeLayer === "text") {
+        document.getElementById("custom-text-input").value = "";
+        updateTextElement();
+      } else {
+        const imageLayer = document.getElementById("image-layer");
+        if (imageLayer) imageLayer.classList.add("hidden");
+        document.getElementById("upload-image-input").value = "";
+        setActiveLayer("text");
+      }
+      showToast(`Cleared ${activeLayer} layer`, "success");
     }
 
     function loadCanvasData() {
@@ -393,11 +498,12 @@
       // Update workspace image
       updateGarmentWorkspaceImage();
       
-      lucide.createIcons();
+      if (window.lucide) lucide.createIcons();
     }
 
     function buildGarmentPicker(products) {
       const grid = document.getElementById("garment-picker-grid");
+      if (!grid) return;
       grid.innerHTML = "";
 
       products.forEach(p => {
@@ -485,9 +591,13 @@
       const markup = activeProduct.prices.printed - activeProduct.prices.plain;
       document.getElementById("price-printing-markup").textContent = `Rs. ${markup}`;
       document.getElementById("price-total").textContent = `Rs. ${activeProduct.prices.printed}`;
+      
+      const mobTotal = document.getElementById("mobile-price-total");
+      if (mobTotal) mobTotal.textContent = `Rs. ${activeProduct.prices.printed}`;
 
-      lucide.createIcons();
+      if (window.lucide) lucide.createIcons();
     }
+
 
     function updateGarmentWorkspaceImage() {
       if (!activeProduct) return;
