@@ -124,6 +124,18 @@
     </div>
   </main>
 
+  <!-- Mobile sticky checkout bar -->
+  <div class="mobile-cta-bar lg:hidden">
+    <div class="flex-1 min-w-0">
+      <div class="text-[10px] text-gray-500 uppercase font-bold">Total</div>
+      <div id="mobile-cart-total" class="text-base font-black text-white">Rs. 0</div>
+    </div>
+    <button onclick="proceedToCheckout()" class="flex-1 py-3.5 rounded-xl font-bold text-sm text-white flex items-center justify-center gap-2" style="background:var(--accent); box-shadow:0 4px 16px rgba(124,58,237,0.4);">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+      Checkout
+    </button>
+  </div>
+
   <!-- Footer -->
   <footer class="bg-gray-950 border-t border-gray-900 py-8 text-center text-xs text-gray-500 mt-20">
     &copy; 2026 CUSTOM WEAR & CRADANCE. All rights reserved.
@@ -197,9 +209,9 @@
             
             <!-- Qty Adjust -->
             <div class="flex items-center gap-2">
-              <button onclick="adjustCartItemQty(${idx}, -1)" class="w-8 h-8 rounded bg-gray-900 border border-gray-800 text-xs font-bold hover:border-gray-600 transition">-</button>
-              <span class="text-xs font-extrabold w-4 text-center">${item.quantity}</span>
-              <button onclick="adjustCartItemQty(${idx}, 1)" class="w-8 h-8 rounded bg-gray-900 border border-gray-800 text-xs font-bold hover:border-gray-600 transition">+</button>
+              <button onclick="adjustCartItemQty(${idx}, -1)" class="w-11 h-11 rounded bg-gray-900 border border-gray-800 text-sm font-bold hover:border-gray-600 transition flex items-center justify-center">−</button>
+              <span class="text-xs font-extrabold w-6 text-center">${item.quantity}</span>
+              <button onclick="adjustCartItemQty(${idx}, 1)" class="w-11 h-11 rounded bg-gray-900 border border-gray-800 text-sm font-bold hover:border-gray-600 transition flex items-center justify-center">+</button>
             </div>
             
             <!-- Remove -->

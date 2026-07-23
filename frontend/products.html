@@ -66,19 +66,57 @@
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
     
     <!-- Search and Sort Header -->
-    <div class="glass-card p-6 rounded-2xl mb-8 flex flex-col md:flex-row gap-4 items-center justify-between">
+    <div class="glass-card p-4 sm:p-6 rounded-2xl mb-6 flex flex-col sm:flex-row gap-3 items-center justify-between">
       <!-- Search Input with Auto Suggest -->
-      <div class="relative w-full md:max-w-md">
+      <div class="relative w-full sm:max-w-md">
         <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
           <i data-lucide="search" class="w-5 h-5"></i>
         </span>
-        <input type="text" id="search-input" placeholder="Search products, materials, hoodies..." class="glass-input pl-10 pr-4 py-3 rounded-xl w-full text-sm placeholder-gray-500 focus:outline-none">
-        
+        <input type="text" id="search-input" placeholder="Search products..." class="glass-input pl-10 pr-4 py-3 rounded-xl w-full text-sm placeholder-gray-500 focus:outline-none" style="min-height:48px;">
         <!-- Suggestions container -->
         <div id="suggestions-box" class="absolute left-0 top-full mt-2 w-full glass-card rounded-xl border border-gray-800 overflow-hidden z-20 hidden">
           <!-- Dynamically filled -->
         </div>
       </div>
+      <div class="flex items-center gap-2 w-full sm:w-auto">
+        <!-- Mobile filter toggle -->
+        <button onclick="openFilterDrawer()" class="lg:hidden flex items-center gap-2 px-4 py-3 rounded-xl glass-card border border-gray-700 text-xs font-bold shrink-0" style="min-height:48px;">
+          <i data-lucide="sliders-horizontal" class="w-4 h-4"></i> Filters
+        </button>
+        <label for="sort-select" class="text-xs text-gray-400 font-semibold shrink-0 hidden sm:block">SORT BY</label>
+        <select id="sort-select" class="glass-input px-3 py-3 rounded-xl text-xs font-semibold focus:outline-none bg-gray-900 border-gray-800 flex-1 sm:w-48" style="min-height:48px;">
+          <option value="popularity">Popularity</option>
+          <option value="newest">Newest</option>
+          <option value="price_asc">Price: Low–High</option>
+          <option value="price_desc">Price: High–Low</option>
+          <option value="rating">Rating</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Filter Drawer (mobile slide-in) -->
+    <div id="filter-drawer">
+      <div id="filter-drawer-backdrop" onclick="closeFilterDrawer()"></div>
+      <div id="filter-drawer-panel">
+        <div class="flex items-center justify-between mb-5 pb-4 border-b border-gray-800">
+          <h3 class="font-extrabold text-sm tracking-wider uppercase">Filters</h3>
+          <div class="flex items-center gap-4">
+            <button onclick="clearFilters()" class="text-xs text-violet-400 font-bold">Clear All</button>
+            <button onclick="closeFilterDrawer()" class="p-2 rounded-full hover:bg-gray-800 transition">
+              <i data-lucide="x" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+        <div id="filter-drawer-content">
+          <!-- Cloned from desktop filters by JS -->
+        </div>
+        <button onclick="closeFilterDrawer()" class="mt-6 w-full py-3.5 rounded-xl font-bold text-sm text-white" style="background:var(--accent);">
+          Show Results
+        </button>
+      </div>
+    </div>
+
+    <div class="flex flex-col lg:flex-row gap-8">
 
       <!-- Sorting -->
       <div class="flex items-center gap-2 w-full md:w-auto">
@@ -95,8 +133,8 @@
 
     <div class="flex flex-col lg:flex-row gap-8">
       
-      <!-- Side Filtering Pane -->
-      <aside class="w-full lg:w-64 shrink-0 flex flex-col gap-6">
+      <!-- Side Filtering Pane — hidden on mobile, shown in drawer -->
+      <aside class="hidden lg:block w-full lg:w-64 shrink-0 flex flex-col gap-6" id="desktop-filters">
         <div class="glass-card p-6 rounded-2xl border border-gray-800">
           <div class="flex items-center justify-between mb-6 pb-4 border-b border-gray-800">
             <h3 class="font-extrabold text-sm tracking-wider uppercase">Filters</h3>
@@ -513,6 +551,43 @@
     function closeQuickView() {
       const modal = document.getElementById("quickview-modal");
       modal.classList.add("hidden");
+    }
+
+    // ── Filter drawer (mobile) ──────────────────────────────
+    function openFilterDrawer() {
+      const drawer = document.getElementById("filter-drawer");
+      const drawerContent = document.getElementById("filter-drawer-content");
+      const desktopFilters = document.getElementById("desktop-filters");
+      // Clone desktop filter card into drawer
+      if (desktopFilters && drawerContent) {
+        drawerContent.innerHTML = desktopFilters.innerHTML;
+        // Re-attach listeners on cloned checkboxes
+        drawerContent.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+          cb.addEventListener("change", () => {
+            // Sync checked state back to desktop filters
+            const name = cb.name, value = cb.value;
+            const desktop = document.querySelector(`#desktop-filters input[name="${name}"][value="${value}"]`);
+            if (desktop) desktop.checked = cb.checked;
+            applyFilters();
+          });
+        });
+        drawerContent.querySelectorAll('input[type="range"]').forEach(r => {
+          r.addEventListener("input", (e) => {
+            const desktop = document.getElementById(r.id);
+            if (desktop) { desktop.value = e.target.value; }
+            document.getElementById("price-slider-value").textContent = `Rs. ${e.target.value}`;
+            applyFilters();
+          });
+        });
+      }
+      drawer.classList.add("open");
+      document.body.style.overflow = "hidden";
+      lucide.createIcons();
+    }
+
+    function closeFilterDrawer() {
+      document.getElementById("filter-drawer").classList.remove("open");
+      document.body.style.overflow = "";
     }
   </script>
 </body>

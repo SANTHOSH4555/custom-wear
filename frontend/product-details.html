@@ -141,16 +141,16 @@
           <div class="mb-8">
             <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">Quantity</h3>
             <div class="flex items-center gap-3">
-              <button onclick="adjustQty(-1)" class="w-10 h-10 rounded-xl bg-gray-900 border border-gray-800 text-sm font-bold flex items-center justify-center hover:border-gray-600 transition">-</button>
+              <button onclick="adjustQty(-1)" class="w-11 h-11 rounded-xl bg-gray-900 border border-gray-800 text-sm font-bold flex items-center justify-center hover:border-gray-600 transition">-</button>
               <span id="qty-value" class="text-sm font-extrabold w-8 text-center">1</span>
-              <button onclick="adjustQty(1)" class="w-10 h-10 rounded-xl bg-gray-900 border border-gray-800 text-sm font-bold flex items-center justify-center hover:border-gray-600 transition">+</button>
+              <button onclick="adjustQty(1)" class="w-11 h-11 rounded-xl bg-gray-900 border border-gray-800 text-sm font-bold flex items-center justify-center hover:border-gray-600 transition">+</button>
             </div>
           </div>
 
         </div>
 
-        <!-- Buttons Panel -->
-        <div class="flex flex-col sm:flex-row gap-4">
+        <!-- Buttons Panel (desktop: inline, mobile: sticky bar below) -->
+        <div class="hidden lg:flex flex-col sm:flex-row gap-4" id="desktop-cta-btns">
           <button onclick="triggerAddToCart()" class="flex-1 bg-gray-900 border border-gray-800 hover:bg-gray-800 font-bold py-4 rounded-xl transition flex items-center justify-center gap-2">
             <i data-lucide="shopping-bag" class="w-5 h-5"></i> Add to Cart
           </button>
@@ -159,6 +159,21 @@
           </button>
           <button id="customize-btn" onclick="triggerCustomize()" class="w-full sm:w-auto bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 font-bold py-4 px-6 rounded-xl shadow-lg transition flex items-center justify-center gap-2">
             <i data-lucide="palette" class="w-5 h-5"></i> Customize
+          </button>
+        </div>
+
+        <!-- Mobile: show inline too for medium screens where bar may be off -->
+        <div class="flex lg:hidden flex-col gap-3">
+          <div class="flex gap-3">
+            <button onclick="triggerAddToCart()" class="flex-1 bg-gray-900 border border-gray-800 font-bold py-3.5 rounded-xl transition flex items-center justify-center gap-2 text-sm">
+              <i data-lucide="shopping-bag" class="w-4 h-4"></i> Add to Cart
+            </button>
+            <button onclick="triggerBuyNow()" class="flex-1 font-bold py-3.5 rounded-xl shadow-lg transition flex items-center justify-center gap-2 text-sm text-white" style="background:var(--accent);">
+              <i data-lucide="credit-card" class="w-4 h-4"></i> Buy Now
+            </button>
+          </div>
+          <button id="customize-btn-mobile" onclick="triggerCustomize()" class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 font-bold py-3.5 rounded-xl shadow-lg transition flex items-center justify-center gap-2 text-sm">
+            <i data-lucide="palette" class="w-4 h-4"></i> Customize Design
           </button>
         </div>
 
@@ -257,9 +272,11 @@
 
       // Disable Customize button if product category is not custom printing friendly
       const customizeBtn = document.getElementById("customize-btn");
+      const customizeBtnMobile = document.getElementById("customize-btn-mobile");
       const btnStylePrinted = document.getElementById("btn-style-printed");
       if (currentProduct.brand === "CRADANCE" || currentProduct.category.toLowerCase().includes("pants") || currentProduct.category.toLowerCase().includes("joggers")) {
-        customizeBtn.style.display = "none";
+        if (customizeBtn) customizeBtn.style.display = "none";
+        if (customizeBtnMobile) customizeBtnMobile.style.display = "none";
         if (btnStylePrinted) {
           btnStylePrinted.style.display = "none";
           const printStyleGrid = document.querySelector("#print-style-wrapper .grid");
@@ -523,6 +540,44 @@
         showToast(err.message, "error");
       }
     }
+  </script>
+
+  <script>
+    // ── Touch swipe for main product image ─────────────────
+    (function() {
+      const imgEl = document.getElementById("main-product-image");
+      if (!imgEl) return;
+      let startX = 0, startY = 0;
+      imgEl.addEventListener("touchstart", e => {
+        startX = e.touches[0].clientX;
+        startY = e.touches[0].clientY;
+      }, { passive: true });
+      imgEl.addEventListener("touchend", e => {
+        const dx = e.changedTouches[0].clientX - startX;
+        const dy = e.changedTouches[0].clientY - startY;
+        if (Math.abs(dx) < 30 || Math.abs(dy) > Math.abs(dx)) return;
+        if (!currentProduct) return;
+        const colors = currentProduct.colors;
+        const curIdx = colors.findIndex(c => c.name === selectedColor);
+        const nextIdx = dx < 0
+          ? (curIdx + 1) % colors.length
+          : (curIdx - 1 + colors.length) % colors.length;
+        const next = colors[nextIdx];
+        selectedColor = next.name;
+        document.getElementById("main-product-image").src = next.image;
+        document.getElementById("selected-color-name").textContent = next.name;
+        // Update swatch highlight
+        document.querySelectorAll(".color-swatch-thumb").forEach((sw, i) => {
+          if (i === nextIdx) {
+            sw.classList.add("border-blue-500", "ring-2", "ring-blue-500/50", "scale-105");
+            sw.classList.remove("border-gray-700");
+          } else {
+            sw.classList.remove("border-blue-500", "ring-2", "ring-blue-500/50", "scale-105");
+            sw.classList.add("border-gray-700");
+          }
+        });
+      }, { passive: true });
+    })();
   </script>
 </body>
 </html>
