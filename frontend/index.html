@@ -92,11 +92,7 @@
             <i data-lucide="heart" class="w-5 h-5"></i>
           </a>
 
-          <!-- Theme Toggle (desktop only) -->
-          <button id="theme-toggle" class="hidden sm:flex p-2 rounded-full hover:bg-gray-800 text-gray-400 hover:text-white transition" title="Toggle Theme">
-            <i data-lucide="sun" class="w-5 h-5 block dark:hidden"></i>
-            <i data-lucide="moon" class="w-5 h-5 hidden dark:block"></i>
-          </button>
+
 
           <!-- Profile / Login -->
           <div class="auth-guest">
@@ -311,10 +307,15 @@
             </div>
 
             <!-- Centre badge -->
-            <div class="absolute inset-0 flex items-center justify-center pointer-events-none" style="z-index:10;">
-              <div class="rounded-full flex items-center justify-center shadow-2xl"
-                   style="width:52px; height:52px; background: linear-gradient(135deg,#7c3aed,#a78bfa); box-shadow: 0 0 0 4px rgba(124,58,237,0.25), 0 8px 24px rgba(124,58,237,0.5);">
-                <i data-lucide="printer" class="w-5 h-5 text-white"></i>
+            <div class="absolute inset-0 flex items-center justify-center" style="z-index:20; pointer-events:none;">
+              <div class="flex flex-col items-center justify-center rounded-2xl gap-1"
+                   style="padding: 10px 14px; background: rgba(10,8,18,0.82); border: 1px solid rgba(167,139,250,0.35); backdrop-filter: blur(12px); box-shadow: 0 8px 32px rgba(124,58,237,0.45);">
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
+                  <path d="M6 9V3a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v6"/>
+                  <rect x="6" y="14" width="12" height="8" rx="1"/>
+                </svg>
+                <span style="font-size:9px; font-weight:800; letter-spacing:0.12em; color:#c4b5fd; text-transform:uppercase; white-space:nowrap;">PRINT STUDIO</span>
               </div>
             </div>
 

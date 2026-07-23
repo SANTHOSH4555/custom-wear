@@ -68,6 +68,21 @@
       
       <!-- Left Column: Details Form -->
       <section class="flex-1">
+
+        <!-- Saved Address Quick-Fill Banner (shown only when a saved address exists) -->
+        <div id="saved-addr-banner" class="hidden mb-4 glass-card rounded-2xl border border-gray-800 overflow-hidden">
+          <div class="flex items-center justify-between px-5 py-3 border-b border-gray-800/60">
+            <div class="flex items-center gap-2">
+              <i data-lucide="map-pin" class="w-4 h-4 text-violet-400"></i>
+              <span class="text-xs font-bold text-white uppercase tracking-wider">Saved Addresses</span>
+            </div>
+            <button onclick="document.getElementById('saved-addr-list').classList.toggle('hidden')" class="text-[10px] text-gray-400 hover:text-white font-bold transition">SHOW / HIDE</button>
+          </div>
+          <div id="saved-addr-list" class="flex flex-col divide-y divide-gray-800/40">
+            <!-- Injected by JS -->
+          </div>
+        </div>
+
         <form onsubmit="handlePlaceOrder(event)" class="glass-card p-6 sm:p-8 rounded-2xl border border-gray-800 flex flex-col gap-6" data-aos="fade-up">
           
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -252,18 +267,69 @@
     function fillUserInfo() {
       const user = getCurrentUser();
       if (user) {
-        document.getElementById("ship-name").value = user.name || "";
+        document.getElementById("ship-name").value  = user.name  || "";
         document.getElementById("ship-email").value = user.email || "";
         document.getElementById("ship-phone").value = user.phone || "";
-        if (user.addresses && user.addresses.length > 0) {
-          const addr = user.addresses[0];
-          document.getElementById("ship-address").value = addr.address || "";
-          document.getElementById("ship-city").value = addr.city || "";
-          document.getElementById("ship-district").value = addr.district || "";
-          document.getElementById("ship-state").value = addr.state || "";
-          document.getElementById("ship-pin").value = addr.pin || "";
-        }
       }
+
+      // Try saved addresses from localStorage first (freshest data)
+      const saved = getSavedAddresses();
+      if (saved.length > 0) {
+        // Auto-fill form with most recent address
+        fillFromAddress(saved[0]);
+        // Render the banner with all saved addresses
+        renderSavedAddrBanner(saved);
+      } else if (user && user.addresses && user.addresses.length > 0) {
+        // Fall back to address stored in user object
+        fillFromAddress(user.addresses[0]);
+      }
+    }
+
+    function fillFromAddress(addr) {
+      if (!addr) return;
+      const set = (id, val) => { const el = document.getElementById(id); if (el) el.value = val || ""; };
+      set("ship-name",     addr.name);
+      set("ship-phone",    addr.phone);
+      set("ship-email",    addr.email);
+      set("ship-address",  addr.address);
+      set("ship-city",     addr.city);
+      set("ship-district", addr.district);
+      set("ship-state",    addr.state);
+      set("ship-pin",      addr.pin);
+    }
+
+    function renderSavedAddrBanner(addresses) {
+      const banner = document.getElementById("saved-addr-banner");
+      const list   = document.getElementById("saved-addr-list");
+      if (!banner || !list || addresses.length === 0) return;
+
+      banner.classList.remove("hidden");
+      list.innerHTML = "";
+
+      addresses.forEach((addr, idx) => {
+        const row = document.createElement("button");
+        row.type = "button";
+        row.className = "w-full text-left px-5 py-3.5 flex items-start justify-between gap-4 hover:bg-gray-800/40 transition group";
+        row.innerHTML = `
+          <div class="flex-1 min-w-0">
+            <p class="text-xs font-bold text-white truncate">${addr.name} &nbsp;<span class="text-gray-500 font-normal">${addr.phone || ""}</span></p>
+            <p class="text-[11px] text-gray-400 mt-0.5 truncate">${addr.address}, ${addr.city}, ${addr.state} — ${addr.pin}</p>
+          </div>
+          <span class="text-[10px] font-bold text-violet-400 shrink-0 group-hover:text-violet-300 transition mt-0.5">USE</span>
+        `;
+        row.addEventListener("click", () => {
+          fillFromAddress(addr);
+          showToast("Address filled in!", "success");
+          // Highlight active
+          list.querySelectorAll("button").forEach(b => b.classList.remove("bg-violet-600/10"));
+          row.classList.add("bg-violet-600/10");
+        });
+        // Auto-highlight first address
+        if (idx === 0) row.classList.add("bg-violet-600/10");
+        list.appendChild(row);
+      });
+
+      lucide.createIcons();
     }
 
     function loadCheckoutSummary() {
@@ -319,7 +385,8 @@
         pin: document.getElementById("ship-pin").value
       };
 
-      // Create update profile address on backend if user didn't have one
+      // Save address to localStorage immediately so it's available next time
+      saveShippingAddress(shipAddress);
       const user = getCurrentUser();
       if (user && (!user.addresses || user.addresses.length === 0)) {
         try {

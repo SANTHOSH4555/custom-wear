@@ -150,6 +150,16 @@ async function apiRequest(endpoint, method = "GET", body = null) {
     const res = await fetch(`${API_BASE_URL}${urlPath}`, config);
     const data = await res.json();
     if (!res.ok) {
+      // 401 = expired / invalid token — silently clear stale session
+      if (res.status === 401) {
+        localStorage.removeItem("auth_token");
+        localStorage.removeItem("user");
+        if (typeof syncNavbarAuth === "function") syncNavbarAuth();
+        // Throw a silent error (no toast — callers that need auth will redirect)
+        const err = new Error(data.message || "Session expired.");
+        err.isAuthError = true;
+        throw err;
+      }
       throw new Error(data.message || "Something went wrong!");
     }
     return data;
@@ -266,4 +276,22 @@ function createToastContainer() {
   container.className = "fixed bottom-5 right-5 z-[99999] flex flex-col gap-2";
   document.body.appendChild(container);
   return container;
+}
+
+// ─── Saved Addresses ───────────────────────────────────────────────────────
+// Saves a shipping address to localStorage (max 3, newest first, no duplicates)
+function saveShippingAddress(addr) {
+  if (!addr || !addr.name || !addr.address) return;
+  let saved = getSavedAddresses();
+  // Remove duplicate by matching name + pin + address
+  saved = saved.filter(a =>
+    !(a.name === addr.name && a.pin === addr.pin && a.address === addr.address)
+  );
+  saved.unshift(addr);          // newest first
+  saved = saved.slice(0, 3);    // keep max 3
+  localStorage.setItem("saved_addresses", JSON.stringify(saved));
+}
+
+function getSavedAddresses() {
+  return JSON.parse(localStorage.getItem("saved_addresses") || "[]");
 }

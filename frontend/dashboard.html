@@ -230,28 +230,59 @@
         const addrContainer = document.getElementById("addresses-container");
         addrContainer.innerHTML = "";
         
-        if (!user.addresses || user.addresses.length === 0) {
-          addrContainer.innerHTML = "<p class='text-xs text-gray-500 italic'>No saved addresses yet.</p>";
+        const backendAddresses = (user.addresses && user.addresses.length > 0) ? user.addresses : [];
+        const localAddresses   = getSavedAddresses();
+
+        // Merge: backend first, then any local-only ones not already in backend
+        const merged = [...backendAddresses];
+        localAddresses.forEach(la => {
+          const alreadyIn = merged.some(a =>
+            a.name === la.name && a.pin === la.pin && a.address === la.address
+          );
+          if (!alreadyIn) merged.push(la);
+        });
+
+        if (merged.length === 0) {
+          addrContainer.innerHTML = `
+            <div class="flex flex-col items-center py-10 text-center gap-3">
+              <div class="w-12 h-12 rounded-full bg-gray-800/60 flex items-center justify-center">
+                <i data-lucide="map-pin" class="w-5 h-5 text-gray-500"></i>
+              </div>
+              <p class="text-xs text-gray-500 italic">No saved addresses yet.<br>Complete a purchase and your address will appear here.</p>
+            </div>`;
+          lucide.createIcons();
           return;
         }
 
-        user.addresses.forEach(addr => {
+        merged.forEach((addr, idx) => {
+          const isLocal = !backendAddresses.some(a =>
+            a.name === addr.name && a.pin === addr.pin && a.address === addr.address
+          );
           const item = document.createElement("div");
-          item.className = "p-4 rounded-xl border border-gray-800 bg-gray-900/40 text-xs leading-relaxed text-gray-400 flex justify-between items-center";
+          item.className = "p-4 rounded-xl border border-gray-800 bg-gray-900/40 text-xs leading-relaxed text-gray-400 flex justify-between items-start gap-4";
           item.innerHTML = `
-            <div>
-              <p class="font-bold text-white mb-1">${addr.name}</p>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2 mb-1">
+                <p class="font-bold text-white">${addr.name}</p>
+                ${idx === 0 ? `<span class="text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full" style="background:rgba(124,58,237,0.15);color:#a78bfa;">Default</span>` : ""}
+                ${isLocal ? `<span class="text-[9px] font-bold text-gray-500 uppercase tracking-wider">Local</span>` : ""}
+              </div>
               <p>${addr.address}</p>
-              <p>${addr.city}, ${addr.district}, ${addr.state} - ${addr.pin}</p>
-              <p class="mt-1 font-bold">Phone: ${addr.phone}</p>
+              <p>${addr.city}${addr.district ? ", " + addr.district : ""}, ${addr.state} — ${addr.pin}</p>
+              <p class="mt-1 font-semibold text-gray-300">Phone: ${addr.phone || "—"}</p>
             </div>
-            <i data-lucide="map-pin" class="w-5 h-5 text-blue-500 shrink-0"></i>
+            <div class="flex flex-col items-end gap-2 shrink-0">
+              <i data-lucide="map-pin" class="w-4 h-4 text-violet-400"></i>
+              <button onclick="deleteLocalAddress(${idx})" class="text-[10px] text-red-400 hover:text-red-300 font-bold transition flex items-center gap-1">
+                <i data-lucide="trash-2" class="w-3 h-3"></i> Remove
+              </button>
+            </div>
           `;
           addrContainer.appendChild(item);
         });
         lucide.createIcons();
       } catch (err) {
-        showToast(err.message, "error");
+        if (!err.isAuthError) showToast(err.message, "error");
       }
     }
 
@@ -388,7 +419,7 @@
         });
         lucide.createIcons();
       } catch (err) {
-        showToast(err.message, "error");
+        if (!err.isAuthError) showToast(err.message, "error");
       }
     }
 
@@ -441,6 +472,31 @@
       toggleWishlist(id);
       loadWishlistData();
       showToast("Item removed from wishlist.", "success");
+    }
+
+    function deleteLocalAddress(idx) {
+      // Rebuild merged list the same way loadProfileData does, then remove by index
+      const user = getCurrentUser();
+      const backendAddresses = (user && user.addresses && user.addresses.length > 0) ? user.addresses : [];
+      const localAddresses   = getSavedAddresses();
+      const merged = [...backendAddresses];
+      localAddresses.forEach(la => {
+        const alreadyIn = merged.some(a =>
+          a.name === la.name && a.pin === la.pin && a.address === la.address
+        );
+        if (!alreadyIn) merged.push(la);
+      });
+
+      const target = merged[idx];
+      if (!target) return;
+
+      // Remove from localStorage saved_addresses
+      const updated = localAddresses.filter(a =>
+        !(a.name === target.name && a.pin === target.pin && a.address === target.address)
+      );
+      localStorage.setItem("saved_addresses", JSON.stringify(updated));
+      showToast("Address removed.", "success");
+      loadProfileData(); // re-render
     }
   </script>
 </body>
