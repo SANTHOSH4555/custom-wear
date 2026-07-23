@@ -151,9 +151,10 @@
 
       <!-- Scannable QR -->
       <div class="bg-white p-3 rounded-2xl shadow-2xl border-2 border-indigo-200 mb-4 relative">
-        <img id="upi-qr-image" src="" alt="UPI Pay QR" class="w-44 h-44 object-contain">
+        <!-- Generate QR code for UPI ID: insecurityo@okhdfcbank -->
+        <img id="upi-qr-image" src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=upi://pay?pa=insecurityo@okhdfcbank%26pn=Insecurity%20Office%26cu=INR" alt="UPI Pay QR" class="w-44 h-44 object-contain">
         <div class="absolute -bottom-3 left-1/2 -translate-x-1/2 bg-indigo-600 text-white rounded-full px-3 py-1 text-[9px] font-bold shadow-lg tracking-widest uppercase whitespace-nowrap">
-          📱 7708374473
+          UPI ID: insecurityo@okhdfcbank
         </div>
       </div>
 
@@ -351,7 +352,8 @@
         
         // Update UI
         document.getElementById("pay-order-id").textContent = `Order ID: ${generatedOrder.id}`;
-        document.getElementById("upi-qr-image").src = payDetails.qr_code_url;
+        // Static QR code - no need to update from backend
+        // document.getElementById("upi-qr-image").src = payDetails.qr_code_url;
         document.getElementById("pay-amount-badge").textContent = `Pay Rs. ${generatedOrder.pricing.grand_total.toFixed(2)}`;
         
         // Reset payment state
