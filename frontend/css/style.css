@@ -1,32 +1,48 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;800;900&family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
 
 :root {
+  --font-serif: 'Cinzel', serif;
   --font-heading: 'Outfit', sans-serif;
-  --font-body: 'Inter', sans-serif;
+  --font-body: 'Plus Jakarta Sans', sans-serif;
   
   --primary-light: #2563eb;
   --primary-dark: #3b82f6;
-  --bg-dark-glow: radial-gradient(circle at 50% 50%, #0f172a 0%, #020617 100%);
-  --glass-border: rgba(255, 255, 255, 0.05);
-  --glass-bg: rgba(10, 15, 30, 0.65);
-  --glass-bg-light: rgba(255, 255, 255, 0.75);
-  --glass-border-light: rgba(0, 0, 0, 0.06);
+  --gold-accent: #D4AF37;
+  --gold-light: #F3E5AB;
+  
+  --bg-obsidian: #09090b;
+  --bg-onyx: #121215;
+  --bg-dark-glow: radial-gradient(circle at 50% 0%, #1e1b4b 0%, #09090b 70%);
+  
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-bg: rgba(18, 18, 21, 0.75);
+  --glass-bg-hover: rgba(24, 24, 30, 0.85);
+  
+  --glass-bg-light: rgba(255, 255, 255, 0.82);
+  --glass-border-light: rgba(0, 0, 0, 0.08);
 }
 
 html {
   overflow-x: hidden;
   max-width: 100vw;
+  scroll-behavior: smooth;
 }
 
 body {
   font-family: var(--font-body);
+  background-color: var(--bg-obsidian);
+  color: #f4f4f5;
   overflow-x: hidden;
   max-width: 100vw;
-  transition: background-color 0.3s, color 0.3s;
+  transition: background-color 0.4s ease, color 0.4s ease;
 }
 
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-heading);
+}
+
+.font-serif-luxury {
+  font-family: var(--font-serif);
 }
 
 /* Glassmorphism Styles */

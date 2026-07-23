@@ -1,4 +1,6 @@
-const API_BASE_URL = "https://custom-wear.onrender.com";
+const API_BASE_URL = window.location.origin.includes("localhost") || window.location.origin.includes("127.0.0.1") || window.location.origin.includes(":5000")
+  ? window.location.origin
+  : "https://custom-wear.onrender.com";
 
 // Initialize system states
 document.addEventListener("DOMContentLoaded", () => {

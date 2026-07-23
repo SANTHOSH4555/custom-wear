@@ -1,5 +1,5 @@
 import os
-from flask import Flask, send_from_directory
+from flask import Flask, send_from_directory, jsonify
 from flask_cors import CORS
 from backend.config import Config
 from backend.routes.auth import auth_bp
@@ -21,6 +21,24 @@ app.register_blueprint(auth_bp, url_prefix="/api/auth")
 app.register_blueprint(products_bp, url_prefix="/api/products")
 app.register_blueprint(orders_bp, url_prefix="/api/orders")
 app.register_blueprint(admin_bp, url_prefix="/api/admin")
+
+# Security Headers Middleware
+@app.after_request
+def add_security_headers(response):
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "SAMEORIGIN"
+    response.headers["X-XSS-Protection"] = "1; mode=block"
+    response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    return response
+
+# Global Exception Handler
+@app.errorhandler(404)
+def not_found(e):
+    return jsonify({"message": "Resource not found"}), 404
+
+@app.errorhandler(500)
+def server_error(e):
+    return jsonify({"message": "An internal server error occurred"}), 500
 
 # Route custom prints uploads and invoices
 @app.route("/static/uploads/<path:filename>")
@@ -46,3 +64,4 @@ if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     print(f"CUSTOM WEAR & CRADANCE Server launching at http://localhost:{port}/")
     app.run(host="0.0.0.0", port=port, debug=True)
+

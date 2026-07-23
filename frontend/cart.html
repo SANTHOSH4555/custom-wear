@@ -177,7 +177,7 @@
         
         card.innerHTML = `
           <div class="flex items-center gap-4 w-full sm:w-auto">
-            <img src="${item.image || 'assets/images/brand_logo.jpeg'}" alt="${item.name}" class="h-16 w-16 object-cover rounded-xl border border-gray-800 shrink-0">
+            <img src="${item.image || 'assets/images/brand_logo.jpeg'}" alt="${item.name}" class="h-16 w-16 object-cover rounded-xl border border-gray-800 shrink-0" onerror="this.onerror=null; this.src='assets/images/brand_logo.jpeg';">
             <div>
               <h4 class="font-bold text-sm text-white">${item.name}</h4>
               <p class="text-[10px] text-gray-500 mt-1 uppercase font-semibold">

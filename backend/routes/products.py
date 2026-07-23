@@ -89,10 +89,13 @@ def add_review(product_id):
     user = g.current_user
     data = request.get_json() or {}
     rating = data.get("rating", 5)
-    comment = data.get("comment", "")
-    
+    comment = (data.get("comment", "") or "").strip()
     if not comment:
         return jsonify({"message": "Comment is required!"}), 400
+        
+    # Basic XSS sanitization
+    sanitized_comment = comment.replace("<", "&lt;").replace(">", "&gt;")
+    rating_val = max(1.0, min(float(rating), 5.0))
         
     product = db_manager.get_product(product_id)
     if not product:
@@ -102,8 +105,8 @@ def add_review(product_id):
         "product_id": product_id,
         "user_id": user["id"],
         "user_name": user["name"],
-        "rating": float(rating),
-        "comment": comment
+        "rating": rating_val,
+        "comment": sanitized_comment
     }
     
     review = db_manager.add_review(review_data)

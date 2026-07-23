@@ -37,19 +37,25 @@ def token_required(f):
 def generate_token(user_id):
     payload = {
         "user_id": user_id,
-        "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=Config.TOKEN_EXPIRATION_HOURS)
+        "exp": datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(hours=Config.TOKEN_EXPIRATION_HOURS)
     }
     return jwt.encode(payload, Config.SECRET_KEY, algorithm="HS256")
 
 @auth_bp.route("/register", methods=["POST"])
 def register():
     data = request.get_json() or {}
-    name = data.get("name")
-    email = data.get("email", "").strip().lower()
-    password = data.get("password")
+    name = (data.get("name") or "").strip()
+    email = (data.get("email") or "").strip().lower()
+    password = data.get("password") or ""
     
     if not name or not email or not password:
         return jsonify({"message": "Missing required fields (name, email, password)!"}), 400
+
+    if "@" not in email or "." not in email:
+        return jsonify({"message": "Please enter a valid email address!"}), 400
+
+    if len(password) < 6:
+        return jsonify({"message": "Password must be at least 6 characters long!"}), 400
         
     existing_user = db_manager.get_user_by_email(email)
     if existing_user:

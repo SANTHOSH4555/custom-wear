@@ -39,7 +39,8 @@ def create_order():
                     item_price = var["prices"]["plain"] if item.get("print_style", "plain").lower() == "plain" else var["prices"]["printed"]
                     break
                     
-        qty = int(item.get("quantity", 1))
+        qty = max(1, min(int(item.get("quantity", 1)), 100))
+        item["quantity"] = qty
         subtotal += item_price * qty
         
     # Apply coupon discount

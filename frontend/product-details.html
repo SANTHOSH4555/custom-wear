@@ -67,7 +67,7 @@
       <!-- Left Column: Gallery & Zoom -->
       <div class="flex-1 flex flex-col gap-4">
         <div class="zoom-wrapper aspect-[3/4] rounded-2xl bg-gray-900 border border-gray-800 overflow-hidden relative flex items-center justify-center">
-          <img id="main-product-image" src="" alt="Main Product" class="w-full h-full object-cover">
+          <img id="main-product-image" src="" alt="Main Product" class="w-full h-full object-cover" onerror="if(currentProduct && currentProduct.cover_image && this.src !== currentProduct.cover_image){ this.src=currentProduct.cover_image; } else { this.src='assets/images/brand_logo.jpeg'; }">
         </div>
         <!-- Thumbnails of alternate colors -->
         <div id="product-thumbnails" class="flex gap-3 overflow-x-auto py-2">
@@ -124,7 +124,7 @@
           <!-- Color selection -->
           <div class="mb-6">
             <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">Color: <span id="selected-color-name" class="text-white normal-case font-medium ml-1"></span></h3>
-            <div class="flex items-center gap-3" id="color-circles-container">
+            <div class="flex items-center gap-3 overflow-x-auto pb-1" id="color-circles-container">
               <!-- JS Injected Circles -->
             </div>
           </div>
@@ -299,36 +299,34 @@
         });
       }
 
-      // Colors Grid
+      // Colors Grid — thumbnail swatches showing actual dress image
       const circles = document.getElementById("color-circles-container");
       circles.innerHTML = "";
       currentProduct.colors.forEach(c => {
         const item = document.createElement("button");
-        // Create matching background colors
-        let bgStyle = c.name.toLowerCase();
-        if (bgStyle === "crimson red" || bgStyle === "red") bgStyle = "#dc2626";
-        else if (bgStyle === "navy blue") bgStyle = "#1e3a8a";
-        else if (bgStyle === "burgundy") bgStyle = "#800020";
-        else if (bgStyle === "beige") bgStyle = "#f5f5dc";
-        else if (bgStyle === "lavender" || bgStyle === "lilac") bgStyle = "#e6e6fa";
-        else if (bgStyle === "olive green" || bgStyle === "army green" || bgStyle === "sage green" || bgStyle === "forest green") bgStyle = "#556b2f";
-        else if (bgStyle === "charcoal gray" || bgStyle === "charcoal grey") bgStyle = "#36454f";
-        else if (bgStyle === "grey" || bgStyle === "grey melange") bgStyle = "#808080";
-        else if (bgStyle === "baby pink" || bgStyle === "dusty pink") bgStyle = "#ffc0cb";
-        else if (bgStyle === "white" || bgStyle === "off-white") bgStyle = "#ffffff";
-        else if (bgStyle === "black") bgStyle = "#000000";
-        
-        item.className = `color-circle w-8 h-8 rounded-full border border-gray-700/50 hover:scale-110 transition ${
-          c.name === selectedColor ? 'active ring-2 ring-blue-500' : ''
+        item.className = `color-swatch-thumb relative rounded-xl overflow-hidden border-2 transition-all duration-200 hover:scale-105 focus:outline-none ${
+          c.name === selectedColor ? 'border-blue-500 ring-2 ring-blue-500/50 scale-105' : 'border-gray-700 hover:border-gray-400'
         }`;
-        item.style.backgroundColor = bgStyle;
+        item.style.width = "56px";
+        item.style.height = "72px";
+        item.title = c.name;
+        item.innerHTML = `
+          <img src="${c.image}" alt="${c.name}"
+            class="w-full h-full object-cover"
+            onerror="this.src='assets/images/brand_logo.jpeg'">
+          <span class="absolute inset-0 bg-black/0 hover:bg-black/10 transition"></span>
+        `;
         item.addEventListener("click", () => {
           selectedColor = c.name;
           document.getElementById("selected-color-name").textContent = selectedColor;
           document.getElementById("main-product-image").src = c.image;
           
-          document.querySelectorAll(".color-circle").forEach(circle => circle.classList.remove("active", "ring-2", "ring-blue-500"));
-          item.classList.add("active", "ring-2", "ring-blue-500");
+          document.querySelectorAll(".color-swatch-thumb").forEach(sw => {
+            sw.classList.remove("border-blue-500", "ring-2", "ring-blue-500/50", "scale-105");
+            sw.classList.add("border-gray-700");
+          });
+          item.classList.remove("border-gray-700");
+          item.classList.add("border-blue-500", "ring-2", "ring-blue-500/50", "scale-105");
         });
         circles.appendChild(item);
       });

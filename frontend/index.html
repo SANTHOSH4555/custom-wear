@@ -552,14 +552,24 @@
       renderFeaturedProducts();
     });
     
-    function renderFeaturedProducts() {
+    async function renderFeaturedProducts() {
       const grid = document.getElementById("featured-products-grid");
-      if (!grid || typeof PRODUCTS_DATA === 'undefined') return;
+      if (!grid) return;
+      
+      let products = [];
+      try {
+        products = await apiRequest("/products");
+      } catch (e) {
+        if (typeof PRODUCTS_DATA !== 'undefined') products = PRODUCTS_DATA;
+      }
+      if (!products || !products.length) {
+        if (typeof PRODUCTS_DATA !== 'undefined') products = PRODUCTS_DATA;
+      }
       
       grid.innerHTML = "";
       
       // Get first 4 products
-      const featured = PRODUCTS_DATA.slice(0, 4);
+      const featured = (products || []).slice(0, 4);
       featured.forEach((p, idx) => {
         const card = document.createElement("div");
         card.className = "glass-card rounded-2xl overflow-hidden p-4 flex flex-col justify-between group cursor-pointer border border-white/5 hover:border-blue-500/20";
@@ -567,12 +577,14 @@
         card.setAttribute("data-aos-delay", `${idx * 100}`);
         card.setAttribute("onclick", `window.location.href='product-details.html?id=${p.id}'`);
         
+        const price = (p.prices && p.prices.plain) ? p.prices.plain : 0;
+        
         card.innerHTML = `
           <div class="zoom-wrapper rounded-xl aspect-[3/4] relative bg-gray-950/40 mb-4 flex items-center justify-center overflow-hidden">
-            <img src="${p.cover_image || 'assets/images/brand_logo.jpeg'}" alt="${p.name}" class="w-full h-full object-cover">
+            <img src="${p.cover_image || 'assets/images/brand_logo.jpeg'}" alt="${p.name}" class="w-full h-full object-cover" loading="lazy">
             <span class="absolute top-3 left-3 text-[9px] uppercase font-black px-2.5 py-1 rounded-md bg-blue-600/90 text-white tracking-widest backdrop-blur-md shadow-sm">${p.brand}</span>
-            <div class="absolute inset-0 bg-black/20 backdrop-blur-sm opacity-0 group-hover:opacity-100 flex items-center justify-center gap-2 transition duration-300">
-              <span class="p-3 rounded-full bg-blue-600 text-white font-bold shadow-lg hover:scale-110 transition duration-300">
+            <div class="absolute inset-0 opacity-0 group-hover:opacity-100 flex items-center justify-center gap-2 transition duration-300 pointer-events-none">
+              <span class="p-3 rounded-full bg-blue-600/90 text-white font-bold shadow-lg transform scale-90 group-hover:scale-100 transition duration-300">
                 <i data-lucide="eye" class="w-5 h-5"></i>
               </span>
             </div>
@@ -581,11 +593,11 @@
             <h4 class="font-bold text-sm tracking-wide text-white group-hover:text-blue-400 transition duration-300 truncate">${p.name}</h4>
             <div class="flex items-center justify-between mt-2">
               <span class="text-xs text-gray-400">${p.gender}'s ${p.category}</span>
-              <span class="text-sm font-bold text-blue-400">Rs. ${p.prices.plain}</span>
+              <span class="text-sm font-bold text-blue-400">Rs. ${price}</span>
             </div>
             <div class="flex items-center gap-1 mt-2 text-xs text-yellow-500">
               <i data-lucide="star" class="w-3 h-3 fill-current"></i>
-              <span class="text-gray-400 ml-1 font-semibold">${p.rating} (${p.stock} In Stock)</span>
+              <span class="text-gray-400 ml-1 font-semibold">${p.rating || 5.0} (${p.stock || 100} In Stock)</span>
             </div>
           </div>
         `;

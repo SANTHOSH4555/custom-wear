@@ -163,8 +163,8 @@
         card.innerHTML = `
           <div class="zoom-wrapper rounded-xl aspect-[3/4] relative bg-gray-950/40 mb-4 flex items-center justify-center overflow-hidden">
             <img src="${p.cover_image || 'assets/images/brand_logo.jpeg'}" alt="${p.name}" class="w-full h-full object-cover">
-            <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center gap-2 transition duration-300">
-              <span class="p-3 rounded-full bg-yellow-600 text-white font-bold shadow-lg">
+            <div class="absolute inset-0 opacity-0 group-hover:opacity-100 flex items-center justify-center gap-2 transition duration-300 pointer-events-none">
+              <span class="p-3 rounded-full bg-yellow-600 text-white font-bold shadow-lg transform scale-90 group-hover:scale-100 transition duration-300">
                 <i data-lucide="eye" class="w-5 h-5"></i>
               </span>
             </div>

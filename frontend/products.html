@@ -230,15 +230,25 @@
   <script>
     AOS.init({ duration: 800, once: true });
     
+    let activeProductsList = [];
     let activeSizeFilter = "";
-    
-    document.addEventListener("DOMContentLoaded", () => {
+
+    document.addEventListener("DOMContentLoaded", async () => {
       // Parse parameters from query URL
       const urlParams = new URLSearchParams(window.location.search);
       const genderParam = urlParams.get("gender");
       const brandParam = urlParams.get("brand");
       const categoryParam = urlParams.get("category");
       
+      try {
+        activeProductsList = await apiRequest("/products");
+      } catch(e) {
+        if (typeof PRODUCTS_DATA !== 'undefined') activeProductsList = PRODUCTS_DATA;
+      }
+      if (!activeProductsList || !activeProductsList.length) {
+        if (typeof PRODUCTS_DATA !== 'undefined') activeProductsList = PRODUCTS_DATA;
+      }
+
       if (genderParam) {
         const cb = document.querySelector(`input[name="gender-filter"][value="${genderParam}"]`);
         if (cb) cb.checked = true;
@@ -256,10 +266,11 @@
 
     function initCategoriesFilter(selectedCategory) {
       const box = document.getElementById("category-filter-box");
-      if (!box || typeof PRODUCTS_DATA === 'undefined') return;
+      if (!box) return;
       
+      const sourceData = (activeProductsList && activeProductsList.length) ? activeProductsList : (typeof PRODUCTS_DATA !== 'undefined' ? PRODUCTS_DATA : []);
       // Get unique categories
-      const categories = [...new Set(PRODUCTS_DATA.map(p => p.category))];
+      const categories = [...new Set(sourceData.map(p => p.category).filter(Boolean))];
       box.innerHTML = "";
       
       categories.forEach(cat => {
@@ -333,7 +344,8 @@
       }
       
       // Auto-suggest logic
-      const matches = PRODUCTS_DATA.filter(p => p.name.toLowerCase().includes(val)).slice(0, 5);
+      const sourceData = (activeProductsList && activeProductsList.length) ? activeProductsList : (typeof PRODUCTS_DATA !== 'undefined' ? PRODUCTS_DATA : []);
+      const matches = sourceData.filter(p => p.name && p.name.toLowerCase().includes(val)).slice(0, 5);
       if (matches.length > 0) {
         suggestions.innerHTML = "";
         matches.forEach(m => {
@@ -365,10 +377,10 @@
 
     function applyFilters() {
       const grid = document.getElementById("shop-products-grid");
-      if (!grid || typeof PRODUCTS_DATA === 'undefined') return;
+      if (!grid) return;
       
-      const search = document.getElementById("search-input").value.toLowerCase();
-      const maxPrice = parseInt(document.getElementById("price-range").value);
+      const search = (document.getElementById("search-input")?.value || "").toLowerCase();
+      const maxPrice = parseInt(document.getElementById("price-range")?.value || "2000");
       const ratingActive = document.getElementById("rating-filter")?.checked;
       
       // Selected Brands
@@ -383,39 +395,47 @@
       const catCbs = document.querySelectorAll('input[name="category-filter"]:checked');
       const selectedCats = Array.from(catCbs).map(cb => cb.value.toLowerCase());
       
-      let filtered = PRODUCTS_DATA.filter(p => {
+      const sourceData = (activeProductsList && activeProductsList.length) ? activeProductsList : (typeof PRODUCTS_DATA !== 'undefined' ? PRODUCTS_DATA : []);
+      let filtered = sourceData.filter(p => {
+        if (!p) return false;
         // Search
-        if (search && !p.name.toLowerCase().includes(search) && !p.description.toLowerCase().includes(search) && !p.category.toLowerCase().includes(search)) {
-          return false;
+        if (search) {
+          const nameStr = (p.name || "").toLowerCase();
+          const descStr = (p.description || "").toLowerCase();
+          const catStr = (p.category || "").toLowerCase();
+          if (!nameStr.includes(search) && !descStr.includes(search) && !catStr.includes(search)) {
+            return false;
+          }
         }
         // Max Price
-        if (p.prices.plain > maxPrice) return false;
+        const priceVal = (p.prices && typeof p.prices.plain === 'number') ? p.prices.plain : 0;
+        if (priceVal > maxPrice) return false;
         // Rating
-        if (ratingActive && p.rating < 4.0) return false;
+        if (ratingActive && (p.rating || 0) < 4.0) return false;
         // Brand
-        if (selectedBrands.length > 0 && !selectedBrands.includes(p.brand.toLowerCase())) return false;
+        if (selectedBrands.length > 0 && !selectedBrands.includes((p.brand || "").toLowerCase())) return false;
         // Gender
-        if (selectedGenders.length > 0 && !selectedGenders.includes(p.gender.toLowerCase())) return false;
+        if (selectedGenders.length > 0 && !selectedGenders.includes((p.gender || "").toLowerCase())) return false;
         // Category
-        if (selectedCats.length > 0 && !selectedCats.includes(p.category.toLowerCase())) return false;
+        if (selectedCats.length > 0 && !selectedCats.includes((p.category || "").toLowerCase())) return false;
         // Size
-        if (activeSizeFilter && !p.sizes.includes(activeSizeFilter)) return false;
+        if (activeSizeFilter && p.sizes && !p.sizes.includes(activeSizeFilter)) return false;
         
         return true;
       });
       
       // Sorting
-      const sortBy = document.getElementById("sort-select").value;
+      const sortBy = document.getElementById("sort-select")?.value || "popularity";
       if (sortBy === "newest") {
         filtered.reverse();
       } else if (sortBy === "price_asc") {
-        filtered.sort((a, b) => a.prices.plain - b.prices.plain);
+        filtered.sort((a, b) => ((a.prices && a.prices.plain) || 0) - ((b.prices && b.prices.plain) || 0));
       } else if (sortBy === "price_desc") {
-        filtered.sort((a, b) => b.prices.plain - a.prices.plain);
+        filtered.sort((a, b) => ((b.prices && b.prices.plain) || 0) - ((a.prices && a.prices.plain) || 0));
       } else if (sortBy === "rating") {
-        filtered.sort((a, b) => b.rating - a.rating);
+        filtered.sort((a, b) => (b.rating || 0) - (a.rating || 0));
       } else { // popularity
-        filtered.sort((a, b) => b.stock - a.stock);
+        filtered.sort((a, b) => (b.stock || 0) - (a.stock || 0));
       }
       
       renderProductsGrid(filtered);
@@ -445,7 +465,7 @@
         
         card.innerHTML = `
           <div onclick="window.location.href='product-details.html?id=${p.id}'" class="zoom-wrapper rounded-xl aspect-[3/4] relative bg-gray-950/40 mb-4 flex items-center justify-center overflow-hidden cursor-pointer">
-            <img src="${p.cover_image || 'assets/images/brand_logo.jpeg'}" alt="${p.name}" class="w-full h-full object-cover">
+            <img src="${p.cover_image || 'assets/images/brand_logo.jpeg'}" alt="${p.name}" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='assets/images/brand_logo.jpeg';">
             <span class="absolute top-2 left-2 text-[9px] uppercase font-black px-2 py-1 rounded ${
               p.brand === 'CRADANCE' ? 'bg-yellow-600 text-white' : 'bg-blue-600 text-white'
             } tracking-widest shadow-md">${p.brand}</span>
@@ -473,7 +493,8 @@
 
     // Quick View Logic
     function openQuickView(id) {
-      const p = PRODUCTS_DATA.find(x => x.id === id);
+      const sourceData = (activeProductsList && activeProductsList.length) ? activeProductsList : (typeof PRODUCTS_DATA !== 'undefined' ? PRODUCTS_DATA : []);
+      const p = sourceData.find(x => x.id === id);
       if (!p) return;
       
       document.getElementById("qv-image").src = p.cover_image || 'assets/images/brand_logo.jpeg';
