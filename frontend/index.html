@@ -16,10 +16,11 @@
         extend: {
           colors: {
             brand: {
-              blue: '#2563eb',
-              darkblue: '#1d4ed8',
-              darkbg: '#030712',
-              glass: 'rgba(17, 24, 39, 0.7)'
+              violet: '#7c3aed',
+              indigo: '#5b21b6',
+              gold:   '#d4a847',
+              darkbg: '#0a0a0f',
+              glass:  'rgba(14, 14, 22, 0.78)'
             }
           }
         }
@@ -56,7 +57,7 @@
         <!-- Logo -->
         <a href="index.html" class="flex items-center gap-2 sm:gap-3 shrink-0">
           <img src="assets/images/brand_logo.jpeg" alt="Logo" class="h-9 w-9 sm:h-10 sm:w-10 rounded-full border border-blue-500">
-          <span class="font-extrabold text-base sm:text-xl tracking-wider bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-indigo-400">
+          <span class="font-extrabold text-base sm:text-xl tracking-wider bg-clip-text text-transparent bg-gradient-to-r from-violet-400 to-purple-300">
             CW & CRADANCE
           </span>
         </a>
@@ -68,7 +69,7 @@
           <a href="cradance.html" class="hover:text-blue-400 transition">CRADANCE</a>
           <a href="products.html?gender=Men" class="hover:text-blue-400 transition">Men</a>
           <a href="products.html?gender=Women" class="hover:text-blue-400 transition">Women</a>
-          <a href="custom-printing.html" class="px-3 py-1 rounded-full bg-blue-600/20 border border-blue-500/30 text-blue-400 hover:bg-blue-600 hover:text-white transition">Custom Printing</a>
+          <a href="custom-printing.html" class="px-3 py-1 rounded-full bg-violet-600/20 border border-violet-500/30 text-violet-400 hover:bg-violet-600 hover:text-white transition">Custom Printing</a>
           <a href="products.html" class="hover:text-blue-400 transition">Shop All</a>
           <a href="track-order.html" class="hover:text-blue-400 transition">Track Order</a>
         </div>
@@ -185,8 +186,8 @@
         <h2 class="text-4xl sm:text-6xl font-black tracking-wider uppercase mb-2 group-hover:scale-105 transition duration-500">
           CUSTOM WEAR
         </h2>
-        <p class="text-lg sm:text-2xl text-blue-200 tracking-widest italic mb-6">"Wear Your Identity"</p>
-        <span class="px-6 py-3 rounded-full border border-white/30 bg-white/10 backdrop-blur text-sm font-semibold hover:bg-white hover:text-blue-950 transition duration-300">
+        <p class="text-lg sm:text-2xl tracking-widest italic mb-6" style="color:#f5d07a;">"Wear Your Identity"</p>
+        <span class="px-6 py-3 rounded-full border border-amber-400/40 bg-amber-400/10 backdrop-blur text-sm font-semibold text-amber-200 hover:bg-amber-400 hover:text-black transition duration-300">
           EXPLORE CUSTOM APPAREL
         </span>
       </div>
@@ -197,8 +198,8 @@
         <h2 class="text-4xl sm:text-6xl font-black tracking-wider uppercase mb-2 group-hover:scale-105 transition duration-500">
           CRADANCE
         </h2>
-        <p class="text-lg sm:text-2xl text-gray-300 tracking-widest italic mb-6">"Premium Streetwear Collection"</p>
-        <span class="px-6 py-3 rounded-full border border-white/20 bg-gray-900/40 backdrop-blur text-sm font-semibold hover:bg-white hover:text-black transition duration-300">
+        <p class="text-lg sm:text-2xl text-slate-300 tracking-widest italic mb-6">"Premium Streetwear Collection"</p>
+        <span class="px-6 py-3 rounded-full border border-slate-400/30 bg-slate-800/40 backdrop-blur text-sm font-semibold text-slate-200 hover:bg-white hover:text-black transition duration-300">
           VIEW EXCLUSIVE DROPS
         </span>
       </div>
@@ -210,28 +211,116 @@
 
     <!-- Custom Printing Live Canvas Banner -->
     <section class="mb-20" data-aos="fade-up">
-      <div class="rounded-3xl overflow-hidden relative glass-card p-8 sm:p-12 flex flex-col md:flex-row items-center justify-between gap-8 border border-blue-500/20">
-        <div class="absolute -right-20 -bottom-20 w-80 h-80 bg-blue-600/10 rounded-full blur-3xl pointer-events-none"></div>
-        <div class="flex-1 text-center md:text-left z-10">
-          <span class="text-xs font-bold tracking-widest uppercase text-blue-400 bg-blue-500/10 px-3 py-1 rounded-full mb-4 inline-block">LIVE PRINTING STUDIO</span>
-          <h2 class="text-3xl sm:text-5xl font-black tracking-tight mb-4">Design Your Own Identity</h2>
-          <p class="text-gray-400 max-w-xl text-base mb-6">
-            Upload custom logos, designs, vector SVGs, and texts onto hoodies, sweatshirts, and tees. Interactive live placement preview and price builder instantly updated.
+      <div class="rounded-3xl overflow-hidden relative flex flex-col md:flex-row min-h-[340px]" style="background: linear-gradient(135deg, #0e0b1a 0%, #13101f 60%, #0a0a12 100%); border: 1px solid rgba(139,92,246,0.18);">
+
+        <!-- Background texture grain -->
+        <div class="absolute inset-0 pointer-events-none" style="background-image: url('data:image/svg+xml,%3Csvg width=\'200\' height=\'200\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'n\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.75\' numOctaves=\'4\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23n)\' opacity=\'0.03\'/%3E%3C/svg%3E'); opacity:0.6;"></div>
+
+        <!-- Subtle radial glow behind left text -->
+        <div class="absolute top-0 left-0 w-96 h-96 rounded-full pointer-events-none" style="background: radial-gradient(circle, rgba(124,58,237,0.13) 0%, transparent 70%); transform: translate(-30%, -30%);"></div>
+
+        <!-- Left: Copy -->
+        <div class="relative z-10 flex-1 flex flex-col justify-center px-8 sm:px-12 py-10">
+          <!-- Label pill -->
+          <div class="flex items-center gap-2 mb-5">
+            <span class="w-1.5 h-1.5 rounded-full bg-violet-400 inline-block"></span>
+            <span class="text-[11px] font-bold tracking-[0.2em] uppercase text-violet-400">Custom Printing Studio</span>
+          </div>
+
+          <h2 class="font-black tracking-tight text-white leading-[1.05] mb-4"
+              style="font-size: clamp(2rem, 4vw, 3.2rem);">
+            Print Your<br>
+            <span style="background: linear-gradient(90deg, #a78bfa 0%, #d4a847 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+              Own Identity
+            </span>
+          </h2>
+
+          <p class="text-gray-400 text-sm leading-relaxed mb-8 max-w-sm">
+            Upload logos, vector SVGs, custom text — position them on any garment. Live canvas preview with instant price updates.
           </p>
-          <a href="custom-printing.html" class="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold px-8 py-4 rounded-xl shadow-lg hover:from-blue-700 hover:to-indigo-700 transition">
-            Launch Canvas Designer <i data-lucide="palette" class="w-5 h-5"></i>
-          </a>
-        </div>
-        <div class="flex-1 max-w-md w-full relative z-10">
-          <div class="relative bg-gray-900/60 p-6 rounded-2xl border border-gray-800 shadow-2xl">
-            <img src="assets/images/brand_logo.jpeg" alt="Canvas Designer Preview" class="w-full h-64 object-cover rounded-xl opacity-80 filter saturate-50 hover:saturate-100 transition duration-500">
-            <div class="absolute inset-0 flex items-center justify-center">
-              <span class="bg-blue-600 text-white rounded-full p-4 shadow-lg animate-pulse">
-                <i data-lucide="edit-3" class="w-6 h-6"></i>
-              </span>
+
+          <div class="flex flex-wrap items-center gap-4">
+            <a href="custom-printing.html"
+               class="inline-flex items-center gap-2.5 font-bold text-sm px-6 py-3 rounded-xl text-white transition-all duration-200"
+               style="background: linear-gradient(135deg, #7c3aed, #5b21b6); box-shadow: 0 4px 24px rgba(124,58,237,0.35);"
+               onmouseover="this.style.boxShadow='0 6px 32px rgba(124,58,237,0.55)'; this.style.transform='translateY(-1px)';"
+               onmouseout="this.style.boxShadow='0 4px 24px rgba(124,58,237,0.35)'; this.style.transform='translateY(0)';">
+              <i data-lucide="palette" class="w-4 h-4"></i> Launch Designer
+            </a>
+            <a href="products.html" class="text-sm font-semibold text-gray-400 hover:text-white transition flex items-center gap-1.5">
+              Browse garments <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+            </a>
+          </div>
+
+          <!-- Mini stats row -->
+          <div class="flex items-center gap-6 mt-8 pt-6 border-t border-white/5">
+            <div>
+              <div class="text-base font-black text-white">10+</div>
+              <div class="text-[10px] text-gray-500 uppercase tracking-wider">Garment Types</div>
+            </div>
+            <div class="w-px h-8 bg-white/8"></div>
+            <div>
+              <div class="text-base font-black text-white">30+</div>
+              <div class="text-[10px] text-gray-500 uppercase tracking-wider">Colour Options</div>
+            </div>
+            <div class="w-px h-8 bg-white/8"></div>
+            <div>
+              <div class="text-base font-black text-white">4</div>
+              <div class="text-[10px] text-gray-500 uppercase tracking-wider">Print Positions</div>
             </div>
           </div>
         </div>
+
+        <!-- Right: Product image mosaic -->
+        <div class="relative z-10 flex-shrink-0 flex items-center justify-center p-6 md:p-8"
+             style="width: min(100%, 420px);">
+
+          <!-- 2×2 tilted grid -->
+          <div class="relative w-full" style="aspect-ratio: 1 / 1; max-width: 340px;">
+
+            <!-- Top-left -->
+            <div class="absolute overflow-hidden rounded-2xl shadow-xl"
+                 style="top:0; left:0; width:48%; aspect-ratio:3/4; transform: rotate(-3deg);
+                        border: 1px solid rgba(255,255,255,0.08);">
+              <img src="assets/images/cw-m-oversized-hoodies_cover.jpeg" alt="Oversized Hoodie"
+                   class="w-full h-full object-cover hover:scale-105 transition duration-500">
+            </div>
+
+            <!-- Top-right -->
+            <div class="absolute overflow-hidden rounded-2xl shadow-xl"
+                 style="top:0; right:0; width:48%; aspect-ratio:3/4; transform: rotate(2.5deg);
+                        border: 1px solid rgba(255,255,255,0.08);">
+              <img src="assets/images/cw-m-mens-round-neck-t-shirt_cover.jpeg" alt="Round Neck Tee"
+                   class="w-full h-full object-cover hover:scale-105 transition duration-500">
+            </div>
+
+            <!-- Bottom-left -->
+            <div class="absolute overflow-hidden rounded-2xl shadow-xl"
+                 style="bottom:0; left:4%; width:44%; aspect-ratio:3/4; transform: rotate(2deg);
+                        border: 1px solid rgba(255,255,255,0.08);">
+              <img src="assets/images/cw-w-woman-crop-hoodies_cover.jpeg" alt="Crop Hoodie"
+                   class="w-full h-full object-cover hover:scale-105 transition duration-500">
+            </div>
+
+            <!-- Bottom-right -->
+            <div class="absolute overflow-hidden rounded-2xl shadow-xl"
+                 style="bottom:0; right:4%; width:44%; aspect-ratio:3/4; transform: rotate(-2.5deg);
+                        border: 1px solid rgba(255,255,255,0.08);">
+              <img src="assets/images/cw-m-sweat-shirt_cover.jpeg" alt="Sweatshirt"
+                   class="w-full h-full object-cover hover:scale-105 transition duration-500">
+            </div>
+
+            <!-- Centre badge -->
+            <div class="absolute inset-0 flex items-center justify-center pointer-events-none" style="z-index:10;">
+              <div class="rounded-full flex items-center justify-center shadow-2xl"
+                   style="width:52px; height:52px; background: linear-gradient(135deg,#7c3aed,#a78bfa); box-shadow: 0 0 0 4px rgba(124,58,237,0.25), 0 8px 24px rgba(124,58,237,0.5);">
+                <i data-lucide="printer" class="w-5 h-5 text-white"></i>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
       </div>
     </section>
 
@@ -330,7 +419,7 @@
     <section class="mb-20" data-aos="fade-up">
       <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
         <div class="glass-card p-8 rounded-2xl text-center flex flex-col items-center">
-          <div class="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-400 mb-6">
+          <div class="w-12 h-12 rounded-xl bg-violet-500/10 flex items-center justify-center text-violet-400 mb-6">
             <i data-lucide="crown" class="w-6 h-6"></i>
           </div>
           <h3 class="text-xl font-bold mb-3">Superior Fabric Quality</h3>
@@ -339,7 +428,7 @@
           </p>
         </div>
         <div class="glass-card p-8 rounded-2xl text-center flex flex-col items-center">
-          <div class="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-400 mb-6">
+          <div class="w-12 h-12 rounded-xl bg-violet-500/10 flex items-center justify-center text-violet-400 mb-6">
             <i data-lucide="palette" class="w-6 h-6"></i>
           </div>
           <h3 class="text-xl font-bold mb-3">Wear Your Identity</h3>
@@ -348,7 +437,7 @@
           </p>
         </div>
         <div class="glass-card p-8 rounded-2xl text-center flex flex-col items-center">
-          <div class="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-400 mb-6">
+          <div class="w-12 h-12 rounded-xl bg-violet-500/10 flex items-center justify-center text-violet-400 mb-6">
             <i data-lucide="truck" class="w-6 h-6"></i>
           </div>
           <h3 class="text-xl font-bold mb-3">Eco-Friendly Shipping</h3>
@@ -450,7 +539,7 @@
         </p>
         <form class="flex flex-col sm:flex-row gap-3 max-w-md mx-auto" onsubmit="event.preventDefault(); showToast('Subscribed to newsletter!', 'success'); this.reset();">
           <input type="email" placeholder="Enter your email" class="glass-input px-5 py-3 rounded-xl flex-1 text-sm text-white" required>
-          <button type="submit" class="px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 font-bold text-white transition text-sm">
+          <button type="submit" class="px-6 py-3 rounded-xl bg-violet-600 hover:bg-violet-700 font-bold text-white transition text-sm">
             SUBSCRIBE
           </button>
         </form>
@@ -509,15 +598,15 @@
         <h4 class="font-semibold text-white mb-4">STORE CONTACT</h4>
         <ul class="flex flex-col gap-3 text-xs text-gray-400">
           <li class="flex items-start gap-2">
-            <i data-lucide="map-pin" class="w-4 h-4 text-blue-500 shrink-0"></i>
+            <i data-lucide="map-pin" class="w-4 h-4 text-violet-400 shrink-0"></i>
             <span>Kanniyakumari, Tamil Nadu, India</span>
           </li>
           <li class="flex items-center gap-2">
-            <i data-lucide="phone" class="w-4 h-4 text-blue-500 shrink-0"></i>
+            <i data-lucide="phone" class="w-4 h-4 text-violet-400 shrink-0"></i>
             <span>+91 7708374473 (WhatsApp)</span>
           </li>
           <li class="flex items-center gap-2">
-            <i data-lucide="clock" class="w-4 h-4 text-blue-500 shrink-0"></i>
+            <i data-lucide="clock" class="w-4 h-4 text-violet-400 shrink-0"></i>
             <span>Mon - Sat: 9:00 AM - 7:00 PM</span>
           </li>
         </ul>

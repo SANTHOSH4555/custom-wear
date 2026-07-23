@@ -24,6 +24,24 @@
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
   <style>
+    #garment-picker-grid {
+      scrollbar-width: thin;
+      scrollbar-color: #2563eb33 transparent;
+    }
+    #garment-picker-grid::-webkit-scrollbar {
+      width: 4px;
+    }
+    #garment-picker-grid::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    #garment-picker-grid::-webkit-scrollbar-thumb {
+      background: #2563eb55;
+      border-radius: 99px;
+    }
+    #garment-picker-grid::-webkit-scrollbar-thumb:hover {
+      background: #2563eb;
+    }
+
     #canvas-workspace {
       position: relative;
       background-size: contain;
@@ -218,28 +236,39 @@
 
       <!-- Right Panel: Spec Summary -->
       <aside class="w-full lg:w-80 shrink-0 flex flex-col gap-6 order-3 lg:order-3">
-        <div class="glass-card p-6 rounded-2xl border border-gray-800">
-          <h3 class="font-extrabold text-sm tracking-wider uppercase mb-6 pb-2 border-b border-gray-800">ORDER SUMMARY</h3>
-          
-          <!-- Product Selection Info -->
-          <div class="mb-4">
-            <label class="text-[10px] text-gray-500 uppercase font-black tracking-widest">Base Garment</label>
-            <h4 id="summary-prod-name" class="text-base font-bold mt-1 text-white">Round Neck T-Shirt</h4>
-            <span id="summary-prod-brand" class="text-[10px] text-blue-400 font-bold">CUSTOM WEAR</span>
+        <!-- Base Garment Picker Card -->
+        <div class="glass-card p-5 rounded-2xl border border-gray-800">
+          <h3 class="font-extrabold text-sm tracking-wider uppercase mb-3 pb-2 border-b border-gray-800">BASE GARMENT</h3>
+          <!-- Name list -->
+          <div id="garment-picker-grid" class="flex flex-col gap-1 max-h-56 overflow-y-auto pr-1">
+            <!-- Injected by JS -->
           </div>
+          <!-- Selected price -->
+          <div class="mt-3 pt-3 border-t border-gray-800/50 flex items-center justify-between gap-2">
+            <div class="min-w-0">
+              <h4 id="summary-prod-name" class="text-sm font-bold text-white truncate">—</h4>
+              <span id="summary-prod-brand" class="text-[10px] text-blue-400 font-bold">CUSTOM WEAR</span>
+            </div>
+            <span id="summary-prod-price-tag" class="text-xs font-extrabold text-blue-400 shrink-0"></span>
+          </div>
+        </div>
 
-          <!-- Color Circles -->
+        <!-- Order Options Card -->
+        <div class="glass-card p-5 rounded-2xl border border-gray-800">
+          <h3 class="font-extrabold text-sm tracking-wider uppercase mb-4 pb-2 border-b border-gray-800">ORDER SUMMARY</h3>
+
+          <!-- Color Thumbnails -->
           <div class="mb-4">
             <label class="text-[10px] text-gray-500 uppercase font-black tracking-widest">Garment Color</label>
-            <div class="flex items-center gap-2 mt-2" id="summary-colors">
-              <!-- Injected circles -->
+            <div class="flex items-center gap-2 mt-2 overflow-x-auto pb-1" id="summary-colors">
+              <!-- Injected thumbnails -->
             </div>
           </div>
 
           <!-- Sizes -->
-          <div class="mb-6">
-            <label class="text-[10px] text-gray-500 uppercase font-black tracking-widest text-block mb-2">Size Choice</label>
-            <div class="flex gap-2" id="summary-sizes">
+          <div class="mb-5">
+            <label class="text-[10px] text-gray-500 uppercase font-black tracking-widest block mb-2">Size Choice</label>
+            <div class="flex flex-wrap gap-2" id="summary-sizes">
               <!-- Injected sizes buttons -->
             </div>
           </div>
@@ -253,11 +282,11 @@
           <!-- Printing Surcharge Detail -->
           <div class="flex justify-between items-center text-xs py-2 border-t border-gray-800/40">
             <span class="text-gray-500">Printing Surcharge</span>
-            <span id="price-printing-markup" class="font-semibold text-green-400">Rs. 100</span>
+            <span id="price-printing-markup" class="font-semibold text-green-400">Rs. 0</span>
           </div>
 
           <!-- Total Estimations -->
-          <div class="glass-card p-4 rounded-xl flex items-center justify-between border border-blue-500/10 mb-6 mt-4">
+          <div class="glass-card p-4 rounded-xl flex items-center justify-between border border-blue-500/10 mb-5 mt-4">
             <span class="text-xs text-gray-400 font-bold uppercase tracking-wider">Estimated Total</span>
             <span id="price-total" class="text-xl font-black text-blue-400">Rs. 0</span>
           </div>
@@ -331,8 +360,12 @@
       
       if (typeof PRODUCTS_DATA === 'undefined') return;
 
-      // Filter products only belong to CUSTOM WEAR
-      const cwProds = PRODUCTS_DATA.filter(p => p.brand === "CUSTOM WEAR");
+      // Filter products only belong to CUSTOM WEAR (exclude non-printable)
+      const cwProds = PRODUCTS_DATA.filter(p =>
+        p.brand === "CUSTOM WEAR" &&
+        !p.category.toLowerCase().includes("pants") &&
+        !p.category.toLowerCase().includes("joggers")
+      );
       
       // Default to first custom t-shirt if none specified
       if (!prodId) {
@@ -351,48 +384,92 @@
       selectedSize = urlParams.get("size") || "M";
       selectedColor = urlParams.get("color") || activeProduct.colors[0].name;
 
-      // Summary Info
+      // Build garment picker grid
+      buildGarmentPicker(cwProds);
+
+      // Render the selected product's colors/sizes/prices
+      renderProductOptions();
+
+      // Update workspace image
+      updateGarmentWorkspaceImage();
+      
+      lucide.createIcons();
+    }
+
+    function buildGarmentPicker(products) {
+      const grid = document.getElementById("garment-picker-grid");
+      grid.innerHTML = "";
+
+      products.forEach(p => {
+        const row = document.createElement("button");
+        row.className = `garment-pick-card w-full text-left px-3 py-2 rounded-lg border transition-all duration-150 focus:outline-none flex items-center justify-between ${
+          p.id === activeProduct.id
+            ? "border-blue-500 bg-blue-600/10 text-blue-400"
+            : "border-transparent hover:border-gray-700 hover:bg-gray-800/40 text-gray-300"
+        }`;
+        row.innerHTML = `
+          <span class="text-xs font-semibold truncate">${p.name}</span>
+          <span class="text-[10px] font-bold text-gray-500 shrink-0 ml-2">Rs.${p.prices.printed}</span>
+        `;
+        row.addEventListener("click", () => {
+          activeProduct = p;
+          selectedColor = p.colors[0].name;
+          selectedSize = "M";
+          document.querySelectorAll(".garment-pick-card").forEach(c => {
+            c.classList.remove("border-blue-500", "bg-blue-600/10", "text-blue-400");
+            c.classList.add("border-transparent", "text-gray-300");
+          });
+          row.classList.remove("border-transparent", "text-gray-300");
+          row.classList.add("border-blue-500", "bg-blue-600/10", "text-blue-400");
+          renderProductOptions();
+          updateGarmentWorkspaceImage();
+          showToast(`Selected: ${p.name}`, "success");
+        });
+        grid.appendChild(row);
+      });
+    }
+
+    function renderProductOptions() {
+      if (!activeProduct) return;
+
+      // Summary labels
       document.getElementById("summary-prod-name").textContent = activeProduct.name;
       document.getElementById("summary-prod-brand").textContent = activeProduct.brand;
-      
-      // Load color circles
+      document.getElementById("summary-prod-price-tag").textContent = `Rs. ${activeProduct.prices.printed}`;
+
+      // Color thumbnail swatches
       const colorContainer = document.getElementById("summary-colors");
       colorContainer.innerHTML = "";
       activeProduct.colors.forEach(c => {
-        const item = document.createElement("button");
-        item.className = `w-6 h-6 rounded-full border border-gray-800 ${
-          c.name === selectedColor ? 'ring-2 ring-blue-500' : ''
+        const btn = document.createElement("button");
+        btn.className = `color-swatch-sm rounded-lg overflow-hidden border-2 transition-all hover:scale-110 shrink-0 focus:outline-none ${
+          c.name === selectedColor ? "border-blue-500 ring-2 ring-blue-500/40 scale-110" : "border-gray-700 hover:border-gray-400"
         }`;
-        
-        let bg = c.name.toLowerCase();
-        if (bg.includes("red")) bg = "#dc2626";
-        else if (bg.includes("blue")) bg = "#1e3a8a";
-        else if (bg.includes("pink")) bg = "#ffc0cb";
-        else if (bg.includes("white")) bg = "#ffffff";
-        else if (bg.includes("beige")) bg = "#f5f5dc";
-        else if (bg.includes("lavender") || bg.includes("lilac")) bg = "#e6e6fa";
-        else if (bg.includes("green")) bg = "#556b2f";
-        else if (bg.includes("grey")) bg = "#808080";
-        else if (bg.includes("charcoal")) bg = "#36454f";
-        else if (bg.includes("burgundy")) bg = "#800020";
-
-        item.style.backgroundColor = bg;
-        item.addEventListener("click", () => {
+        btn.style.width = "44px";
+        btn.style.height = "56px";
+        btn.title = c.name;
+        btn.innerHTML = `<img src="${c.image}" alt="${c.name}" class="w-full h-full object-cover"
+          onerror="this.src='assets/images/brand_logo.jpeg'">`;
+        btn.addEventListener("click", () => {
           selectedColor = c.name;
-          document.querySelectorAll("#summary-colors button").forEach(b => b.classList.remove("ring-2", "ring-blue-500"));
-          item.classList.add("ring-2", "ring-blue-500");
+          document.querySelectorAll(".color-swatch-sm").forEach(b => {
+            b.classList.remove("border-blue-500", "ring-2", "ring-blue-500/40", "scale-110");
+            b.classList.add("border-gray-700");
+          });
+          btn.classList.remove("border-gray-700");
+          btn.classList.add("border-blue-500", "ring-2", "ring-blue-500/40", "scale-110");
           updateGarmentWorkspaceImage();
         });
-        colorContainer.appendChild(item);
+        colorContainer.appendChild(btn);
       });
 
-      // Load size buttons
+      // Size buttons
       const sizeContainer = document.getElementById("summary-sizes");
       sizeContainer.innerHTML = "";
       activeProduct.sizes.forEach(s => {
         const btn = document.createElement("button");
         btn.className = `px-3 py-1 rounded bg-gray-900 border text-[10px] font-bold transition ${
-          s === selectedSize ? 'border-blue-500 text-blue-400 bg-blue-600/10' : 'border-gray-800 hover:border-gray-600'
+          s === selectedSize ? "border-blue-500 text-blue-400 bg-blue-600/10" : "border-gray-800 hover:border-gray-600"
         }`;
         btn.textContent = s;
         btn.addEventListener("click", () => {
@@ -403,15 +480,12 @@
         sizeContainer.appendChild(btn);
       });
 
-      // Update workspace image
-      updateGarmentWorkspaceImage();
-      
-      // Update Price details
+      // Prices
       document.getElementById("price-base").textContent = `Rs. ${activeProduct.prices.plain}`;
       const markup = activeProduct.prices.printed - activeProduct.prices.plain;
       document.getElementById("price-printing-markup").textContent = `Rs. ${markup}`;
       document.getElementById("price-total").textContent = `Rs. ${activeProduct.prices.printed}`;
-      
+
       lucide.createIcons();
     }
 

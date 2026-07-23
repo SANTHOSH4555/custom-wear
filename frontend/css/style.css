@@ -4,24 +4,38 @@
   --font-serif: 'Cinzel', serif;
   --font-heading: 'Outfit', sans-serif;
   --font-body: 'Plus Jakarta Sans', sans-serif;
-  
-  --primary-light: #2563eb;
-  --primary-dark: #3b82f6;
-  --gold-accent: #D4AF37;
-  --gold-light: #F3E5AB;
-  
-  --bg-obsidian: #09090b;
-  --bg-onyx: #121215;
-  --bg-dark-glow: radial-gradient(circle at 50% 0%, #1e1b4b 0%, #09090b 70%);
-  
-  --glass-border: rgba(255, 255, 255, 0.08);
-  --glass-bg: rgba(18, 18, 21, 0.75);
-  --glass-bg-hover: rgba(24, 24, 30, 0.85);
-  
-  --glass-bg-light: rgba(255, 255, 255, 0.82);
-  --glass-border-light: rgba(0, 0, 0, 0.08);
+
+  /* ── Brand Core ── */
+  --accent:         #7c3aed;   /* violet-600  — primary CTA */
+  --accent-mid:     #8b5cf6;   /* violet-500  — hover state */
+  --accent-soft:    rgba(124, 58, 237, 0.18);
+  --accent-glow:    rgba(139, 92, 246, 0.35);
+
+  --gold:           #d4a847;   /* warm amber-gold — CUSTOM WEAR warmth */
+  --gold-soft:      rgba(212, 168, 71, 0.15);
+
+  /* ── Backgrounds ── */
+  --bg-root:        #0a0a0f;   /* near-black with blue tint */
+  --bg-surface:     #111118;   /* card surface */
+  --bg-raised:      #16161f;   /* slightly lifted */
+  --bg-overlay:     #1c1c27;   /* hover / active surface */
+
+  /* ── Borders & Glass ── */
+  --border-subtle:  rgba(255, 255, 255, 0.06);
+  --border-mid:     rgba(255, 255, 255, 0.10);
+  --border-accent:  rgba(124, 58, 237, 0.40);
+
+  --glass-bg:       rgba(14, 14, 22, 0.78);
+  --glass-bg-hover: rgba(20, 20, 32, 0.88);
+
+  /* Light mode */
+  --glass-bg-light:     rgba(255, 255, 255, 0.85);
+  --glass-border-light: rgba(0, 0, 0, 0.07);
 }
 
+/* ═══════════════════════════════════════════
+   Base Reset
+═══════════════════════════════════════════ */
 html {
   overflow-x: hidden;
   max-width: 100vw;
@@ -30,8 +44,8 @@ html {
 
 body {
   font-family: var(--font-body);
-  background-color: var(--bg-obsidian);
-  color: #f4f4f5;
+  background-color: var(--bg-root);
+  color: #e8e8f0;
   overflow-x: hidden;
   max-width: 100vw;
   transition: background-color 0.4s ease, color 0.4s ease;
@@ -45,12 +59,14 @@ h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-serif);
 }
 
-/* Glassmorphism Styles */
+/* ═══════════════════════════════════════════
+   Glassmorphism
+═══════════════════════════════════════════ */
 .glass-nav {
   background: var(--glass-bg);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-bottom: 1px solid var(--glass-border);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-bottom: 1px solid var(--border-subtle);
 }
 
 .light .glass-nav {
@@ -59,63 +75,65 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .glass-card {
-  background: rgba(15, 23, 42, 0.45);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.4);
-  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s, border-color 0.4s;
+  background: rgba(16, 16, 26, 0.55);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid var(--border-subtle);
+  box-shadow: 0 4px 32px rgba(0, 0, 0, 0.5);
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.4s,
+              border-color 0.4s;
 }
 
 .glass-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 20px 40px rgba(59, 130, 246, 0.1);
-  border-color: rgba(96, 165, 250, 0.25);
+  transform: translateY(-3px);
+  box-shadow: 0 16px 48px rgba(124, 58, 237, 0.12);
+  border-color: rgba(139, 92, 246, 0.22);
 }
 
 .light .glass-card {
-  background: rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.65);
   border: 1px solid var(--glass-border-light);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.05);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
 }
 
 .light .glass-card:hover {
-  box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.1);
-  border-color: rgba(37, 99, 235, 0.2);
+  box-shadow: 0 12px 40px rgba(124, 58, 237, 0.12);
+  border-color: rgba(124, 58, 237, 0.25);
 }
 
 .glass-input {
-  background: rgba(17, 24, 39, 0.5);
-  border: 1px solid var(--glass-border);
-  color: white;
+  background: rgba(16, 16, 26, 0.6);
+  border: 1px solid var(--border-mid);
+  color: #e8e8f0;
   transition: border-color 0.3s, box-shadow 0.3s;
 }
 
 .glass-input:focus {
-  border-color: var(--primary-dark);
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.25);
+  border-color: var(--accent-mid);
+  box-shadow: 0 0 0 2px var(--accent-soft);
   outline: none;
 }
 
 .light .glass-input {
   background: rgba(255, 255, 255, 0.8);
   border: 1px solid var(--glass-border-light);
-  color: #111827;
+  color: #0f0f18;
 }
 
 .light .glass-input:focus {
-  border-color: var(--primary-light);
-  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.15);
 }
 
-/* Page Loader */
+/* ═══════════════════════════════════════════
+   Page Loader
+═══════════════════════════════════════════ */
 #page-loader {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: #030712;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  background: var(--bg-root);
   z-index: 9999;
   display: flex;
   justify-content: center;
@@ -124,11 +142,10 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .spinner {
-  width: 50px;
-  height: 50px;
-  border: 3px solid rgba(59, 130, 246, 0.1);
+  width: 50px; height: 50px;
+  border: 3px solid rgba(139, 92, 246, 0.12);
   border-radius: 50%;
-  border-top-color: var(--primary-dark);
+  border-top-color: var(--accent-mid);
   animation: spin 1s ease-in-out infinite;
 }
 
@@ -136,9 +153,11 @@ h1, h2, h3, h4, h5, h6 {
   to { transform: rotate(360deg); }
 }
 
-/* Skeleton Loading Shimmer */
+/* ═══════════════════════════════════════════
+   Skeleton Shimmer
+═══════════════════════════════════════════ */
 .skeleton {
-  background: linear-gradient(90deg, #1f2937 25%, #374151 50%, #1f2937 75%);
+  background: linear-gradient(90deg, #1a1a28 25%, #24243a 50%, #1a1a28 75%);
   background-size: 200% 100%;
   animation: loading-shimmer 1.5s infinite;
 }
@@ -149,93 +168,69 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 @keyframes loading-shimmer {
-  0% { background-position: 200% 0; }
+  0%   { background-position: 200% 0; }
   100% { background-position: -200% 0; }
 }
 
-/* Live Canvas Printing Styles */
-.canvas-container {
-  margin: 0 auto;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-}
+/* ═══════════════════════════════════════════
+   Custom Scrollbars
+═══════════════════════════════════════════ */
+::-webkit-scrollbar { width: 6px; height: 6px; }
 
-/* Custom Scrollbars */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
+::-webkit-scrollbar-track { background: var(--bg-root); }
 
-::-webkit-scrollbar-track {
-  background: #030712;
-}
-
-.light ::-webkit-scrollbar-track {
-  background: #f9fafb;
-}
+.light ::-webkit-scrollbar-track { background: #f9fafb; }
 
 ::-webkit-scrollbar-thumb {
-  background: #1f2937;
-  border-radius: 4px;
+  background: #2d2d42;
+  border-radius: 99px;
 }
 
-.light ::-webkit-scrollbar-thumb {
-  background: #d1d5db;
-}
+.light ::-webkit-scrollbar-thumb { background: #d1d5db; }
 
-::-webkit-scrollbar-thumb:hover {
-  background: #374151;
-}
+::-webkit-scrollbar-thumb:hover { background: var(--accent); }
 
-/* Premium Glow Elements */
-.glow-effect {
-  position: relative;
-}
+/* ═══════════════════════════════════════════
+   Glow Effect Utility
+═══════════════════════════════════════════ */
+.glow-effect { position: relative; }
 
 .glow-effect::after {
   content: '';
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  inset: 0;
   border-radius: inherit;
-  box-shadow: 0 0 15px rgba(59, 130, 246, 0.4);
+  box-shadow: 0 0 18px var(--accent-glow);
   opacity: 0;
-  transition: opacity 0.3s ease-in-out;
+  transition: opacity 0.3s;
   pointer-events: none;
 }
 
-.glow-effect:hover::after {
-  opacity: 1;
-}
+.glow-effect:hover::after { opacity: 1; }
 
-/* Color Circle Selection Active Ring */
+/* ═══════════════════════════════════════════
+   Colour Swatch Active Ring
+═══════════════════════════════════════════ */
 .color-circle.active {
-  ring-offset-2: true;
-  box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--primary-dark);
+  box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--accent);
 }
 
 .light .color-circle.active {
-  box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--primary-light);
+  box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--accent);
 }
 
-/* Image Zoom Wrapper */
-.zoom-wrapper {
-  overflow: hidden;
-  position: relative;
-}
+/* ═══════════════════════════════════════════
+   Image Zoom Wrapper
+═══════════════════════════════════════════ */
+.zoom-wrapper { overflow: hidden; position: relative; }
 
-.zoom-wrapper img {
-  transition: transform 0.5s ease;
-}
+.zoom-wrapper img { transition: transform 0.55s ease; }
 
-.zoom-wrapper:hover img {
-  transform: scale(1.15);
-}
+.zoom-wrapper:hover img { transform: scale(1.12); }
 
-/* Brand Hub Switcher */
+/* ═══════════════════════════════════════════
+   Brand Hub Split Hero
+═══════════════════════════════════════════ */
 .brand-hub {
   height: 80vh;
   display: flex;
@@ -247,7 +242,7 @@ h1, h2, h3, h4, h5, h6 {
 .brand-pane {
   flex: 1;
   min-width: 0;
-  transition: flex 0.6s cubic-bezier(0.25, 1, 0.5, 1), filter 0.6s;
+  transition: flex 0.65s cubic-bezier(0.25, 1, 0.5, 1), filter 0.5s;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -259,23 +254,15 @@ h1, h2, h3, h4, h5, h6 {
 
 .brand-pane::before {
   content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.4);
+  position: absolute; inset: 0;
+  background: rgba(0, 0, 0, 0.45);
   transition: background 0.6s;
   z-index: 1;
 }
 
-.brand-pane:hover {
-  flex: 1.4;
-}
+.brand-pane:hover { flex: 1.4; }
 
-.brand-pane:hover::before {
-  background: rgba(0, 0, 0, 0.2);
-}
+.brand-pane:hover::before { background: rgba(0, 0, 0, 0.18); }
 
 .brand-pane-content {
   z-index: 2;
@@ -283,19 +270,81 @@ h1, h2, h3, h4, h5, h6 {
   color: white;
 }
 
+/* CUSTOM WEAR pane — warm golden overlay */
 .custom-wear-pane {
-  background: linear-gradient(rgba(15, 32, 67, 0.35), rgba(10, 15, 30, 0.85)), url('../assets/images/cw-m-oversized-hoodies_cover.jpeg') no-repeat center/cover;
+  background:
+    linear-gradient(160deg, rgba(30, 18, 6, 0.5) 0%, rgba(10, 8, 2, 0.88) 100%),
+    url('../assets/images/cw-m-oversized-hoodies_cover.jpeg') no-repeat center/cover;
 }
 
+/* CRADANCE pane — cool deep purple-slate overlay */
 .cradance-pane {
-  background: linear-gradient(rgba(24, 24, 35, 0.3), rgba(3, 7, 18, 0.9)), url('../assets/images/crad_supima_tee.jpeg') no-repeat center/cover;
+  background:
+    linear-gradient(160deg, rgba(12, 8, 28, 0.45) 0%, rgba(4, 3, 14, 0.90) 100%),
+    url('../assets/images/crad_supima_tee.jpeg') no-repeat center/cover;
 }
 
-/* ============================
-   Mobile Responsive Fixes
-   ============================ */
+/* ═══════════════════════════════════════════
+   Tailwind colour overrides — swap blue-* to violet-*
+   These shadow selectors override Tailwind utility
+   classes so we don't need to touch every HTML file.
+═══════════════════════════════════════════ */
 
-/* Brand Hub: stacked on mobile */
+/* Primary buttons */
+.bg-blue-600  { background-color: var(--accent)     !important; }
+.bg-blue-700  { background-color: #6d28d9            !important; }
+.hover\:bg-blue-600:hover { background-color: var(--accent)  !important; }
+.hover\:bg-blue-700:hover { background-color: #6d28d9         !important; }
+
+/* Text accent */
+.text-blue-400 { color: #a78bfa !important; }  /* violet-400 */
+.text-blue-500 { color: #8b5cf6 !important; }  /* violet-500 */
+
+/* Borders */
+.border-blue-500   { border-color: var(--accent) !important; }
+.border-blue-500\/10 { border-color: rgba(124,58,237,0.10) !important; }
+.border-blue-500\/20 { border-color: rgba(124,58,237,0.20) !important; }
+.border-blue-500\/30 { border-color: rgba(124,58,237,0.30) !important; }
+
+/* Ring */
+.ring-blue-500       { --tw-ring-color: var(--accent) !important; }
+.ring-2.ring-blue-500 { box-shadow: 0 0 0 2px var(--accent) !important; }
+
+/* Backgrounds with opacity */
+.bg-blue-600\/10  { background-color: var(--accent-soft) !important; }
+.bg-blue-600\/20  { background-color: rgba(124,58,237,0.20) !important; }
+.bg-blue-500\/10  { background-color: rgba(139,92,246,0.10) !important; }
+
+/* Hover text */
+.hover\:text-blue-400:hover { color: #a78bfa !important; }
+.hover\:text-blue-300:hover { color: #c4b5fd !important; }
+
+/* Focus rings */
+.focus\:ring-0:focus { box-shadow: none !important; }
+
+/* Gradient button override */
+.from-blue-600 { --tw-gradient-from: var(--accent)  !important; }
+.to-indigo-600 { --tw-gradient-to:   #5b21b6         !important; }
+.hover\:from-blue-700:hover { --tw-gradient-from: #6d28d9 !important; }
+.hover\:to-indigo-700:hover { --tw-gradient-to:   #4c1d95 !important; }
+
+/* Cart badge */
+.cart-count-badge { background-color: var(--accent) !important; }
+
+/* ── Gold accents for brand identity ── */
+/* CUSTOM WEAR brand label gets warm gold */
+.brand-pane.custom-wear-pane .brand-pane-content p {
+  color: #f5d07a;
+}
+
+/* ═══════════════════════════════════════════
+   Navbar link active & hover polish
+═══════════════════════════════════════════ */
+nav a:hover { color: #a78bfa; }
+
+/* ═══════════════════════════════════════════
+   Mobile Responsive
+═══════════════════════════════════════════ */
 @media (max-width: 767px) {
   .brand-hub {
     flex-direction: column;
@@ -312,17 +361,10 @@ h1, h2, h3, h4, h5, h6 {
     max-width: 100vw;
   }
 
-  .brand-pane:hover {
-    flex: none;
-  }
+  .brand-pane:hover { flex: none; }
 
-  /* Prevent navbar overflow on small screens */
-  html, body {
-    overflow-x: hidden;
-    max-width: 100vw;
-  }
+  html, body { overflow-x: hidden; max-width: 100vw; }
 
-  /* Prevent large text from causing overflow */
   .brand-pane-content h2 {
     font-size: clamp(2rem, 10vw, 3.5rem);
     word-break: break-word;
@@ -333,39 +375,48 @@ h1, h2, h3, h4, h5, h6 {
   }
 }
 
-/* Canvas designer: full width canvas on mobile */
 @media (max-width: 1023px) {
-  #canvas-workspace {
-    min-height: 300px;
-  }
+  #canvas-workspace { min-height: 300px; }
 }
 
-/* Glass card: disable lift animation on touch devices */
 @media (hover: none) {
   .glass-card:hover {
     transform: none;
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 4px 32px rgba(0, 0, 0, 0.5);
   }
 }
 
-/* Smooth mobile menu animation */
+/* Mobile menu */
 #mobile-menu {
   animation-duration: 0.2s;
   animation-timing-function: ease-out;
 }
 
-/* Step tracker (order progress) active node */
+/* Order tracker */
 .step-active {
-  border-color: #2563eb;
-  background-color: rgba(37, 99, 235, 0.12);
-  color: #60a5fa;
+  border-color: var(--accent);
+  background-color: var(--accent-soft);
+  color: #a78bfa;
 }
 
-.line-active {
-  background-color: #2563eb;
-}
+.line-active { background-color: var(--accent); }
 
 /* Tab panel utility */
-.tab-panel.hidden {
-  display: none;
+.tab-panel.hidden { display: none; }
+
+/* ═══════════════════════════════════════════
+   Garment picker scrollbar
+═══════════════════════════════════════════ */
+#garment-picker-grid {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(124, 58, 237, 0.35) transparent;
+}
+#garment-picker-grid::-webkit-scrollbar { width: 4px; }
+#garment-picker-grid::-webkit-scrollbar-track { background: transparent; }
+#garment-picker-grid::-webkit-scrollbar-thumb {
+  background: rgba(124, 58, 237, 0.4);
+  border-radius: 99px;
+}
+#garment-picker-grid::-webkit-scrollbar-thumb:hover {
+  background: var(--accent);
 }
