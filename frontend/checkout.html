@@ -151,7 +151,7 @@
 
       <!-- Scannable QR -->
       <div class="bg-white p-3 rounded-2xl shadow-2xl border-2 border-indigo-200 mb-4 relative">
-        <!-- Generate QR code for UPI ID: insecurityo@okhdfcbank -->
+        <!-- QR code gets updated dynamically with order amount on placement -->
         <img id="upi-qr-image" src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=upi://pay?pa=insecurityo@okhdfcbank%26pn=Insecurity%20Office%26cu=INR" alt="UPI Pay QR" class="w-44 h-44 object-contain">
         <div class="absolute -bottom-3 left-1/2 -translate-x-1/2 bg-indigo-600 text-white rounded-full px-3 py-1 text-[9px] font-bold shadow-lg tracking-widest uppercase whitespace-nowrap">
           UPI ID: insecurityo@okhdfcbank
@@ -352,9 +352,11 @@
         
         // Update UI
         document.getElementById("pay-order-id").textContent = `Order ID: ${generatedOrder.id}`;
-        // Static QR code - no need to update from backend
-        // document.getElementById("upi-qr-image").src = payDetails.qr_code_url;
-        document.getElementById("pay-amount-badge").textContent = `Pay Rs. ${generatedOrder.pricing.grand_total.toFixed(2)}`;
+        // Update QR code with actual amount for the correct UPI payment
+        const amount = generatedOrder.pricing.grand_total.toFixed(2);
+        const qrData = `upi://pay?pa=${UPI_ID}&pn=${encodeURIComponent(UPI_NAME)}&am=${amount}&cu=INR&tn=${encodeURIComponent("Order " + generatedOrder.id)}`;
+        document.getElementById("upi-qr-image").src = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(qrData)}`;
+        document.getElementById("pay-amount-badge").textContent = `Pay Rs. ${amount}`;
         
         // Reset payment state
         paymentAppClicked = false;
@@ -372,44 +374,79 @@
       }
     }
 
-    // Store UPI link globally
+    // Store payment details globally
     let currentUpiLink = null;
+    let currentAmount = 0;
     let paymentAppClicked = false;
+
+    // Fixed UPI details
+    const UPI_ID = "insecurityo@okhdfcbank";
+    const UPI_NAME = "Insecurity Office";
+
+    function buildUpiLink(amount, orderId) {
+      const note = encodeURIComponent(`Order ${orderId}`);
+      const name = encodeURIComponent(UPI_NAME);
+      return `upi://pay?pa=${UPI_ID}&pn=${name}&am=${amount}&cu=INR&tn=${note}`;
+    }
 
     function openUpiApp(app, event) {
       event.preventDefault();
-      if (!currentUpiLink) {
-        showToast("Payment details not loaded yet. Please wait.", "error");
+
+      if (!generatedOrder) {
+        showToast("Order not ready yet. Please wait.", "error");
         return;
       }
 
-      // Build per-app deep link using the universal UPI scheme
-      let deepLink = currentUpiLink;
+      const amount = generatedOrder.pricing.grand_total.toFixed(2);
+      const orderId = generatedOrder.id;
+      const baseUpiLink = buildUpiLink(amount, orderId);
 
-      // App-specific intent URIs (Android deep links)
-      const appSchemes = {
-        gpay:    currentUpiLink.replace("upi://", "tez://"),  // Google Pay uses tez://
-        phonepe: currentUpiLink,  // PhonePe supports standard upi://
-        paytm:   currentUpiLink,  // Paytm supports standard upi://
-        bhim:    currentUpiLink   // BHIM supports standard upi://
+      // App-specific deep links
+      const appNames = {
+        gpay: "Google Pay",
+        phonepe: "PhonePe",
+        paytm: "Paytm",
+        bhim: "BHIM UPI"
       };
 
-      deepLink = appSchemes[app] || currentUpiLink;
+      // Build intent links per app (Android intent format for better compatibility)
+      const intentLinks = {
+        gpay:    `intent://pay?pa=${UPI_ID}&pn=${encodeURIComponent(UPI_NAME)}&am=${amount}&cu=INR&tn=${encodeURIComponent("Order " + orderId)}#Intent;scheme=upi;package=com.google.android.apps.nbu.paisa.user;end`,
+        phonepe: `intent://pay?pa=${UPI_ID}&pn=${encodeURIComponent(UPI_NAME)}&am=${amount}&cu=INR&tn=${encodeURIComponent("Order " + orderId)}#Intent;scheme=upi;package=com.phonepe.app;end`,
+        paytm:   `intent://pay?pa=${UPI_ID}&pn=${encodeURIComponent(UPI_NAME)}&am=${amount}&cu=INR&tn=${encodeURIComponent("Order " + orderId)}#Intent;scheme=upi;package=net.one97.paytm;end`,
+        bhim:    `intent://pay?pa=${UPI_ID}&pn=${encodeURIComponent(UPI_NAME)}&am=${amount}&cu=INR&tn=${encodeURIComponent("Order " + orderId)}#Intent;scheme=upi;package=in.org.npci.upiapp;end`
+      };
 
-      showToast(`Opening ${app === 'gpay' ? 'Google Pay' : app === 'phonepe' ? 'PhonePe' : app === 'paytm' ? 'Paytm' : 'BHIM UPI'}...`, "success");
+      showToast(`Opening ${appNames[app]}...`, "success");
 
-      // Attempt to open the UPI app via deep link
-      window.location.href = deepLink;
+      // Use a hidden anchor to open the deep link without navigating away
+      const link = document.createElement("a");
+      link.href = intentLinks[app] || baseUpiLink;
+      link.style.display = "none";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
 
-      // After redirect attempt, show the waiting + "I've Paid" state
+      // Fallback: if intent didn't open, try standard upi:// after short delay
+      const fallbackTimer = setTimeout(() => {
+        const fallbackLink = document.createElement("a");
+        fallbackLink.href = baseUpiLink;
+        fallbackLink.style.display = "none";
+        document.body.appendChild(fallbackLink);
+        fallbackLink.click();
+        document.body.removeChild(fallbackLink);
+      }, 1500);
+
+      // Show waiting state
       paymentAppClicked = true;
       setTimeout(() => {
+        clearTimeout(fallbackTimer);
         document.getElementById("payment-waiting").classList.remove("hidden");
         const ivePaidBtn = document.getElementById("ive-paid-btn");
         ivePaidBtn.style.background = "linear-gradient(135deg, #15803d, #166534)";
         ivePaidBtn.style.boxShadow = "0 6px 25px rgba(22,163,74,0.55)";
         ivePaidBtn.style.transform = "scale(1.02)";
-      }, 1500);
+      }, 2000);
     }
 
     function buildWhatsAppMessage(order) {
