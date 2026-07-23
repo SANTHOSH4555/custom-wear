@@ -361,34 +361,62 @@
         });
       }
 
-      // Colors Grid — thumbnail swatches showing actual dress image
+      // COLOR_HEX_MAP for clean color dot rendering
+      const COLOR_HEX_MAP = {
+        "Black": "#18181b",
+        "Navy Blue": "#1e293b",
+        "Army Green": "#3f4a3c",
+        "Olive Green": "#374151",
+        "Beige": "#d4b896",
+        "Lavender": "#a78bfa",
+        "Off-White": "#f5f5f4",
+        "White": "#ffffff",
+        "Crimson Red": "#991b1b",
+        "Red": "#dc2626",
+        "Grey": "#6b7280",
+        "Gray": "#6b7280",
+        "Charcoal": "#27272a",
+        "Yellow": "#eab308",
+        "Blue": "#2563eb",
+        "Green": "#16a34a",
+        "Maroon": "#7f1d1d",
+        "Pink": "#ec4899",
+        "Purple": "#9333ea"
+      };
+
+      // Colors Grid — clean circular color dots
       const circles = document.getElementById("color-circles-container");
       circles.innerHTML = "";
-      currentProduct.colors.forEach(c => {
+      currentProduct.colors.forEach((c, idx) => {
+        const hex = COLOR_HEX_MAP[c.name] || "#3b82f6";
         const item = document.createElement("button");
-        item.className = `color-swatch-thumb relative rounded-xl overflow-hidden border-2 transition-all duration-200 hover:scale-105 focus:outline-none ${
-          c.name === selectedColor ? 'border-blue-500 ring-2 ring-blue-500/50 scale-105' : 'border-gray-700 hover:border-gray-400'
+        item.className = `w-10 h-10 rounded-full border-2 transition-all duration-200 hover:scale-110 focus:outline-none relative flex items-center justify-center shrink-0 ${
+          c.name === selectedColor ? 'border-blue-500 ring-2 ring-blue-500/50 scale-110' : 'border-gray-700 hover:border-gray-400'
         }`;
-        item.style.width = "56px";
-        item.style.height = "72px";
+        item.style.backgroundColor = hex;
         item.title = c.name;
-        item.innerHTML = `
-          <img src="${c.image}" alt="${c.name}"
-            class="w-full h-full object-cover"
-            onerror="this.src='assets/images/brand_logo.jpeg'">
-          <span class="absolute inset-0 bg-black/0 hover:bg-black/10 transition"></span>
-        `;
         item.addEventListener("click", () => {
           selectedColor = c.name;
           document.getElementById("selected-color-name").textContent = selectedColor;
           document.getElementById("main-product-image").src = c.image;
           
-          document.querySelectorAll(".color-swatch-thumb").forEach(sw => {
-            sw.classList.remove("border-blue-500", "ring-2", "ring-blue-500/50", "scale-105");
+          document.querySelectorAll("#color-circles-container button").forEach(sw => {
+            sw.classList.remove("border-blue-500", "ring-2", "ring-blue-500/50", "scale-110");
             sw.classList.add("border-gray-700");
           });
           item.classList.remove("border-gray-700");
-          item.classList.add("border-blue-500", "ring-2", "ring-blue-500/50", "scale-105");
+          item.classList.add("border-blue-500", "ring-2", "ring-blue-500/50", "scale-110");
+
+          // Sync gallery thumbnails under main photo
+          document.querySelectorAll("#product-thumbnails button").forEach((t, tIdx) => {
+            if (tIdx === idx) {
+              t.classList.add("border-blue-500", "ring-2", "ring-blue-500/40");
+              t.classList.remove("border-gray-800");
+            } else {
+              t.classList.remove("border-blue-500", "ring-2", "ring-blue-500/40");
+              t.classList.add("border-gray-800");
+            }
+          });
         });
         circles.appendChild(item);
       });
