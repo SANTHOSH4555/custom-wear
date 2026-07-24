@@ -16,8 +16,20 @@ def token_required(f):
             auth_header = request.headers["Authorization"]
             if auth_header.startswith("Bearer "):
                 token = auth_header.split(" ")[1]
+            elif auth_header:
+                token = auth_header
         
+        # Fallback to query string parameter (useful for direct invoice downloads / GET links)
         if not token:
+            token = request.args.get("token") or request.args.get("auth_token")
+            if not token and "Authorization" in request.args:
+                auth_arg = request.args.get("Authorization")
+                if auth_arg.startswith("Bearer "):
+                    token = auth_arg.split(" ")[1]
+                else:
+                    token = auth_arg
+        
+        if not token or not isinstance(token, str) or token.strip().lower() in ["undefined", "null", "none", "false", ""]:
             return jsonify({"message": "Token is missing!"}), 401
         
         try:
@@ -39,7 +51,10 @@ def generate_token(user_id):
         "user_id": user_id,
         "exp": datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(hours=Config.TOKEN_EXPIRATION_HOURS)
     }
-    return jwt.encode(payload, Config.SECRET_KEY, algorithm="HS256")
+    encoded = jwt.encode(payload, Config.SECRET_KEY, algorithm="HS256")
+    if isinstance(encoded, bytes):
+        return encoded.decode("utf-8")
+    return encoded
 
 @auth_bp.route("/register", methods=["POST"])
 def register():

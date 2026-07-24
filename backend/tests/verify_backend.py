@@ -152,7 +152,33 @@ class BackendAPITests(unittest.TestCase):
         confirm_data = json.loads(confirm_res.data)["order"]
         self.assertEqual(confirm_data["payment_status"], "Paid")
         
+        # Test invoice retrieval via query parameter Authorization
+        invoice_res = self.app.get(f'/api/orders/{order_id}/invoice?Authorization=Bearer%20{token}')
+        self.assertEqual(invoice_res.status_code, 200)
+
         print("Successfully validated Order placement and UPI Payment simulation.")
+
+    def test_4_token_verification_and_query_param_auth(self):
+        print("Testing token error handling for missing/invalid tokens...")
+        
+        # 1. Missing Authorization header
+        res1 = self.app.get('/api/auth/profile')
+        self.assertEqual(res1.status_code, 401)
+        data1 = json.loads(res1.data)
+        self.assertEqual(data1["message"], "Token is missing!")
+
+        # 2. String literal "undefined" or "null" token
+        res2 = self.app.get('/api/auth/profile', headers={"Authorization": "Bearer undefined"})
+        self.assertEqual(res2.status_code, 401)
+        data2 = json.loads(res2.data)
+        self.assertEqual(data2["message"], "Token is missing!")
+
+        res3 = self.app.get('/api/auth/profile', headers={"Authorization": "Bearer null"})
+        self.assertEqual(res3.status_code, 401)
+        data3 = json.loads(res3.data)
+        self.assertEqual(data3["message"], "Token is missing!")
+        
+        print("Successfully verified token error handling and edge cases.")
 
 if __name__ == '__main__':
     unittest.main()

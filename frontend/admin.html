@@ -292,7 +292,11 @@
           table.appendChild(row);
         });
       } catch (err) {
-        showToast(err.message, "error");
+        if (err.isAuthError) {
+          window.location.href = "login.html";
+        } else {
+          showToast(err.message, "error");
+        }
       }
     }
 

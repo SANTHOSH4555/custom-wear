@@ -1092,6 +1092,84 @@
       "payment_method": "UPI",
       "id": "ORD-3CAC1EFE",
       "created_at": "2026-07-23T22:42:21.401965"
+    },
+    "ORD-E3DE66A2": {
+      "user_id": "c6a7713e-57cf-4e9f-913e-01708f2ac3e3",
+      "user_name": "Order Tester",
+      "user_email": "order.tester@customwear.io",
+      "items": [
+        {
+          "product_id": "cw-m-3-4th-oversized-t-shirts",
+          "name": "Test Tee",
+          "price": 320,
+          "quantity": 2,
+          "size": "L",
+          "color": "White",
+          "print_style": "plain"
+        }
+      ],
+      "shipping_address": {
+        "name": "Order Tester",
+        "phone": "9999999999",
+        "email": "order.tester@customwear.io",
+        "address": "123 Verification Street",
+        "city": "Salem",
+        "district": "Salem",
+        "state": "Tamil Nadu",
+        "pin": "636001"
+      },
+      "coupon_code": null,
+      "pricing": {
+        "subtotal": 840.0,
+        "discount": 0.0,
+        "gst": 0.0,
+        "shipping": 50.0,
+        "grand_total": 890.0
+      },
+      "status": "Ordered",
+      "payment_status": "Paid",
+      "payment_method": "UPI",
+      "id": "ORD-E3DE66A2",
+      "created_at": "2026-07-24T09:23:13.372347"
+    },
+    "ORD-92A0EB52": {
+      "user_id": "c6a7713e-57cf-4e9f-913e-01708f2ac3e3",
+      "user_name": "Order Tester",
+      "user_email": "order.tester@customwear.io",
+      "items": [
+        {
+          "product_id": "cw-m-3-4th-oversized-t-shirts",
+          "name": "Test Tee",
+          "price": 320,
+          "quantity": 2,
+          "size": "L",
+          "color": "White",
+          "print_style": "plain"
+        }
+      ],
+      "shipping_address": {
+        "name": "Order Tester",
+        "phone": "9999999999",
+        "email": "order.tester@customwear.io",
+        "address": "123 Verification Street",
+        "city": "Salem",
+        "district": "Salem",
+        "state": "Tamil Nadu",
+        "pin": "636001"
+      },
+      "coupon_code": null,
+      "pricing": {
+        "subtotal": 840.0,
+        "discount": 0.0,
+        "gst": 0.0,
+        "shipping": 50.0,
+        "grand_total": 890.0
+      },
+      "status": "Ordered",
+      "payment_status": "Paid",
+      "payment_method": "UPI",
+      "id": "ORD-92A0EB52",
+      "created_at": "2026-07-24T09:23:37.944420"
     }
   },
   "cart": {

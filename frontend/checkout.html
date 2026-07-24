@@ -478,7 +478,12 @@
         lucide.createIcons();
       } catch (err) {
         hidePageLoader();
-        showToast(err.message, "error");
+        if (err.isAuthError) {
+          showToast("Your session expired. Please log in to complete checkout.", "error");
+          setTimeout(() => window.location.href = "login.html?redirect=checkout.html", 1500);
+        } else {
+          showToast(err.message, "error");
+        }
       }
     }
 

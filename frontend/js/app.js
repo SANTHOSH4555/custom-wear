@@ -70,17 +70,34 @@ function hidePageLoader() {
 
 // Authentication Helpers
 function getAuthToken() {
-  return localStorage.getItem("auth_token");
+  const token = localStorage.getItem("auth_token");
+  if (!token || token === "undefined" || token === "null" || token === "none" || token === "false" || token.trim() === "") {
+    return null;
+  }
+  return token;
 }
 
 function getCurrentUser() {
   const userStr = localStorage.getItem("user");
-  return userStr ? JSON.parse(userStr) : null;
+  if (!userStr || userStr === "undefined" || userStr === "null") return null;
+  try {
+    return JSON.parse(userStr);
+  } catch (e) {
+    return null;
+  }
 }
 
 function saveSession(token, user) {
-  localStorage.setItem("auth_token", token);
-  localStorage.setItem("user", JSON.stringify(user));
+  if (token && token !== "undefined" && token !== "null" && typeof token === "string" && token.trim() !== "") {
+    localStorage.setItem("auth_token", token);
+  } else {
+    localStorage.removeItem("auth_token");
+  }
+  if (user && typeof user === "object") {
+    localStorage.setItem("user", JSON.stringify(user));
+  } else {
+    localStorage.removeItem("user");
+  }
   syncNavbarAuth();
 }
 
@@ -155,8 +172,7 @@ async function apiRequest(endpoint, method = "GET", body = null) {
         localStorage.removeItem("auth_token");
         localStorage.removeItem("user");
         if (typeof syncNavbarAuth === "function") syncNavbarAuth();
-        // Throw a silent error (no toast — callers that need auth will redirect)
-        const err = new Error(data.message || "Session expired.");
+        const err = new Error(data.message || "Session expired. Please log in again.");
         err.isAuthError = true;
         throw err;
       }
