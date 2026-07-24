@@ -1,0 +1,22 @@
+
+    CUSTOM WEAR & CRADANCE INVOICE
+    ======================================
+    Order ID: ORD-CF38AACD
+    Date: 2026-07-24T09:55:56.991681
+    Customer: Order Tester
+    Email: order.tester@customwear.io
+    --------------------------------------
+    ITEMS SUMMARY:
+    
+- Test Tee | Size: L | Color: White | Qty: 2 | Print: plain
+    --------------------------------------
+    Subtotal: Rs. 840.0
+    Discount: Rs. 0.0
+    GST (0%): Rs. 0.0
+    Shipping: Rs. 50.0
+    --------------------------------------
+    GRAND TOTAL: Rs. 890.0
+    Payment Status: Paid
+    ======================================
+    Thank you for shopping with us!
+    
