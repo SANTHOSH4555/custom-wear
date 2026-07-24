@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en" class="dark">
 <head>
   <meta charset="UTF-8">
@@ -151,12 +151,9 @@
             </div>
           </div>
 
-          <!-- Color selection -->
+          <!-- Color: shown as text only -->
           <div class="mb-6">
-            <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">Color: <span id="selected-color-name" class="text-white normal-case font-medium ml-1"></span></h3>
-            <div class="flex items-center gap-4 overflow-x-auto py-3 px-2" id="color-circles-container">
-              <!-- JS Injected Circles -->
-            </div>
+            <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Color: <span id="selected-color-name" class="text-white normal-case font-medium ml-1"></span></p>
           </div>
 
 
@@ -362,65 +359,7 @@
         });
       }
 
-      // COLOR_HEX_MAP for clean color dot rendering
-      const COLOR_HEX_MAP = {
-        "Black": "#18181b",
-        "Navy Blue": "#1e293b",
-        "Army Green": "#3f4a3c",
-        "Olive Green": "#374151",
-        "Beige": "#d4b896",
-        "Lavender": "#a78bfa",
-        "Off-White": "#f5f5f4",
-        "White": "#ffffff",
-        "Crimson Red": "#991b1b",
-        "Red": "#dc2626",
-        "Grey": "#6b7280",
-        "Gray": "#6b7280",
-        "Charcoal": "#27272a",
-        "Yellow": "#eab308",
-        "Blue": "#2563eb",
-        "Green": "#16a34a",
-        "Maroon": "#7f1d1d",
-        "Pink": "#ec4899",
-        "Purple": "#9333ea"
-      };
-
-      // Colors Grid — clean circular color dots
-      const circles = document.getElementById("color-circles-container");
-      circles.innerHTML = "";
-      currentProduct.colors.forEach((c, idx) => {
-        const hex = COLOR_HEX_MAP[c.name] || "#3b82f6";
-        const item = document.createElement("button");
-        item.className = `w-9 h-9 rounded-full border-2 transition-all duration-200 focus:outline-none shrink-0 ${
-          c.name === selectedColor ? 'border-blue-500 ring-2 ring-blue-500 ring-offset-2 ring-offset-gray-950 scale-105' : 'border-gray-700 hover:border-gray-400'
-        }`;
-        item.style.backgroundColor = hex;
-        item.title = c.name;
-        item.addEventListener("click", () => {
-          selectedColor = c.name;
-          document.getElementById("selected-color-name").textContent = selectedColor;
-          document.getElementById("main-product-image").src = c.image;
-          
-          document.querySelectorAll("#color-circles-container button").forEach(sw => {
-            sw.classList.remove("border-blue-500", "ring-2", "ring-blue-500", "ring-offset-2", "ring-offset-gray-950", "scale-105");
-            sw.classList.add("border-gray-700");
-          });
-          item.classList.remove("border-gray-700");
-          item.classList.add("border-blue-500", "ring-2", "ring-blue-500", "ring-offset-2", "ring-offset-gray-950", "scale-105");
-
-          // Sync gallery thumbnails under main photo
-          document.querySelectorAll("#product-thumbnails button").forEach((t, tIdx) => {
-            if (tIdx === idx) {
-              t.classList.add("border-blue-500", "ring-2", "ring-blue-500/40");
-              t.classList.remove("border-gray-800");
-            } else {
-              t.classList.remove("border-blue-500", "ring-2", "ring-blue-500/40");
-              t.classList.add("border-gray-800");
-            }
-          });
-        });
-        circles.appendChild(item);
-      });
+      // Color name shown as text; clicking thumbnails below updates selected color
 
       // Sizes Grid
       const sizes = document.getElementById("sizes-container");
