@@ -389,6 +389,7 @@
       loadCanvasData();
       initDragging();
       hidePageLoader();
+      if (window.lucide) lucide.createIcons();
     });
 
     function setActiveLayer(layerId) {
@@ -797,6 +798,17 @@
       };
       document.addEventListener("mouseup", stopHandler);
       document.addEventListener("touchend", stopHandler);
+    }
+
+    function toggleMobileMenu() {
+      const menu = document.getElementById("mobile-menu");
+      const icon = document.getElementById("mobile-menu-icon");
+      if (!menu) return;
+      const isHidden = menu.classList.toggle("hidden");
+      if (icon) {
+        icon.setAttribute("data-lucide", isHidden ? "menu" : "x");
+        if (window.lucide) lucide.createIcons();
+      }
     }
 
     function addCustomProductToCart() {

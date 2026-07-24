@@ -542,3 +542,63 @@ button:active, [role="button"]:active {
   background: var(--accent);
 }
 
+
+/* -------------------------------------------
+   Canvas Mobile Toolbar
+------------------------------------------- */
+.canvas-mobile-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  overflow-x: auto;
+  padding: 8px 12px;
+  background: rgba(14, 14, 22, 0.92);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 16px;
+  width: 100%;
+  max-width: 32rem;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.canvas-mobile-toolbar::-webkit-scrollbar { display: none; }
+
+.canvas-mobile-toolbar button {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 11px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.04);
+  color: #d1d5db;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  min-height: 36px;
+  flex-shrink: 0;
+}
+
+.canvas-mobile-toolbar button:hover,
+.canvas-mobile-toolbar button:active {
+  background: rgba(124,58,237,0.18);
+  border-color: rgba(124,58,237,0.5);
+  color: #a78bfa;
+}
+
+.canvas-mobile-toolbar button.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.canvas-mobile-toolbar button.text-red-400 {
+  color: #f87171 !important;
+}
+.canvas-mobile-toolbar button.text-red-400:hover {
+  background: rgba(239,68,68,0.15) !important;
+  border-color: rgba(239,68,68,0.4) !important;
+  color: #fca5a5 !important;
+}
