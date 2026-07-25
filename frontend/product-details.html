@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en" class="dark">
 <head>
   <meta charset="UTF-8">
@@ -88,7 +88,7 @@
       <div class="flex-1 flex flex-col gap-4">
         <div class="zoom-wrapper aspect-[3/4] rounded-2xl bg-gray-900 border border-gray-800 overflow-hidden relative flex items-center justify-center">
           <img id="main-product-image" src="" alt="Main Product" class="w-full h-full object-cover" onerror="if(currentProduct && currentProduct.cover_image && this.src !== currentProduct.cover_image){ this.src=currentProduct.cover_image; } else { this.src='assets/images/brand_logo.jpeg'; }">
-          <!-- Swipe hint — only visible on touch, fades out after first swipe -->
+          <!-- Swipe hint � only visible on touch, fades out after first swipe -->
           <div id="swipe-hint" class="absolute inset-0 flex items-center justify-between px-4 pointer-events-none lg:hidden" style="opacity:1; transition:opacity 0.4s;">
             <div class="flex items-center justify-center rounded-full" style="width:36px;height:36px;background:rgba(0,0,0,0.45);backdrop-filter:blur(6px);">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
@@ -233,7 +233,7 @@
         <!-- JS Injected -->
       </div>
       <!-- Add Review Form (Only show if logged in) -->
-      <div class="glass-card p-6 rounded-xl border border-gray-800 mt-8" id="add-review-section">
+      <div class="glass-card p-6 rounded-xl border border-gray-800 mt-8" id="add-review-section" style="display:none;">
         <h3 class="font-extrabold text-sm mb-4">Write a Product Review</h3>
         <form onsubmit="submitReview(event)" class="flex flex-col gap-4">
           <div class="flex items-center gap-2">
@@ -405,10 +405,17 @@
         washSection.style.display = "none";
       }
 
-      // Hide or show Auth form for reviews
+      // Show review form only when logged in
       const addReviewSec = document.getElementById("add-review-section");
-      if (!getAuthToken()) {
+      if (getAuthToken()) {
+        addReviewSec.style.display = "";
+      } else {
         addReviewSec.style.display = "none";
+        // Show a login prompt instead
+        const loginPrompt = document.createElement("p");
+        loginPrompt.className = "text-xs text-gray-500 italic mt-8";
+        loginPrompt.innerHTML = `<a href="login.html?redirect=product-details.html%3Fid=${currentProduct.id}" class="text-violet-400 hover:text-violet-300 font-semibold">Log in</a> to write a review.`;
+        addReviewSec.parentNode.insertBefore(loginPrompt, addReviewSec);
       }
 
       // Render photo gallery thumbnails
@@ -619,16 +626,25 @@
         fetchReviews();
         
         // Recalculate average rating locally
-        const productRes = await apiRequest(`/products/${currentProduct.id}`);
-        document.getElementById("product-rating").textContent = `${productRes.rating} Rating`;
+        try {
+          const productRes = await apiRequest(`/products/${currentProduct.id}`);
+          document.getElementById("product-rating").textContent = `${productRes.rating} Rating`;
+        } catch(_) {}
       } catch (err) {
-        showToast(err.message, "error");
+        if (err.isAuthError) {
+          showToast("Please log in to submit a review.", "error");
+          setTimeout(() => {
+            window.location.href = `login.html?redirect=${encodeURIComponent(window.location.pathname + window.location.search)}`;
+          }, 1500);
+        } else {
+          showToast(err.message || "Failed to submit review.", "error");
+        }
       }
     }
   </script>
 
   <script>
-    // ── Touch swipe for main product image ─────────────────
+    // -- Touch swipe for main product image -----------------
     (function() {
       const imgEl = document.getElementById("main-product-image");
       if (!imgEl) return;
