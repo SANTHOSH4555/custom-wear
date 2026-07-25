@@ -1833,41 +1833,54 @@
       renderCanvasLayers();
     }
 
-    // Export High-Res Mockup PNG
-    function exportMockupImage() {
-      if (!activeProduct) {
-        showToast("No active product selected", "error");
-        return;
-      }
-      showToast("Rendering high-res mockup preview...", "info");
+    // Render Composite Mockup Canvas Image (Text + Clipart + Custom Uploads + Background)
+    async function renderCompositeMockupDataUrl(activeSides) {
+      if (!activeProduct) return null;
+      const sidesToDraw = activeSides && activeSides.length > 0 ? activeSides : [activePlacement];
+      const panelSize = 600;
+      const totalWidth = panelSize * sidesToDraw.length;
+      const totalHeight = panelSize;
 
       const canvas = document.createElement("canvas");
-      canvas.width = 800;
-      canvas.height = 800;
+      canvas.width = totalWidth;
+      canvas.height = totalHeight;
       const ctx = canvas.getContext("2d");
 
       const matchingColor = activeProduct.colors ? activeProduct.colors.find(c => c.name === selectedColor) : null;
-      const bgPath = matchingColor ? matchingColor.image : (activeProduct.cover_image || 'assets/images/brand_logo.jpeg');
 
-      const bgImg = new Image();
-      if (bgPath.startsWith("http://") || bgPath.startsWith("https://")) {
-        bgImg.crossOrigin = "anonymous";
-      }
+      for (let i = 0; i < sidesToDraw.length; i++) {
+        const side = sidesToDraw[i];
+        const offsetX = i * panelSize;
+        const bgPath = matchingColor ? matchingColor.image : (activeProduct.cover_image || 'assets/images/brand_logo.jpeg');
 
-      bgImg.onload = async function() {
-        ctx.drawImage(bgImg, 0, 0, 800, 800);
+        // Draw background image for this panel
+        await new Promise((resolve) => {
+          const bgImg = new Image();
+          if (bgPath.startsWith("http://") || bgPath.startsWith("https://")) {
+            bgImg.crossOrigin = "anonymous";
+          }
+          bgImg.onload = () => {
+            ctx.drawImage(bgImg, offsetX, 0, panelSize, panelSize);
+            resolve();
+          };
+          bgImg.onerror = () => {
+            ctx.fillStyle = "#0f172a";
+            ctx.fillRect(offsetX, 0, panelSize, panelSize);
+            resolve();
+          };
+          bgImg.src = bgPath;
+        });
 
-        // Render all visible layers on current placement side
-        const layers = placementStore[activePlacement] || [];
-        
+        // Draw layers for this placement side
+        const layers = placementStore[side] || [];
+        const scale = panelSize / 500;
+
         for (const layer of layers) {
           if (!layer.visible) continue;
-
           ctx.save();
 
-          // Calculate layer position on 800x800 canvas
-          const cx = (layer.x / 100) * 800;
-          const cy = (layer.y / 100) * 800;
+          const cx = offsetX + (layer.x / 100) * panelSize;
+          const cy = (layer.y / 100) * panelSize;
 
           ctx.translate(cx, cy);
           ctx.rotate((layer.rotation * Math.PI) / 180);
@@ -1876,7 +1889,7 @@
           if (layer.type === 'text') {
             const fontStyle = layer.fontStyle || 'normal';
             const fontWeight = layer.fontWeight || 'bold';
-            const fontSize = Math.round((layer.fontSize || 28) * 1.5);
+            const fontSize = Math.round((layer.fontSize || 28) * scale);
             const fontFamily = layer.fontFamily || 'Outfit';
 
             ctx.font = `${fontStyle} ${fontWeight} ${fontSize}px '${fontFamily}', sans-serif`;
@@ -1885,28 +1898,27 @@
 
             if (layer.shadow) {
               ctx.shadowColor = "rgba(0,0,0,0.8)";
-              ctx.shadowBlur = 10;
-              ctx.shadowOffsetX = 3;
-              ctx.shadowOffsetY = 3;
+              ctx.shadowBlur = 10 * scale;
+              ctx.shadowOffsetX = 3 * scale;
+              ctx.shadowOffsetY = 3 * scale;
             }
 
             if (layer.strokeWidth && layer.strokeWidth > 0) {
               ctx.strokeStyle = layer.strokeColor || "#000000";
-              ctx.lineWidth = layer.strokeWidth * 1.5;
+              ctx.lineWidth = layer.strokeWidth * scale;
               ctx.strokeText(layer.text, 0, 0);
             }
 
             ctx.fillStyle = layer.color || "#FFFFFF";
             ctx.fillText(layer.text, 0, 0);
           } else if (layer.type === 'image' || layer.type === 'clipart') {
-            const drawW = (layer.width || 120) * 1.6;
-            const drawH = (layer.height || 120) * 1.6;
+            const drawW = (layer.width || 120) * scale;
+            const drawH = (layer.height || 120) * scale;
 
             if (layer.src && layer.src.startsWith('<svg')) {
               const svgBlob = new Blob([layer.src], { type: 'image/svg+xml;charset=utf-8' });
               const URL = window.URL || window.webkitURL || window;
               const svgUrl = URL.createObjectURL(svgBlob);
-              
               await new Promise((resolve) => {
                 const svgImg = new Image();
                 svgImg.onload = () => {
@@ -1937,44 +1949,44 @@
           ctx.restore();
         }
 
-        // Draw studio watermark & placement badge
+        // Draw studio watermark badge for side
         ctx.save();
-        ctx.font = "bold 14px Outfit, sans-serif";
+        ctx.font = "bold 13px Outfit, sans-serif";
         ctx.fillStyle = "rgba(255, 255, 255, 0.85)";
-        ctx.fillText(`CUSTOM WEAR STUDIO — ${activePlacement.toUpperCase()} VIEW`, 30, 770);
+        ctx.fillText(`CUSTOM WEAR — ${side.toUpperCase()} VIEW`, offsetX + 20, panelSize - 20);
         ctx.restore();
+      }
 
-        // Trigger PNG Download
-        try {
-          const dataUrl = canvas.toDataURL("image/png");
-          const link = document.createElement("a");
-          link.download = `custom_wear_${activeProduct.id}_${activePlacement}.png`;
-          link.href = dataUrl;
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-          showToast("Mockup PNG downloaded successfully! 🎨", "success");
-        } catch (err) {
-          console.error("Canvas export error:", err);
-          showToast("Error generating PNG download", "error");
-        }
-      };
+      try {
+        return canvas.toDataURL("image/png");
+      } catch (err) {
+        console.error("Mockup Canvas rendering error:", err);
+        return null;
+      }
+    }
 
-      bgImg.onerror = function() {
-        showToast("Notice: Export fallback triggered", "info");
-        ctx.fillStyle = "#0f172a";
-        ctx.fillRect(0, 0, 800, 800);
-        const dataUrl = canvas.toDataURL("image/png");
+    // Export High-Res Mockup PNG
+    async function exportMockupImage() {
+      if (!activeProduct) {
+        showToast("No active product selected", "error");
+        return;
+      }
+      const activeSides = Object.keys(placementStore).filter(side => placementStore[side].length > 0);
+      const sidesToExport = activeSides.length > 0 ? activeSides : [activePlacement];
+      showToast("Rendering high-res mockup preview...", "info");
+
+      const dataUrl = await renderCompositeMockupDataUrl(sidesToExport);
+      if (dataUrl) {
         const link = document.createElement("a");
-        link.download = `custom_wear_design_${activePlacement}.png`;
+        link.download = `custom_wear_${activeProduct.id}_design.png`;
         link.href = dataUrl;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-        showToast("Mockup PNG downloaded!", "success");
-      };
-
-      bgImg.src = bgPath;
+        showToast("Mockup PNG downloaded successfully! 🎨", "success");
+      } else {
+        showToast("Error generating PNG mockup", "error");
+      }
     }
 
     // Share Design via WhatsApp to Store Owner
@@ -2011,7 +2023,7 @@
     }
 
     // Add Customized Item to Cart
-    function addCustomProductToCart() {
+    async function addCustomProductToCart() {
       if (!activeProduct) return;
 
       const activeSides = Object.keys(placementStore).filter(side => placementStore[side].length > 0);
@@ -2021,57 +2033,38 @@
         return;
       }
 
+      showToast("Rendering custom dress print mockup...", "info");
+
       let extraMarkup = activeSides.length > 1 ? (activeSides.length - 1) * 150 : 0;
       const finalPrice = activeProduct.prices.printed + extraMarkup;
 
-      // Generate composite mockup image thumbnail
-      const canvas = document.createElement("canvas");
-      canvas.width = 600;
-      canvas.height = 600;
-      const ctx = canvas.getContext("2d");
-      const bgImg = new Image();
-      bgImg.crossOrigin = "anonymous";
-      const matchingColor = activeProduct.colors.find(c => c.name === selectedColor);
-      bgImg.src = matchingColor ? matchingColor.image : activeProduct.cover_image;
+      const mockupDataUrl = await renderCompositeMockupDataUrl(activeSides);
+      const garmentImage = activeProduct.colors.find(c => c.name === selectedColor)?.image || activeProduct.cover_image;
 
-      const processAddToCart = (mockupDataUrl) => {
-        const cartItem = {
-          product_id: activeProduct.id,
-          name: `${activeProduct.name} (Custom Design)`,
-          price: finalPrice,
-          quantity: 1,
-          size: selectedSize,
-          color: selectedColor,
-          print_style: "custom_printed",
-          image: activeProduct.colors.find(c => c.name === selectedColor)?.image || activeProduct.cover_image,
-          customization: {
-            mockup_image: mockupDataUrl,
-            active_placements: activeSides,
-            layers_breakdown: placementStore,
-            garment_color: selectedColor,
-            size: selectedSize
-          }
-        };
-
-        addToCart(cartItem);
-        showToast("Added custom design clothing to cart!", "success");
-
-        setTimeout(() => {
-          window.location.href = "cart.html";
-        }, 1000);
+      const cartItem = {
+        product_id: activeProduct.id,
+        name: `${activeProduct.name} (Custom Design)`,
+        price: finalPrice,
+        quantity: 1,
+        size: selectedSize,
+        color: selectedColor,
+        print_style: "custom_printed",
+        image: mockupDataUrl || garmentImage,
+        customization: {
+          mockup_image: mockupDataUrl,
+          active_placements: activeSides,
+          layers_breakdown: placementStore,
+          garment_color: selectedColor,
+          size: selectedSize
+        }
       };
 
-      bgImg.onload = function() {
-        ctx.drawImage(bgImg, 0, 0, 600, 600);
-        ctx.font = "bold 12px Outfit, sans-serif";
-        ctx.fillStyle = "rgba(255,255,255,0.7)";
-        ctx.fillText(`CUSTOM WEAR — ${activePlacement.toUpperCase()} DESIGN`, 20, 580);
-        processAddToCart(canvas.toDataURL("image/png"));
-      };
+      addToCart(cartItem);
+      showToast("Added custom design clothing to cart! 🎨", "success");
 
-      bgImg.onerror = function() {
-        processAddToCart(null);
-      };
+      setTimeout(() => {
+        window.location.href = "cart.html";
+      }, 1000);
     }
 
     function toggleMobileMenu() {

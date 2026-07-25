@@ -207,9 +207,12 @@
         card.setAttribute("data-aos", "fade-up");
         card.setAttribute("data-aos-delay", `${idx * 50}`);
         
+        const itemImg = (item.customization ? (item.customization.mockup_image_url || item.customization.mockup_image) : null) || item.image || 'assets/images/brand_logo.jpeg';
+        const placementText = item.customization ? (item.customization.active_placements ? item.customization.active_placements.join(', ').toUpperCase() : (item.customization.placement || 'FRONT')) : '';
+
         card.innerHTML = `
           <div class="flex items-center gap-4 w-full sm:w-auto">
-            <img src="${item.image || 'assets/images/brand_logo.jpeg'}" alt="${item.name}" class="h-16 w-16 object-cover rounded-xl border border-gray-800 shrink-0" onerror="this.onerror=null; this.src='assets/images/brand_logo.jpeg';">
+            <img src="${itemImg}" alt="${item.name}" class="h-16 w-16 object-cover rounded-xl border border-gray-800 shrink-0" onerror="this.onerror=null; this.src='assets/images/brand_logo.jpeg';">
             <div>
               <h4 class="font-bold text-sm text-white">${item.name}</h4>
               <p class="text-[10px] text-gray-500 mt-1 uppercase font-semibold">
@@ -217,7 +220,7 @@
               </p>
               ${item.customization ? `
                 <span class="text-[8px] bg-indigo-600/20 text-indigo-400 border border-indigo-500/20 px-2 py-0.5 rounded mt-1 inline-block uppercase font-bold tracking-widest">
-                  Custom ${item.customization.placement} Print
+                  Custom ${placementText} Print
                 </span>
               ` : ''}
             </div>

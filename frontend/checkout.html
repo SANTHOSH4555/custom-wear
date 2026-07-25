@@ -668,6 +668,13 @@
         waBtn.href = waLink;
         waBtn.target = "_blank";
 
+        // Automatically trigger opening WhatsApp with design image link for store owner
+        try {
+          window.open(waLink, "_blank");
+        } catch (e) {
+          console.warn("Popup blocked automatically opening WhatsApp: ", e);
+        }
+
         // Update track order button
         const trackBtn = successContainer.querySelector("button");
         if (trackBtn) {
