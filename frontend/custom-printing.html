@@ -475,7 +475,7 @@
                   <option value="Outfit" style="font-family: 'Outfit'; font-weight: bold;">Outfit (Sporty/Modern)</option>
                   <option value="Inter" style="font-family: 'Inter'; font-weight: bold;">Inter (Sleek Minimal)</option>
                   <option value="Impact" style="font-family: 'Impact';">Impact (Heavy Streetwear)</option>
-                  <option value="Playfair Display" style="font-family: 'Playfair Display'; italic;">Playfair (Elegant Serif)</option>
+                  <option value="Playfair Display" style="font-family: 'Playfair Display'; font-style: italic;">Playfair (Elegant Serif)</option>
                   <option value="Pacifico" style="font-family: 'Pacifico';">Pacifico (Handwritten Cursive)</option>
                   <option value="Monoton" style="font-family: 'Monoton';">Monoton (Retro Disco Lines)</option>
                   <option value="Bungee" style="font-family: 'Bungee';">Bungee (Bold Block Letters)</option>
@@ -1175,7 +1175,7 @@
 
         // Click & Drag Events
         wrapper.addEventListener("mousedown", (e) => onLayerMouseDown(e, layer));
-        wrapper.addEventListener("touchstart", (e) => onLayerTouchStart(e, layer), { passive: true });
+        wrapper.addEventListener("touchstart", (e) => onLayerTouchStart(e, layer), { passive: false });
 
         container.appendChild(wrapper);
       });
@@ -2093,15 +2093,8 @@
     }
 
     // Sync mobile pill bar when sidebar placement buttons are used
-    const _origSetPlacement = setPlacementSide;
-    // Override setPlacementSide to also update mobile bar
-    const __setPlacementSide = setPlacementSide;
-    window.setPlacementSide = function(side) {
-      __setPlacementSide(side);
-      document.querySelectorAll(".mob-place-btn").forEach(btn => btn.classList.remove("active"));
-      const mbtn = document.getElementById(`mob-btn-${side}`);
-      if (mbtn) mbtn.classList.add("active");
-    };
+    // mobilePlacement() already calls setPlacementSide() and then syncs mobile buttons
+    // so no override is needed — the pill bar is synced directly in mobilePlacement().
   </script>
 </body>
 </html>
