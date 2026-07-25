@@ -210,6 +210,7 @@
       touch-action: none;
       border: 1px dashed transparent;
       transition: border-color 0.15s ease;
+      overflow: visible;
     }
 
     .layer-overlay.active-selected {
@@ -884,8 +885,8 @@
         shadow: false,
         x: 50,
         y: 45,
-        width: 220,
-        height: 50,
+        width: 240,
+        height: 52,
         rotation: 0,
         opacity: 1,
         locked: false,
@@ -1176,6 +1177,7 @@
         // Click & Drag Events
         wrapper.addEventListener("mousedown", (e) => onLayerMouseDown(e, layer));
         wrapper.addEventListener("touchstart", (e) => onLayerTouchStart(e, layer), { passive: false });
+        wrapper.addEventListener("touchmove", (e) => e.preventDefault(), { passive: false });
 
         container.appendChild(wrapper);
       });
@@ -1513,6 +1515,8 @@
       if (e.target && (e.target.classList.contains("layer-handle") || e.target.closest(".layer-handle"))) {
         return;
       }
+      e.preventDefault();
+      e.stopPropagation();
       selectLayer(layer.id);
       const touch = e.touches[0];
       const workspace = document.getElementById("canvas-workspace");
