@@ -3,580 +3,873 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Custom Printing Canvas | CUSTOM WEAR</title>
+  <title>Custom Printing Design Studio | CUSTOM WEAR</title>
+
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
       darkMode: 'class',
       theme: {
         extend: {
-          colors: { brand: { blue: '#2563eb' } }
+          colors: {
+            brand: {
+              blue: '#2563eb',
+              purple: '#7c3aed',
+              dark: '#0b0f19'
+            }
+          }
         }
       }
     }
   </script>
+
+  <!-- Custom Stylesheet & Google Fonts -->
   <link rel="stylesheet" href="css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bungee&family=Courier+Prime:wght@400;700&family=Impact&family=Inter:wght@400;600;800&family=Monoton&family=Montserrat:ital,wght@0,700;0,900;1,700&family=Orbitron:wght@700;900&family=Outfit:wght@400;600;800;900&family=Pacifico&family=Permanent+Marker&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+  
   <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
   <script src="https://unpkg.com/lucide@latest"></script>
+
   <!-- Firebase SDK v8 compat -->
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+
   <style>
-    #garment-picker-grid {
-      scrollbar-width: thin;
-      scrollbar-color: #2563eb33 transparent;
+    /* Custom Scrollbars */
+    .custom-scroll::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
     }
-    #garment-picker-grid::-webkit-scrollbar {
-      width: 4px;
+    .custom-scroll::-webkit-scrollbar-track {
+      background: rgba(15, 23, 42, 0.6);
+      border-radius: 8px;
     }
-    #garment-picker-grid::-webkit-scrollbar-track {
-      background: transparent;
+    .custom-scroll::-webkit-scrollbar-thumb {
+      background: #3b82f644;
+      border-radius: 8px;
     }
-    #garment-picker-grid::-webkit-scrollbar-thumb {
-      background: #2563eb55;
-      border-radius: 99px;
-    }
-    #garment-picker-grid::-webkit-scrollbar-thumb:hover {
+    .custom-scroll::-webkit-scrollbar-thumb:hover {
       background: #2563eb;
     }
 
+    /* Studio Tab Active Pill */
+    .tab-btn.active {
+      background: linear-gradient(135deg, rgba(37, 99, 235, 0.25), rgba(124, 58, 237, 0.25));
+      border-color: #3b82f6;
+      color: #60a5fa;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+    }
+
+    /* Canvas Workspace Container */
     #canvas-workspace {
       position: relative;
       background-size: contain;
       background-position: center;
       background-repeat: no-repeat;
-      transition: background-image 0.3s;
+      transition: background-image 0.3s ease-in-out;
+      user-select: none;
     }
-    
-    .design-overlay {
+
+    /* Safe Print Zone Overlay */
+    .print-safe-zone {
       position: absolute;
-      width: 120px;
-      height: 120px;
-      border: 2px dashed transparent;
-      cursor: grab;
+      top: 15%;
+      left: 20%;
+      width: 60%;
+      height: 65%;
+      border: 1.5px dashed rgba(59, 130, 246, 0.5);
+      border-radius: 12px;
+      pointer-events: none;
+      transition: opacity 0.2s;
+    }
+
+    .print-safe-zone::before {
+      content: 'PRINT AREA';
+      position: absolute;
+      top: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(15, 23, 42, 0.9);
+      color: #60a5fa;
+      font-size: 8px;
+      font-weight: 800;
+      padding: 1px 6px;
+      border-radius: 4px;
+      letter-spacing: 1px;
+      border: 1px solid rgba(59, 130, 246, 0.4);
+    }
+
+    /* Alignment Snap Lines */
+    .snap-line-x, .snap-line-y {
+      position: absolute;
+      background-color: #3b82f6;
+      z-index: 40;
+      pointer-events: none;
+      display: none;
+    }
+    .snap-line-x {
+      left: 50%;
+      top: 0;
+      bottom: 0;
+      width: 1px;
+      box-shadow: 0 0 8px #3b82f6;
+    }
+    .snap-line-y {
+      top: 50%;
+      left: 0;
+      right: 0;
+      height: 1px;
+      box-shadow: 0 0 8px #3b82f6;
+    }
+
+    /* Interactive Bounding Overlay */
+    .layer-overlay {
+      position: absolute;
+      cursor: move;
       display: flex;
       align-items: center;
       justify-content: center;
       user-select: none;
       touch-action: none;
-      transition: border-color 0.2s;
+      border: 1px dashed transparent;
+      transition: border-color 0.15s ease;
     }
 
-    .design-overlay.active {
-      border-color: rgba(59, 130, 246, 0.6);
+    .layer-overlay.active-selected {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.3);
     }
 
-    .design-overlay:hover {
-      border-color: rgba(255, 255, 255, 0.3);
+    .preview-mode .layer-overlay {
+      border-color: transparent !important;
+      box-shadow: none !important;
+    }
+    .preview-mode .layer-handle {
+      display: none !important;
+    }
+    .preview-mode .print-safe-zone {
+      display: none !important;
     }
 
-    .design-overlay.active:hover {
-      border-color: rgba(59, 130, 246, 0.8);
-    }
-    
-    .design-overlay:active {
-      cursor: grabbing;
-    }
-    
-    .design-element {
-      width: 100%;
-      height: 100%;
+    /* Layer Corner Action Handles */
+    .layer-handle {
+      position: absolute;
+      width: 22px;
+      height: 22px;
+      background: #1e293b;
+      border: 2px solid #3b82f6;
+      color: #ffffff;
+      border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      text-align: center;
-      font-weight: bold;
-      pointer-events: none;
+      font-size: 10px;
+      z-index: 30;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+      transition: transform 0.15s, background-color 0.15s;
     }
-    
-    .design-element img {
-      max-width: 100%;
-      max-height: 100%;
-      object-fit: contain;
-    }
-    
-    .resize-handle {
-      position: absolute;
-      width: 12px;
-      height: 12px;
+    .layer-handle:hover {
+      transform: scale(1.15);
       background: #2563eb;
-      border: 2px solid white;
-      border-radius: 50%;
-      bottom: -6px;
-      right: -6px;
-      cursor: se-resize;
+    }
+
+    .handle-tl { top: -11px; left: -11px; cursor: pointer; background: #ef4444; border-color: #f87171; } /* Delete */
+    .handle-tr { top: -11px; right: -11px; cursor: grab; background: #3b82f6; border-color: #93c5fd; } /* Rotate */
+    .handle-bl { bottom: -11px; left: -11px; cursor: pointer; background: #8b5cf6; border-color: #c4b5fd; } /* Duplicate */
+    .handle-br { bottom: -11px; right: -11px; cursor: se-resize; background: #10b981; border-color: #6ee7b7; } /* Resize */
+
+    /* Text Layer Curving & Formatting */
+    .text-node-span {
+      display: inline-block;
+      white-space: nowrap;
+      text-shadow: var(--ts-shadow, none);
+      -webkit-text-stroke: var(--ts-stroke, none);
+    }
+
+    /* Clipart library items */
+    .clipart-card {
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .clipart-card:hover {
+      transform: translateY(-2px) scale(1.03);
+      border-color: #3b82f6;
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.25);
     }
   </style>
 </head>
-<body class="bg-gray-950 text-gray-100 min-h-screen pt-20">
+<body class="bg-gray-950 text-gray-100 min-h-screen pt-20 custom-scroll font-['Outfit',sans-serif]">
 
   <!-- Page Loader -->
-  <div id="page-loader">
+  <div id="page-loader" class="fixed inset-0 bg-gray-950/90 backdrop-blur-md z-[100] flex items-center justify-center transition-opacity duration-500">
     <div class="flex flex-col items-center">
-      <div class="spinner mb-4"></div>
-      <h1 class="text-xl font-bold tracking-widest text-blue-500">OPENING DESIGN CANVAS</h1>
+      <div class="spinner mb-4 w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+      <h1 class="text-lg font-black tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">LOADING DESIGN STUDIO</h1>
+      <p class="text-xs text-gray-500 mt-1">Preparing high-res garment canvases...</p>
     </div>
   </div>
 
-  <!-- Navbar -->
-  <nav class="glass-nav fixed top-0 left-0 w-full z-50 transition duration-300">
+  <!-- Main Navbar -->
+  <nav class="glass-nav fixed top-0 left-0 w-full z-50 transition duration-300 border-b border-gray-800/80 bg-gray-950/80 backdrop-blur-xl">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex items-center justify-between h-20">
         <a href="index.html" class="flex items-center gap-3">
-          <img src="assets/images/brand_logo.jpeg" alt="Logo" class="h-10 w-10 rounded-full border border-blue-500">
-          <span class="font-extrabold text-xl tracking-wider text-blue-500">CUSTOM WEAR</span>
+          <img src="assets/images/brand_logo.jpeg" alt="Logo" class="h-10 w-10 rounded-full border border-blue-500/50 shadow-md">
+          <div class="flex flex-col">
+            <span class="font-black text-xl tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-300 to-purple-400">CUSTOM WEAR</span>
+            <span class="text-[9px] font-bold tracking-widest text-gray-400 -mt-1 uppercase">Printing Studio Pro</span>
+          </div>
         </a>
         <div class="hidden md:flex items-center space-x-6 text-sm font-medium">
           <a href="index.html" class="hover:text-blue-400 transition">Home</a>
           <a href="custom-wear.html" class="hover:text-blue-400 transition">CUSTOM WEAR</a>
           <a href="cradance.html" class="hover:text-blue-400 transition">CRADANCE</a>
-          <a href="custom-printing.html" class="text-blue-500 hover:text-blue-400 transition flex items-center gap-1">
-            <i data-lucide="sparkles" class="w-4 h-4 text-amber-400"></i> Custom Printing
+          <a href="custom-printing.html" class="text-blue-400 font-bold flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-600/10 border border-blue-500/30">
+            <i data-lucide="sparkles" class="w-4 h-4 text-amber-400 animate-pulse"></i> Custom Printing
           </a>
           <a href="products.html" class="hover:text-blue-400 transition">Shop All</a>
           <a href="contact.html" class="hover:text-blue-400 transition">Contact Us</a>
         </div>
         <div class="flex items-center space-x-4">
-          <a href="cart.html" class="p-2 rounded-full hover:bg-gray-800 text-gray-400 hover:text-white transition relative">
+          <a href="cart.html" class="p-2.5 rounded-xl hover:bg-gray-800 text-gray-300 hover:text-white transition relative border border-gray-800">
             <i data-lucide="shopping-bag" class="w-5 h-5"></i>
-            <span class="cart-count-badge absolute -top-1 -right-1 bg-blue-600 text-white rounded-full text-[10px] w-4 h-4 flex items-center justify-center font-bold hidden">0</span>
+            <span class="cart-count-badge absolute -top-1.5 -right-1.5 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-full text-[10px] w-5 h-5 flex items-center justify-center font-bold border border-gray-900 hidden">0</span>
           </a>
-          <a href="dashboard.html" class="p-2 rounded-full hover:bg-gray-800 text-gray-400 hover:text-white transition"><i data-lucide="user" class="w-5 h-5"></i></a>
-          <button id="mobile-menu-btn" onclick="toggleMobileMenu()" class="lg:hidden p-2 rounded-xl hover:bg-gray-800 text-gray-400 hover:text-white transition ml-1" aria-label="Open menu">
+          <a href="dashboard.html" class="p-2.5 rounded-xl hover:bg-gray-800 text-gray-300 hover:text-white transition border border-gray-800"><i data-lucide="user" class="w-5 h-5"></i></a>
+          <button id="mobile-menu-btn" onclick="toggleMobileMenu()" class="md:hidden p-2.5 rounded-xl hover:bg-gray-800 text-gray-300 transition border border-gray-800" aria-label="Open menu">
             <i data-lucide="menu" class="w-6 h-6" id="mobile-menu-icon"></i>
           </button>
         </div>
       </div>
     </div>
     <!-- Mobile Menu Drawer -->
-    <div id="mobile-menu" class="lg:hidden hidden bg-gray-950/95 backdrop-blur-xl border-t border-gray-800/60">
+    <div id="mobile-menu" class="md:hidden hidden bg-gray-950/95 backdrop-blur-xl border-t border-gray-800">
       <div class="px-4 pt-3 pb-5 space-y-3 font-medium text-sm">
-        <a href="index.html" class="block py-2 px-3 rounded-lg hover:bg-gray-800/60 text-gray-200">Home</a>
-        <a href="custom-wear.html" class="block py-2 px-3 rounded-lg hover:bg-gray-800/60 text-gray-200">CUSTOM WEAR</a>
-        <a href="cradance.html" class="block py-2 px-3 rounded-lg hover:bg-gray-800/60 text-gray-200">CRADANCE</a>
-        <a href="custom-printing.html" class="block py-2 px-3 rounded-lg hover:bg-gray-800/60 text-blue-400 font-semibold flex items-center gap-2">
-          <i data-lucide="sparkles" class="w-4 h-4 text-amber-400"></i> Custom Printing Canvas
+        <a href="index.html" class="block py-2 px-3 rounded-lg hover:bg-gray-800 text-gray-200">Home</a>
+        <a href="custom-wear.html" class="block py-2 px-3 rounded-lg hover:bg-gray-800 text-gray-200">CUSTOM WEAR</a>
+        <a href="cradance.html" class="block py-2 px-3 rounded-lg hover:bg-gray-800 text-gray-200">CRADANCE</a>
+        <a href="custom-printing.html" class="block py-2 px-3 rounded-lg bg-blue-600/20 text-blue-400 font-bold flex items-center gap-2">
+          <i data-lucide="sparkles" class="w-4 h-4 text-amber-400"></i> Custom Printing Studio
         </a>
-        <a href="products.html" class="block py-2 px-3 rounded-lg hover:bg-gray-800/60 text-gray-200">Shop All</a>
-        <a href="contact.html" class="block py-2 px-3 rounded-lg hover:bg-gray-800/60 text-gray-200">Contact Us</a>
+        <a href="products.html" class="block py-2 px-3 rounded-lg hover:bg-gray-800 text-gray-200">Shop All</a>
+        <a href="contact.html" class="block py-2 px-3 rounded-lg hover:bg-gray-800 text-gray-200">Contact Us</a>
       </div>
     </div>
   </nav>
 
+  <!-- Studio Top Bar Banner -->
+  <header class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4 mb-4">
+    <div class="glass-card p-4 rounded-2xl border border-gray-800/80 bg-gray-900/40 flex flex-wrap items-center justify-between gap-4 shadow-xl">
+      <div class="flex items-center gap-3">
+        <div class="p-2.5 rounded-xl bg-blue-600/20 border border-blue-500/30 text-blue-400">
+          <i data-lucide="palette" class="w-6 h-6"></i>
+        </div>
+        <div>
+          <h1 class="text-base font-black tracking-wide text-white flex items-center gap-2">
+            DESIGN STUDIO 
+            <span class="text-[10px] uppercase font-extrabold px-2 py-0.5 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 text-white">PRO 2.0</span>
+          </h1>
+          <p class="text-xs text-gray-400">Create multi-side custom apparel with live graphics, custom fonts & cliparts.</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2 flex-wrap text-xs">
+        <button onclick="toggleSafeZone()" id="btn-safezone-toggle" class="px-3 py-2 rounded-xl bg-gray-900 border border-gray-800 hover:border-gray-700 font-semibold text-gray-300 flex items-center gap-1.5 transition">
+          <i data-lucide="square-dashed" class="w-4 h-4 text-blue-400"></i> Safe Print Area
+        </button>
+        <button onclick="clearCurrentPlacement()" class="px-3 py-2 rounded-xl bg-gray-900 border border-gray-800 hover:border-red-900/60 font-semibold text-red-400 hover:bg-red-950/30 flex items-center gap-1.5 transition">
+          <i data-lucide="trash-2" class="w-4 h-4"></i> Clear Placement
+        </button>
+        <button onclick="exportMockupImage()" class="px-4 py-2 rounded-xl bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white font-bold flex items-center gap-1.5 shadow-lg shadow-purple-600/20 transition">
+          <i data-lucide="download" class="w-4 h-4"></i> Download Mockup
+        </button>
+      </div>
+    </div>
+  </header>
 
-  <!-- Main Canvas Designer Container -->
-  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <div class="flex flex-col lg:flex-row gap-8">
-      
-      <!-- Left Panel: Design Controls -->
-      <aside class="w-full lg:w-80 shrink-0 flex flex-col gap-6 order-2 lg:order-1">
-        <div class="glass-card p-6 rounded-2xl border border-gray-800">
-          <h3 class="font-extrabold text-sm tracking-wider uppercase mb-6 pb-2 border-b border-gray-800">DESIGN UTILITIES</h3>
+  <!-- Main Canvas Studio Grid -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+      <!-- LEFT SIDEBAR: DESIGN UTILITIES & TABS (5 Cols on LG) -->
+      <aside class="lg:col-span-4 flex flex-col gap-4 order-2 lg:order-1">
+        <div class="glass-card rounded-2xl border border-gray-800/80 bg-gray-900/40 p-4 shadow-xl flex flex-col h-full min-h-[640px]">
           
-          <!-- Printing Positions -->
-          <div class="mb-6">
-            <h4 class="text-xs font-bold text-gray-400 tracking-wider uppercase mb-3">Print Placement</h4>
-            <div class="grid grid-cols-2 gap-2 text-xs">
-              <button onclick="changePlacement('front')" id="btn-place-front" class="p-2.5 rounded-lg bg-blue-600 text-white border border-blue-500 font-bold transition">Front Print</button>
-              <button onclick="changePlacement('back')" id="btn-place-back" class="p-2.5 rounded-lg bg-gray-900 border border-gray-800 hover:border-gray-600 transition">Back Print</button>
-              <button onclick="changePlacement('left')" id="btn-place-left" class="p-2.5 rounded-lg bg-gray-900 border border-gray-800 hover:border-gray-600 transition">Left Sleeve</button>
-              <button onclick="changePlacement('right')" id="btn-place-right" class="p-2.5 rounded-lg bg-gray-900 border border-gray-800 hover:border-gray-600 transition">Right Sleeve</button>
+          <!-- Sidebar Navigation Tabs -->
+          <div class="grid grid-cols-4 gap-1 p-1 bg-gray-950/80 rounded-xl border border-gray-800 mb-5 text-[11px] font-bold">
+            <button onclick="switchStudioTab('placement')" id="tab-btn-placement" class="tab-btn active px-2 py-2 rounded-lg text-center transition flex flex-col items-center gap-1">
+              <i data-lucide="shirt" class="w-4 h-4"></i> Placement
+            </button>
+            <button onclick="switchStudioTab('text')" id="tab-btn-text" class="tab-btn px-2 py-2 rounded-lg text-center transition flex flex-col items-center gap-1">
+              <i data-lucide="type" class="w-4 h-4"></i> Text
+            </button>
+            <button onclick="switchStudioTab('graphics')" id="tab-btn-graphics" class="tab-btn px-2 py-2 rounded-lg text-center transition flex flex-col items-center gap-1">
+              <i data-lucide="image" class="w-4 h-4"></i> Graphics
+            </button>
+            <button onclick="switchStudioTab('layers')" id="tab-btn-layers" class="tab-btn px-2 py-2 rounded-lg text-center transition flex flex-col items-center gap-1 relative">
+              <i data-lucide="layers" class="w-4 h-4"></i> Layers
+              <span id="badge-layers-count" class="absolute top-1 right-1 bg-blue-600 text-white rounded-full text-[9px] w-4 h-4 flex items-center justify-center hidden">0</span>
+            </button>
+          </div>
+
+          <!-- TAB 1: PLACEMENT & PRESETS -->
+          <div id="tab-content-placement" class="tab-pane flex flex-col gap-5">
+            <div>
+              <h3 class="text-xs font-bold text-gray-400 tracking-wider uppercase mb-3 flex items-center justify-between">
+                <span>Select Print Location</span>
+                <span class="text-[10px] text-blue-400 font-extrabold" id="placement-side-badge">FRONT PRINT</span>
+              </h3>
+              <div class="grid grid-cols-2 gap-2 text-xs">
+                <button onclick="setPlacementSide('front')" id="place-btn-front" class="p-3 rounded-xl bg-blue-600 text-white border border-blue-500 font-bold transition flex items-center justify-between">
+                  <span class="flex items-center gap-2"><i data-lucide="square-user" class="w-4 h-4"></i> Front</span>
+                  <span id="badge-front-count" class="text-[10px] px-1.5 py-0.5 rounded-md bg-blue-800 font-mono">0</span>
+                </button>
+                <button onclick="setPlacementSide('back')" id="place-btn-back" class="p-3 rounded-xl bg-gray-900 border border-gray-800 hover:border-gray-700 text-gray-300 font-semibold transition flex items-center justify-between">
+                  <span class="flex items-center gap-2"><i data-lucide="user-minus" class="w-4 h-4"></i> Back</span>
+                  <span id="badge-back-count" class="text-[10px] px-1.5 py-0.5 rounded-md bg-gray-800 text-gray-400 font-mono">0</span>
+                </button>
+                <button onclick="setPlacementSide('left')" id="place-btn-left" class="p-3 rounded-xl bg-gray-900 border border-gray-800 hover:border-gray-700 text-gray-300 font-semibold transition flex items-center justify-between">
+                  <span class="flex items-center gap-2"><i data-lucide="arrow-left-right" class="w-4 h-4"></i> Left Sleeve</span>
+                  <span id="badge-left-count" class="text-[10px] px-1.5 py-0.5 rounded-md bg-gray-800 text-gray-400 font-mono">0</span>
+                </button>
+                <button onclick="setPlacementSide('right')" id="place-btn-right" class="p-3 rounded-xl bg-gray-900 border border-gray-800 hover:border-gray-700 text-gray-300 font-semibold transition flex items-center justify-between">
+                  <span class="flex items-center gap-2"><i data-lucide="arrow-left-right" class="w-4 h-4"></i> Right Sleeve</span>
+                  <span id="badge-right-count" class="text-[10px] px-1.5 py-0.5 rounded-md bg-gray-800 text-gray-400 font-mono">0</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Text Style Quick Presets -->
+            <div class="border-t border-gray-800/80 pt-4">
+              <h3 class="text-xs font-bold text-gray-400 tracking-wider uppercase mb-3">Quick Style Templates</h3>
+              <div class="grid grid-cols-2 gap-2 text-xs">
+                <button onclick="applyTextPreset('vintage')" class="p-2.5 rounded-xl bg-gray-900/80 border border-gray-800 hover:border-amber-500/50 hover:bg-gray-800/50 transition text-left">
+                  <div class="text-[10px] font-bold text-amber-400 uppercase tracking-widest">VINTAGE</div>
+                  <div class="font-serif italic font-bold text-sm text-amber-200">Athletic '98</div>
+                </button>
+                <button onclick="applyTextPreset('neon')" class="p-2.5 rounded-xl bg-gray-900/80 border border-gray-800 hover:border-purple-500/50 hover:bg-gray-800/50 transition text-left">
+                  <div class="text-[10px] font-bold text-purple-400 uppercase tracking-widest">CYBERPUNK</div>
+                  <div class="font-mono font-black text-sm text-cyan-300 drop-shadow-[0_0_8px_#06b6d4]">NEON 2077</div>
+                </button>
+                <button onclick="applyTextPreset('street')" class="p-2.5 rounded-xl bg-gray-900/80 border border-gray-800 hover:border-red-500/50 hover:bg-gray-800/50 transition text-left">
+                  <div class="text-[10px] font-bold text-red-400 uppercase tracking-widest">STREETWEAR</div>
+                  <div class="font-black text-sm uppercase text-white tracking-widest">RAW HEAVY</div>
+                </button>
+                <button onclick="applyTextPreset('luxury')" class="p-2.5 rounded-xl bg-gray-900/80 border border-gray-800 hover:border-amber-400/50 hover:bg-gray-800/50 transition text-left">
+                  <div class="text-[10px] font-bold text-amber-300 uppercase tracking-widest">LUXURY</div>
+                  <div class="font-['Playfair_Display'] italic text-sm text-amber-400">Custom Paris</div>
+                </button>
+              </div>
+            </div>
+
+            <!-- Print Quality & Guidelines -->
+            <div class="mt-auto border-t border-gray-800/80 pt-4">
+              <div class="p-3 rounded-xl bg-blue-950/30 border border-blue-500/20 text-xs text-blue-300/90 flex gap-2">
+                <i data-lucide="shield-check" class="w-5 h-5 text-blue-400 shrink-0 mt-0.5"></i>
+                <div>
+                  <div class="font-bold text-white mb-0.5">High Precision DTG Print</div>
+                  <p class="text-[11px] text-gray-400">Designs inside the safe boundary are printed using premium 1200 DPI direct-to-garment ink.</p>
+                </div>
+              </div>
             </div>
           </div>
 
-          <!-- Logo & Graphic Upload -->
-          <div class="mb-6">
-            <h4 class="text-xs font-bold text-gray-400 tracking-wider uppercase mb-3">Upload Graphic (PNG / SVG)</h4>
-            <label class="flex flex-col items-center justify-center border-2 border-dashed border-gray-800 hover:border-blue-500/50 rounded-xl p-4 cursor-pointer bg-gray-900/20 transition">
-              <i data-lucide="upload-cloud" class="w-8 h-8 text-blue-500 mb-2"></i>
-              <span class="text-[10px] text-gray-500 font-bold">PNG, SVG, PDF, or JPEG</span>
-              <input type="file" id="upload-image-input" accept="image/*" class="hidden" onchange="handleImageUpload(event)">
-            </label>
+          <!-- TAB 2: TEXT STUDIO -->
+          <div id="tab-content-text" class="tab-pane hidden flex flex-col gap-4 custom-scroll overflow-y-auto max-h-[540px] pr-1">
+            <button onclick="addNewTextLayer()" class="w-full py-3 rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-blue-600/20 transition">
+              <i data-lucide="plus-circle" class="w-4 h-4"></i> Add New Text Box
+            </button>
+
+            <div id="text-controls-box" class="space-y-4 pt-1">
+              <!-- Text Input -->
+              <div>
+                <label class="text-[11px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Text Content</label>
+                <input type="text" id="input-text-content" value="Your Custom Text" placeholder="Type text here..." class="glass-input px-3.5 py-2.5 rounded-xl text-xs w-full bg-gray-950 border-gray-800 focus:border-blue-500 focus:outline-none text-white font-semibold" oninput="updateActiveTextLayer()">
+              </div>
+
+              <!-- Font Family Dropdown -->
+              <div>
+                <label class="text-[11px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Font Family</label>
+                <select id="select-font-family" class="glass-input px-3 py-2.5 rounded-xl text-xs w-full bg-gray-950 border-gray-800 focus:border-blue-500 focus:outline-none text-white font-semibold" onchange="updateActiveTextLayer()">
+                  <option value="Outfit" style="font-family: 'Outfit'; font-weight: bold;">Outfit (Sporty/Modern)</option>
+                  <option value="Inter" style="font-family: 'Inter'; font-weight: bold;">Inter (Sleek Minimal)</option>
+                  <option value="Impact" style="font-family: 'Impact';">Impact (Heavy Streetwear)</option>
+                  <option value="Playfair Display" style="font-family: 'Playfair Display'; italic;">Playfair (Elegant Serif)</option>
+                  <option value="Pacifico" style="font-family: 'Pacifico';">Pacifico (Handwritten Cursive)</option>
+                  <option value="Monoton" style="font-family: 'Monoton';">Monoton (Retro Disco Lines)</option>
+                  <option value="Bungee" style="font-family: 'Bungee';">Bungee (Bold Block Letters)</option>
+                  <option value="Orbitron" style="font-family: 'Orbitron'; font-weight: bold;">Orbitron (Futuristic Cyber)</option>
+                  <option value="Permanent Marker" style="font-family: 'Permanent Marker';">Permanent Marker (Graffiti)</option>
+                  <option value="Courier Prime" style="font-family: 'Courier Prime'; font-weight: bold;">Courier (Vintage Typewriter)</option>
+                </select>
+              </div>
+
+              <!-- Font Size & Weight Grid -->
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <div class="flex justify-between items-center mb-1">
+                    <label class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Font Size</label>
+                    <span id="val-font-size" class="text-[10px] font-mono text-blue-400">28px</span>
+                  </div>
+                  <input type="range" id="range-font-size" min="14" max="72" value="28" class="w-full h-1.5 bg-gray-800 rounded-lg appearance-none cursor-pointer accent-blue-500" oninput="updateActiveTextLayer()">
+                </div>
+                <div>
+                  <label class="text-[11px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Font Style</label>
+                  <div class="flex gap-1">
+                    <button type="button" onclick="toggleTextStyle('bold')" id="btn-style-bold" class="flex-1 py-1.5 rounded-lg bg-gray-950 border border-gray-800 text-xs font-black hover:border-gray-700 transition">B</button>
+                    <button type="button" onclick="toggleTextStyle('italic')" id="btn-style-italic" class="flex-1 py-1.5 rounded-lg bg-gray-950 border border-gray-800 text-xs font-serif italic font-bold hover:border-gray-700 transition">I</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Color & Stroke Options -->
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="text-[11px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Text Color</label>
+                  <div class="flex items-center gap-2">
+                    <input type="color" id="picker-text-color" value="#ffffff" class="w-9 h-9 rounded-xl border-0 bg-transparent cursor-pointer" oninput="updateActiveTextLayer()">
+                    <input type="text" id="hex-text-color" value="#FFFFFF" class="glass-input px-2 py-1.5 rounded-lg text-xs w-full bg-gray-950 border-gray-800 text-center font-mono text-gray-300" readonly>
+                  </div>
+                </div>
+                <div>
+                  <label class="text-[11px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Outline Color</label>
+                  <div class="flex items-center gap-2">
+                    <input type="color" id="picker-stroke-color" value="#000000" class="w-9 h-9 rounded-xl border-0 bg-transparent cursor-pointer" oninput="updateActiveTextLayer()">
+                    <input type="text" id="hex-stroke-color" value="#000000" class="glass-input px-2 py-1.5 rounded-lg text-xs w-full bg-gray-950 border-gray-800 text-center font-mono text-gray-300" readonly>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Outline Stroke Width Range -->
+              <div>
+                <div class="flex justify-between items-center mb-1">
+                  <label class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Outline Thickness</label>
+                  <span id="val-stroke-width" class="text-[10px] font-mono text-blue-400">0px</span>
+                </div>
+                <input type="range" id="range-stroke-width" min="0" max="10" value="0" class="w-full h-1.5 bg-gray-800 rounded-lg appearance-none cursor-pointer accent-blue-500" oninput="updateActiveTextLayer()">
+              </div>
+
+              <!-- Curved Arc Slider -->
+              <div>
+                <div class="flex justify-between items-center mb-1">
+                  <label class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Text Arc / Curve</label>
+                  <span id="val-text-arc" class="text-[10px] font-mono text-blue-400">0°</span>
+                </div>
+                <input type="range" id="range-text-arc" min="-120" max="120" value="0" class="w-full h-1.5 bg-gray-800 rounded-lg appearance-none cursor-pointer accent-blue-500" oninput="updateActiveTextLayer()">
+              </div>
+
+              <!-- Letter Spacing & Drop Shadow Toggle -->
+              <div class="grid grid-cols-2 gap-3 pt-1">
+                <div>
+                  <div class="flex justify-between items-center mb-1">
+                    <label class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Spacing</label>
+                    <span id="val-letter-spacing" class="text-[10px] font-mono text-blue-400">0px</span>
+                  </div>
+                  <input type="range" id="range-letter-spacing" min="-2" max="16" value="0" class="w-full h-1.5 bg-gray-800 rounded-lg appearance-none cursor-pointer accent-blue-500" oninput="updateActiveTextLayer()">
+                </div>
+                <div class="flex flex-col justify-end">
+                  <button type="button" onclick="toggleTextShadow()" id="btn-toggle-shadow" class="w-full py-2 rounded-xl bg-gray-950 border border-gray-800 text-xs font-bold text-gray-300 hover:border-gray-700 transition flex items-center justify-center gap-1.5">
+                    <i data-lucide="sun-medium" class="w-3.5 h-3.5 text-amber-400"></i> Drop Shadow
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
 
-          <!-- Add Text -->
-          <div class="mb-6">
-            <h4 class="text-xs font-bold text-gray-400 tracking-wider uppercase mb-3">Add Custom Text</h4>
-            <input type="text" id="custom-text-input" placeholder="Type here..." class="glass-input px-3 py-2 rounded-xl text-xs w-full mb-3 focus:outline-none" oninput="updateTextElement()">
+          <!-- TAB 3: GRAPHICS & CLIPART -->
+          <div id="tab-content-graphics" class="tab-pane hidden flex flex-col gap-4 custom-scroll overflow-y-auto max-h-[540px] pr-1">
+            <!-- Image File Upload Dropzone -->
+            <div>
+              <h3 class="text-xs font-bold text-gray-400 tracking-wider uppercase mb-2">Upload Artwork</h3>
+              <label class="flex flex-col items-center justify-center border-2 border-dashed border-gray-800 hover:border-blue-500/60 rounded-2xl p-4 cursor-pointer bg-gray-950/40 hover:bg-gray-900/60 transition group">
+                <div class="p-3 rounded-full bg-blue-600/10 text-blue-400 group-hover:scale-110 transition mb-2">
+                  <i data-lucide="upload-cloud" class="w-6 h-6"></i>
+                </div>
+                <span class="text-xs font-bold text-gray-200">Click or Drop Custom File</span>
+                <span class="text-[10px] text-gray-500 mt-0.5">High-Res PNG (Transparent), SVG, JPEG</span>
+                <input type="file" id="input-graphic-upload" accept="image/*" class="hidden" onchange="handleGraphicUpload(event)">
+              </label>
+            </div>
+
+            <!-- Active Image Controls -->
+            <div id="image-adjustments-box" class="space-y-3 pt-2 border-t border-gray-800/80">
+              <h3 class="text-xs font-bold text-gray-400 tracking-wider uppercase">Graphic Adjustments</h3>
+              
+              <!-- Opacity Range -->
+              <div>
+                <div class="flex justify-between items-center mb-1">
+                  <label class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Opacity</label>
+                  <span id="val-image-opacity" class="text-[10px] font-mono text-blue-400">100%</span>
+                </div>
+                <input type="range" id="range-image-opacity" min="10" max="100" value="100" class="w-full h-1.5 bg-gray-800 rounded-lg appearance-none cursor-pointer accent-blue-500" oninput="updateActiveImageLayer()">
+              </div>
+
+              <!-- Flip Actions -->
+              <div class="grid grid-cols-2 gap-2 text-xs">
+                <button type="button" onclick="flipActiveImage('x')" class="py-2 rounded-xl bg-gray-950 border border-gray-800 hover:border-gray-700 text-gray-300 font-semibold flex items-center justify-center gap-1.5 transition">
+                  <i data-lucide="flip-horizontal" class="w-4 h-4 text-blue-400"></i> Flip Horiz
+                </button>
+                <button type="button" onclick="flipActiveImage('y')" class="py-2 rounded-xl bg-gray-950 border border-gray-800 hover:border-gray-700 text-gray-300 font-semibold flex items-center justify-center gap-1.5 transition">
+                  <i data-lucide="flip-vertical" class="w-4 h-4 text-blue-400"></i> Flip Vert
+                </button>
+              </div>
+            </div>
+
+            <!-- Built-in Clipart Library -->
+            <div class="border-t border-gray-800/80 pt-3">
+              <div class="flex justify-between items-center mb-2">
+                <h3 class="text-xs font-bold text-gray-400 tracking-wider uppercase">Preset Graphics Library</h3>
+                <span class="text-[10px] text-blue-400 font-semibold">100% Printable</span>
+              </div>
+              <div class="grid grid-cols-3 gap-2" id="clipart-library-grid">
+                <!-- Clipart items dynamically injected -->
+              </div>
+            </div>
+          </div>
+
+          <!-- TAB 4: LAYERS MANAGER -->
+          <div id="tab-content-layers" class="tab-pane hidden flex flex-col gap-3 custom-scroll overflow-y-auto max-h-[540px] pr-1">
+            <div class="flex justify-between items-center">
+              <h3 class="text-xs font-bold text-gray-400 tracking-wider uppercase">Active Side Layers</h3>
+              <span id="layers-list-side-name" class="text-[10px] text-blue-400 font-mono font-bold uppercase">FRONT</span>
+            </div>
             
-            <!-- Font Selection -->
-            <label class="text-[10px] font-bold text-gray-500 uppercase block mb-1">Font Family</label>
-            <select id="font-select" class="glass-input px-3 py-2 rounded-xl text-xs w-full mb-3 bg-gray-900 border-gray-800 focus:outline-none" onchange="updateTextElement()">
-              <option value="Outfit">Outfit (Sporty/Modern)</option>
-              <option value="Inter">Inter (Sleek/Minimal)</option>
-              <option value="Impact">Impact (Bold/Street)</option>
-              <option value="Courier New">Courier (Retro/Code)</option>
-            </select>
-
-            <!-- Text Colors -->
-            <label class="text-[10px] font-bold text-gray-500 uppercase block mb-1">Text Color</label>
-            <div class="flex gap-2">
-              <input type="color" id="text-color-picker" value="#ffffff" class="w-8 h-8 rounded border-0 bg-transparent cursor-pointer" oninput="updateTextElement()">
-              <input type="text" id="text-color-hex" value="#FFFFFF" class="glass-input px-2 py-1.5 rounded-lg text-xs w-20 focus:outline-none text-center" readonly>
+            <div id="layers-list-container" class="space-y-2">
+              <!-- Rendered layer cards -->
             </div>
-          </div>
-
-          <!-- Fine Adjustments Range -->
-          <div>
-            <h4 class="text-xs font-bold text-gray-400 tracking-wider uppercase mb-3">Rotation Adjust</h4>
-            <input type="range" id="rotation-range" min="0" max="360" value="0" class="w-full h-1 bg-gray-800 rounded-lg appearance-none cursor-pointer accent-blue-600" oninput="rotateDesign(this.value)">
           </div>
 
         </div>
       </aside>
 
-      <!-- Middle Panel: Main Canvas -->
-      <section class="flex-1 flex flex-col items-center order-1 lg:order-2">
-        <div class="w-full max-w-lg aspect-square border border-gray-800/80 rounded-3xl relative overflow-hidden bg-gray-900/30 flex items-center justify-center p-4 sm:p-6" style="touch-action: none;">
-          <!-- Canvas Layer Workspace -->
+      <!-- MIDDLE CANVAS STUDIO WORKSPACE (5 Cols on LG) -->
+      <section class="lg:col-span-5 flex flex-col items-center order-1 lg:order-2">
+        <div class="w-full max-w-md aspect-square border border-gray-800/80 rounded-3xl relative overflow-hidden bg-gray-900/40 p-4 sm:p-6 shadow-2xl flex items-center justify-center backdrop-blur-md" id="studio-canvas-card">
+          
+          <!-- Canvas Workspace Wrapper -->
           <div id="canvas-workspace" class="w-full h-full relative">
             
-            <!-- Interactive Draggable Image Overlay -->
-            <div id="image-layer" class="design-overlay hidden" style="top: 20%; left: 35%;">
-              <div id="image-element" class="design-element"></div>
-              <div class="resize-handle" id="image-resize-handle"></div>
-            </div>
+            <!-- Safe Printable Boundary -->
+            <div id="safe-print-zone" class="print-safe-zone"></div>
 
-            <!-- Interactive Draggable Text Overlay -->
-            <div id="text-layer" class="design-overlay active" style="top: 50%; left: 35%;">
-              <div id="text-element" class="design-element">
-                <span id="text-element-node" class="text-white text-base">Your Text</span>
-              </div>
-              <div class="resize-handle" id="text-resize-handle"></div>
-            </div>
+            <!-- Alignment Guide Lines -->
+            <div id="snap-guideline-x" class="snap-line-x"></div>
+            <div id="snap-guideline-y" class="snap-line-y"></div>
+
+            <!-- Dynamic Layers Container (Injected by JS) -->
+            <div id="layers-render-target" class="w-full h-full relative overflow-hidden rounded-xl"></div>
 
           </div>
         </div>
-        
-        <!-- Mobile Canvas Quick Toolbar -->
-        <div class="canvas-mobile-toolbar mt-3">
-          <button onclick="setActiveLayer('text')" id="tb-layer-text" class="active"><i data-lucide="type" class="w-3.5 h-3.5"></i> Text</button>
-          <button onclick="setActiveLayer('image')" id="tb-layer-image"><i data-lucide="image" class="w-3.5 h-3.5"></i> Image</button>
-          <div class="h-4 w-[1px] bg-gray-800 shrink-0 my-auto"></div>
-          <button onclick="adjustActiveScale(1.15)" title="Increase Size"><i data-lucide="zoom-in" class="w-3.5 h-3.5"></i> Size +</button>
-          <button onclick="adjustActiveScale(0.85)" title="Decrease Size"><i data-lucide="zoom-out" class="w-3.5 h-3.5"></i> Size -</button>
-          <button onclick="stepRotate(-15)" title="Rotate Counterclockwise"><i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> -15°</button>
-          <button onclick="stepRotate(15)" title="Rotate Clockwise"><i data-lucide="rotate-cw" class="w-3.5 h-3.5"></i> +15°</button>
-          <button onclick="centerActiveLayer()" title="Center horizontally"><i data-lucide="align-center" class="w-3.5 h-3.5"></i> Center</button>
-          <button onclick="resetActiveLayer()" class="text-red-400 hover:text-red-300" title="Clear layer"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Clear</button>
+
+        <!-- Floating Studio Quick Control Bar -->
+        <div class="mt-4 flex flex-wrap items-center justify-center gap-2 p-2 rounded-2xl bg-gray-900/80 border border-gray-800/80 backdrop-blur-md shadow-xl text-xs">
+          <button onclick="togglePreviewMode()" id="btn-toggle-preview" class="px-3 py-2 rounded-xl bg-gray-950 border border-gray-800 hover:border-gray-700 text-gray-300 font-semibold flex items-center gap-1.5 transition">
+            <i data-lucide="eye" class="w-4 h-4 text-purple-400"></i> Preview
+          </button>
+          <div class="h-4 w-[1px] bg-gray-800"></div>
+          <button onclick="centerActiveLayer('x')" title="Center Horizontally" class="p-2 rounded-xl bg-gray-950 border border-gray-800 hover:border-gray-700 text-gray-300 hover:text-white transition">
+            <i data-lucide="align-center-horizontal" class="w-4 h-4"></i>
+          </button>
+          <button onclick="centerActiveLayer('y')" title="Center Vertically" class="p-2 rounded-xl bg-gray-950 border border-gray-800 hover:border-gray-700 text-gray-300 hover:text-white transition">
+            <i data-lucide="align-center-vertical" class="w-4 h-4"></i>
+          </button>
+          <div class="h-4 w-[1px] bg-gray-800"></div>
+          <button onclick="rotateActiveLayer(-15)" title="-15° CCW" class="p-2 rounded-xl bg-gray-950 border border-gray-800 hover:border-gray-700 text-gray-300 hover:text-white transition">
+            <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+          </button>
+          <button onclick="rotateActiveLayer(15)" title="+15° CW" class="p-2 rounded-xl bg-gray-950 border border-gray-800 hover:border-gray-700 text-gray-300 hover:text-white transition">
+            <i data-lucide="rotate-cw" class="w-4 h-4"></i>
+          </button>
+          <div class="h-4 w-[1px] bg-gray-800"></div>
+          <button onclick="duplicateActiveLayer()" title="Duplicate Layer" class="p-2 rounded-xl bg-gray-950 border border-gray-800 hover:border-gray-700 text-purple-400 hover:text-purple-300 transition">
+            <i data-lucide="copy" class="w-4 h-4"></i>
+          </button>
+          <button onclick="deleteActiveLayer()" title="Delete Layer" class="p-2 rounded-xl bg-gray-950 border border-gray-800 hover:border-red-900/50 text-red-400 hover:text-red-300 transition">
+            <i data-lucide="trash-2" class="w-4 h-4"></i>
+          </button>
         </div>
 
-        <p class="text-[10px] text-gray-500 mt-3 font-bold flex items-center gap-1">
-          <i data-lucide="info" class="w-3.5 h-3.5"></i> Drag handles or use quick buttons to edit text & graphics on garment.
+        <p class="text-[11px] text-gray-500 mt-3 font-semibold flex items-center gap-1.5">
+          <i data-lucide="info" class="w-3.5 h-3.5 text-blue-400 shrink-0"></i> Drag handles on elements to position, scale & rotate. Blue guidelines mark center alignment.
         </p>
       </section>
 
-      <!-- Right Panel: Spec Summary -->
-      <aside class="w-full lg:w-80 shrink-0 flex flex-col gap-6 order-3 lg:order-3">
+      <!-- RIGHT SIDEBAR: BASE GARMENT & ORDER SUMMARY (3 Cols on LG) -->
+      <aside class="lg:col-span-3 flex flex-col gap-4 order-3 lg:order-3">
+        
         <!-- Base Garment Picker Card -->
-        <div class="glass-card p-5 rounded-2xl border border-gray-800">
-          <h3 class="font-extrabold text-sm tracking-wider uppercase mb-3 pb-2 border-b border-gray-800">BASE GARMENT</h3>
-          <!-- Name list -->
-          <div id="garment-picker-grid" class="flex flex-col gap-1 max-h-56 overflow-y-auto pr-1">
+        <div class="glass-card p-4 rounded-2xl border border-gray-800/80 bg-gray-900/40 shadow-xl">
+          <h3 class="font-extrabold text-xs tracking-wider uppercase mb-3 pb-2 border-b border-gray-800/80 text-gray-400">BASE GARMENT</h3>
+          
+          <div id="garment-picker-grid" class="flex flex-col gap-1.5 max-h-48 overflow-y-auto pr-1 custom-scroll">
             <!-- Injected by JS -->
           </div>
-          <!-- Selected price -->
-          <div class="mt-3 pt-3 border-t border-gray-800/50 flex items-center justify-between gap-2">
+
+          <!-- Active Garment Spec Card -->
+          <div class="mt-3 pt-3 border-t border-gray-800/80 flex items-center justify-between gap-2">
             <div class="min-w-0">
-              <h4 id="summary-prod-name" class="text-sm font-bold text-white truncate">—</h4>
-              <span id="summary-prod-brand" class="text-[10px] text-blue-400 font-bold">CUSTOM WEAR</span>
+              <h4 id="summary-prod-name" class="text-xs font-bold text-white truncate">—</h4>
+              <span id="summary-prod-brand" class="text-[10px] text-blue-400 font-extrabold tracking-wider">CUSTOM WEAR</span>
             </div>
-            <span id="summary-prod-price-tag" class="text-xs font-extrabold text-blue-400 shrink-0"></span>
+            <span id="summary-prod-price-tag" class="text-xs font-black text-blue-400 shrink-0 font-mono"></span>
           </div>
         </div>
 
-        <!-- Order Options Card -->
-        <div class="glass-card p-5 rounded-2xl border border-gray-800">
-          <h3 class="font-extrabold text-sm tracking-wider uppercase mb-4 pb-2 border-b border-gray-800">ORDER SUMMARY</h3>
+        <!-- Color & Size Options -->
+        <div class="glass-card p-4 rounded-2xl border border-gray-800/80 bg-gray-900/40 shadow-xl">
+          <h3 class="font-extrabold text-xs tracking-wider uppercase mb-3 pb-2 border-b border-gray-800/80 text-gray-400">GARMENT SPECIFICATIONS</h3>
 
           <!-- Color Thumbnails -->
           <div class="mb-4">
-            <label class="text-[10px] text-gray-500 uppercase font-black tracking-widest">Garment Color</label>
-            <div class="flex items-center gap-2 mt-2 overflow-x-auto pb-1" id="summary-colors">
-              <!-- Injected thumbnails -->
+            <label class="text-[10px] text-gray-400 uppercase font-black tracking-widest block mb-2">Garment Color</label>
+            <div class="flex items-center gap-2 overflow-x-auto pb-1 custom-scroll" id="summary-colors">
+              <!-- Color swatch buttons -->
             </div>
           </div>
 
           <!-- Sizes -->
-          <div class="mb-5">
-            <label class="text-[10px] text-gray-500 uppercase font-black tracking-widest block mb-2">Size Choice</label>
-            <div class="flex flex-wrap gap-2" id="summary-sizes">
-              <!-- Injected sizes buttons -->
+          <div class="mb-4">
+            <label class="text-[10px] text-gray-400 uppercase font-black tracking-widest block mb-2">Size Selection</label>
+            <div class="flex flex-wrap gap-1.5" id="summary-sizes">
+              <!-- Size buttons -->
             </div>
           </div>
 
-          <!-- Base Price Detail -->
-          <div class="flex justify-between items-center text-xs py-2 border-t border-gray-800/40">
-            <span class="text-gray-500">Base Price (Plain)</span>
-            <span id="price-base" class="font-semibold">Rs. 0</span>
-          </div>
-          
-          <!-- Printing Surcharge Detail -->
-          <div class="flex justify-between items-center text-xs py-2 border-t border-gray-800/40">
-            <span class="text-gray-500">Printing Surcharge</span>
-            <span id="price-printing-markup" class="font-semibold text-green-400">Rs. 0</span>
+          <!-- Dynamic Pricing Breakdown -->
+          <div class="space-y-1.5 pt-3 border-t border-gray-800/80 text-xs">
+            <div class="flex justify-between items-center">
+              <span class="text-gray-400">Base Garment (Plain)</span>
+              <span id="price-base" class="font-semibold text-gray-200 font-mono">Rs. 0</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-gray-400">Included Front Print</span>
+              <span class="font-semibold text-green-400 font-mono">Included</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-gray-400">Extra Print Placements</span>
+              <span id="price-extra-placements" class="font-semibold text-blue-400 font-mono">+Rs. 0</span>
+            </div>
           </div>
 
           <!-- Total Estimations -->
-          <div class="glass-card p-4 rounded-xl flex items-center justify-between border border-blue-500/10 mb-5 mt-4">
-            <span class="text-xs text-gray-400 font-bold uppercase tracking-wider">Estimated Total</span>
-            <span id="price-total" class="text-xl font-black text-blue-400">Rs. 0</span>
+          <div class="glass-card p-3 rounded-xl flex items-center justify-between border border-blue-500/20 bg-blue-950/20 my-4">
+            <span class="text-xs text-gray-300 font-bold uppercase tracking-wider">Total Price</span>
+            <span id="price-total" class="text-lg font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400 font-mono">Rs. 0</span>
           </div>
 
-          <!-- Add to Cart -->
-          <button onclick="addCustomProductToCart()" class="w-full bg-blue-600 hover:bg-blue-700 font-bold py-4 rounded-xl shadow-lg transition flex items-center justify-center gap-2 text-sm">
-            <i data-lucide="shopping-bag" class="w-5 h-5"></i> Add Custom To Cart
+          <!-- Add to Cart CTA -->
+          <button onclick="addCustomProductToCart()" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-extrabold text-xs tracking-wider uppercase shadow-lg shadow-blue-600/30 flex items-center justify-center gap-2 transition hover:scale-[1.02]">
+            <i data-lucide="shopping-bag" class="w-4 h-4"></i> Add Custom Design To Cart
           </button>
         </div>
+
       </aside>
 
     </div>
   </main>
 
-  <!-- Mobile sticky CTA bar -->
-  <div class="mobile-cta-bar lg:hidden">
-    <div class="flex-1 min-w-0">
-      <div class="text-[10px] text-gray-500 uppercase font-bold tracking-wider">Custom Item</div>
-      <div id="mobile-price-total" class="text-base font-black text-white">Rs. 0</div>
+  <!-- Mobile Sticky CTA Bar -->
+  <div class="lg:hidden fixed bottom-0 left-0 w-full z-40 bg-gray-950/95 backdrop-blur-xl border-t border-gray-800 p-3 flex items-center justify-between gap-3 shadow-2xl">
+    <div>
+      <div class="text-[9px] text-gray-400 uppercase font-black tracking-widest">Total Estimated</div>
+      <div id="mobile-price-total" class="text-base font-black text-blue-400 font-mono">Rs. 0</div>
     </div>
-    <button onclick="addCustomProductToCart()" class="flex-1 py-3.5 rounded-xl font-bold text-sm text-white flex items-center justify-center gap-2" style="background:var(--accent); box-shadow:0 4px 16px rgba(124,58,237,0.4);">
-      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-      Add To Cart
+    <button onclick="addCustomProductToCart()" class="px-6 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 text-white font-black text-xs uppercase tracking-wider flex items-center gap-2 shadow-lg shadow-blue-600/30">
+      <i data-lucide="shopping-bag" class="w-4 h-4"></i> Add To Cart
     </button>
   </div>
 
-
-    </div>
-  </main>
-
   <!-- Footer -->
-  <footer class="bg-gray-950 border-t border-gray-900 py-8 text-center text-xs text-gray-500 mt-20">
+  <footer class="bg-gray-950 border-t border-gray-900 py-8 text-center text-xs text-gray-500">
     &copy; 2026 CUSTOM WEAR & CRADANCE. All rights reserved.
   </footer>
 
+  <!-- Scripts -->
   <script src="js/products-data.js"></script>
   <script src="js/app.js"></script>
   <script src="js/firebase-config.js"></script>
   <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+
   <script>
     AOS.init({ duration: 800, once: true });
-    
+
+    // Global Studio State
     let activeProduct = null;
     let selectedColor = "";
     let selectedSize = "M";
-    let activePlacement = "front";
-    let activeLayer = "text"; // text or image
-    
-    let textState = {
-      left: 35,
-      top: 50,
-      width: 120,
-      height: 120,
-      rotation: 0
+    let activePlacement = "front"; // "front" | "back" | "left" | "right"
+    let activeLayerId = null;
+    let isPreviewMode = false;
+    let showSafeZone = true;
+
+    // Per-Placement Layer Storage Memory
+    let placementStore = {
+      front: [],
+      back: [],
+      left: [],
+      right: []
     };
-    
-    let imageState = {
-      left: 35,
-      top: 20,
-      width: 120,
-      height: 120,
-      rotation: 0
-    };
-    
+
+    // Preset Clipart SVG graphics library
+    const CLIPART_ITEMS = [
+      { id: 'c1', title: 'Vintage Badge', svg: `<svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="4"><polygon points="50,5 95,25 95,75 50,95 5,75 5,25"/><circle cx="50" cy="50" r="28" stroke-width="3"/><text x="50" y="55" font-size="12" font-weight="bold" text-anchor="middle" fill="currentColor" stroke="none">1998</text></svg>` },
+      { id: 'c2', title: 'Crown Seal', svg: `<svg viewBox="0 0 100 100" fill="currentColor"><path d="M10,70 L25,30 L45,50 L50,20 L55,50 L75,30 L90,70 Z"/><rect x="15" y="75" width="70" height="10" rx="3"/></svg>` },
+      { id: 'c3', title: 'Street Flame', svg: `<svg viewBox="0 0 100 100" fill="currentColor"><path d="M50,5 C60,25 80,35 80,60 C80,80 65,95 50,95 C35,95 20,80 20,60 C20,40 40,25 45,15 C45,30 55,35 50,5 Z"/></svg>` },
+      { id: 'c4', title: 'Cyber Skull', svg: `<svg viewBox="0 0 100 100" fill="currentColor"><path d="M50,10 C25,10 15,30 15,55 C15,70 30,80 35,80 L35,90 L45,90 L45,80 L55,80 L55,90 L65,90 L65,80 C70,80 85,70 85,55 C85,30 75,10 50,10 Z M35,45 A8,8 0 1,1 35,45.1 M65,45 A8,8 0 1,1 65,45.1"/></svg>` },
+      { id: 'c5', title: 'Lightning Star', svg: `<svg viewBox="0 0 100 100" fill="currentColor"><polygon points="50,5 63,35 95,38 71,60 78,92 50,75 22,92 29,60 5,38 37,35"/></svg>` },
+      { id: 'c6', title: 'Minimalist Wave', svg: `<svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="6"><path d="M10,50 Q30,20 50,50 T90,50"/><path d="M10,70 Q30,40 50,70 T90,70"/></svg>` }
+    ];
+
+    // Initialize Studio on DOM Ready
     document.addEventListener("DOMContentLoaded", () => {
       loadCanvasData();
-      initDragging();
+      renderClipartLibrary();
+      initDefaultDemoLayers();
       hidePageLoader();
       if (window.lucide) lucide.createIcons();
     });
 
-    function setActiveLayer(layerId) {
-      activeLayer = layerId;
-      document.querySelectorAll(".design-overlay").forEach(el => {
-        el.classList.remove("active");
-      });
-      const activeEl = document.getElementById(`${layerId}-layer`);
-      if (activeEl) {
-        activeEl.classList.add("active");
-        const currentRot = layerId === "text" ? textState.rotation : imageState.rotation;
-        const rotInput = document.getElementById("rotation-range");
-        if (rotInput) rotInput.value = currentRot;
-      }
-
-      // Update mobile toolbar button states
-      const tbText = document.getElementById("tb-layer-text");
-      const tbImage = document.getElementById("tb-layer-image");
-      if (tbText && tbImage) {
-        if (layerId === "text") {
-          tbText.classList.add("active");
-          tbImage.classList.remove("active");
-        } else {
-          tbImage.classList.add("active");
-          tbText.classList.remove("active");
-        }
-      }
-    }
-
-    // ── Mobile Toolbar Helpers ──
-    function adjustActiveScale(factor) {
-      const layer = document.getElementById(`${activeLayer}-layer`);
-      const state = activeLayer === "text" ? textState : imageState;
-      if (!layer) return;
-      state.width = Math.min(Math.max(40, Math.round(state.width * factor)), 260);
-      state.height = Math.min(Math.max(40, Math.round(state.height * factor)), 260);
-      layer.style.width = `${state.width}px`;
-      layer.style.height = `${state.height}px`;
-    }
-
-    function stepRotate(deg) {
-      const state = activeLayer === "text" ? textState : imageState;
-      let newRot = (state.rotation + deg) % 360;
-      if (newRot < 0) newRot += 360;
-      rotateDesign(newRot);
-      const rotInput = document.getElementById("rotation-range");
-      if (rotInput) rotInput.value = newRot;
-    }
-
-    function centerActiveLayer() {
-      const layer = document.getElementById(`${activeLayer}-layer`);
-      const state = activeLayer === "text" ? textState : imageState;
-      if (!layer) return;
-      state.left = 35;
-      layer.style.left = "35%";
-    }
-
-    function resetActiveLayer() {
-      if (activeLayer === "text") {
-        document.getElementById("custom-text-input").value = "";
-        updateTextElement();
-      } else {
-        const imageLayer = document.getElementById("image-layer");
-        if (imageLayer) imageLayer.classList.add("hidden");
-        document.getElementById("upload-image-input").value = "";
-        setActiveLayer("text");
-      }
-      showToast(`Cleared ${activeLayer} layer`, "success");
-    }
-
+    // Load URL params & set default garment
     function loadCanvasData() {
       const urlParams = new URLSearchParams(window.location.search);
       let prodId = urlParams.get("id");
-      
+
       if (typeof PRODUCTS_DATA === 'undefined') return;
 
-      // Filter products only belong to CUSTOM WEAR (exclude non-printable)
       const cwProds = PRODUCTS_DATA.filter(p =>
         p.brand === "CUSTOM WEAR" &&
         !p.category.toLowerCase().includes("pants") &&
         !p.category.toLowerCase().includes("joggers")
       );
-      
-      // Default to first custom t-shirt if none specified
+
       if (!prodId) {
-        const defaultTee = cwProds.find(p => p.id.includes("round-neck"));
-        activeProduct = defaultTee || cwProds[0];
+        const defaultTee = cwProds.find(p => p.id.includes("round-neck")) || cwProds[0];
+        activeProduct = defaultTee;
       } else {
-        activeProduct = PRODUCTS_DATA.find(p => p.id === prodId);
+        activeProduct = PRODUCTS_DATA.find(p => p.id === prodId) || cwProds[0];
       }
 
-      if (!activeProduct) {
-        showToast("Error locating base product details", "error");
-        return;
-      }
+      if (!activeProduct) return;
 
-      // Selected size and color presets
       selectedSize = urlParams.get("size") || "M";
       selectedColor = urlParams.get("color") || activeProduct.colors[0].name;
 
-      // Build garment picker grid
       buildGarmentPicker(cwProds);
-
-      // Render the selected product's colors/sizes/prices
       renderProductOptions();
-
-      // Update workspace image
       updateGarmentWorkspaceImage();
-      
-      if (window.lucide) lucide.createIcons();
     }
 
+    // Default layers on first visit
+    function initDefaultDemoLayers() {
+      placementStore.front.push({
+        id: 'layer_' + Date.now(),
+        type: 'text',
+        text: 'Your Custom Text',
+        fontFamily: 'Outfit',
+        fontSize: 28,
+        fontWeight: 'bold',
+        fontStyle: 'normal',
+        color: '#FFFFFF',
+        strokeColor: '#000000',
+        strokeWidth: 0,
+        letterSpacing: 0,
+        arc: 0,
+        shadow: false,
+        x: 50,
+        y: 45,
+        width: 220,
+        height: 50,
+        rotation: 0,
+        opacity: 1,
+        locked: false,
+        visible: true
+      });
+      activeLayerId = placementStore.front[0].id;
+      renderCanvasLayers();
+      updateLayersCountBadges();
+      syncTextControlsUI();
+    }
+
+    // Build Left Sidebar Garment Picker
     function buildGarmentPicker(products) {
       const grid = document.getElementById("garment-picker-grid");
       if (!grid) return;
       grid.innerHTML = "";
 
       products.forEach(p => {
-        const row = document.createElement("button");
-        row.className = `garment-pick-card w-full text-left px-3 py-2 rounded-lg border transition-all duration-150 focus:outline-none flex items-center justify-between ${
+        const btn = document.createElement("button");
+        btn.className = `garment-pick-card w-full text-left p-2.5 rounded-xl border transition-all flex items-center justify-between ${
           p.id === activeProduct.id
-            ? "border-blue-500 bg-blue-600/10 text-blue-400"
-            : "border-transparent hover:border-gray-700 hover:bg-gray-800/40 text-gray-300"
+            ? "border-blue-500 bg-blue-600/10 text-blue-400 font-bold"
+            : "border-gray-800/80 hover:border-gray-700 bg-gray-950/40 text-gray-300"
         }`;
-        row.innerHTML = `
-          <span class="text-xs font-semibold truncate">${p.name}</span>
-          <span class="text-[10px] font-bold text-gray-500 shrink-0 ml-2">Rs.${p.prices.printed}</span>
+        btn.innerHTML = `
+          <span class="text-xs truncate max-w-[170px]">${p.name}</span>
+          <span class="text-[10px] font-bold text-gray-400 font-mono">Rs.${p.prices.printed}</span>
         `;
-        row.addEventListener("click", () => {
+        btn.addEventListener("click", () => {
           activeProduct = p;
           selectedColor = p.colors[0].name;
           selectedSize = "M";
           document.querySelectorAll(".garment-pick-card").forEach(c => {
-            c.classList.remove("border-blue-500", "bg-blue-600/10", "text-blue-400");
-            c.classList.add("border-transparent", "text-gray-300");
+            c.classList.remove("border-blue-500", "bg-blue-600/10", "text-blue-400", "font-bold");
+            c.classList.add("border-gray-800/80", "text-gray-300");
           });
-          row.classList.remove("border-transparent", "text-gray-300");
-          row.classList.add("border-blue-500", "bg-blue-600/10", "text-blue-400");
+          btn.classList.remove("border-gray-800/80", "text-gray-300");
+          btn.classList.add("border-blue-500", "bg-blue-600/10", "text-blue-400", "font-bold");
           renderProductOptions();
           updateGarmentWorkspaceImage();
-          showToast(`Selected: ${p.name}`, "success");
+          showToast(`Selected garment: ${p.name}`, "success");
         });
-        grid.appendChild(row);
+        grid.appendChild(btn);
       });
     }
 
+    // Render Options, Colors, Sizes & Prices
     function renderProductOptions() {
       if (!activeProduct) return;
 
-      // Summary labels
       document.getElementById("summary-prod-name").textContent = activeProduct.name;
       document.getElementById("summary-prod-brand").textContent = activeProduct.brand;
       document.getElementById("summary-prod-price-tag").textContent = `Rs. ${activeProduct.prices.printed}`;
 
-      // Color thumbnail swatches
+      // Color Swatches
       const colorContainer = document.getElementById("summary-colors");
       colorContainer.innerHTML = "";
       activeProduct.colors.forEach(c => {
         const btn = document.createElement("button");
-        btn.className = `color-swatch-sm rounded-lg overflow-hidden border-2 transition-all hover:scale-110 shrink-0 focus:outline-none ${
-          c.name === selectedColor ? "border-blue-500 ring-2 ring-blue-500/40 scale-110" : "border-gray-700 hover:border-gray-400"
+        btn.className = `color-swatch-sm rounded-xl overflow-hidden border-2 transition-all shrink-0 ${
+          c.name === selectedColor ? "border-blue-500 ring-2 ring-blue-500/40 scale-105" : "border-gray-800 hover:border-gray-600"
         }`;
-        btn.style.width = "44px";
-        btn.style.height = "56px";
+        btn.style.width = "40px";
+        btn.style.height = "52px";
         btn.title = c.name;
-        btn.innerHTML = `<img src="${c.image}" alt="${c.name}" class="w-full h-full object-cover"
-          onerror="this.src='assets/images/brand_logo.jpeg'">`;
+        btn.innerHTML = `<img src="${c.image}" alt="${c.name}" class="w-full h-full object-cover" onerror="this.src='assets/images/brand_logo.jpeg'">`;
         btn.addEventListener("click", () => {
           selectedColor = c.name;
           document.querySelectorAll(".color-swatch-sm").forEach(b => {
-            b.classList.remove("border-blue-500", "ring-2", "ring-blue-500/40", "scale-110");
-            b.classList.add("border-gray-700");
+            b.classList.remove("border-blue-500", "ring-2", "ring-blue-500/40", "scale-105");
+            b.classList.add("border-gray-800");
           });
-          btn.classList.remove("border-gray-700");
-          btn.classList.add("border-blue-500", "ring-2", "ring-blue-500/40", "scale-110");
+          btn.classList.remove("border-gray-800");
+          btn.classList.add("border-blue-500", "ring-2", "ring-blue-500/40", "scale-105");
           updateGarmentWorkspaceImage();
         });
         colorContainer.appendChild(btn);
       });
 
-      // Size buttons
+      // Size Buttons
       const sizeContainer = document.getElementById("summary-sizes");
       sizeContainer.innerHTML = "";
       activeProduct.sizes.forEach(s => {
         const btn = document.createElement("button");
-        btn.className = `px-3 py-1 rounded bg-gray-900 border text-[10px] font-bold transition ${
-          s === selectedSize ? "border-blue-500 text-blue-400 bg-blue-600/10" : "border-gray-800 hover:border-gray-600"
+        btn.className = `px-3 py-1.5 rounded-lg border text-xs font-bold font-mono transition ${
+          s === selectedSize ? "border-blue-500 text-blue-400 bg-blue-600/10" : "border-gray-800 hover:border-gray-700 bg-gray-950 text-gray-300"
         }`;
         btn.textContent = s;
         btn.addEventListener("click", () => {
@@ -587,217 +880,908 @@
         sizeContainer.appendChild(btn);
       });
 
-      // Prices
-      document.getElementById("price-base").textContent = `Rs. ${activeProduct.prices.plain}`;
-      const markup = activeProduct.prices.printed - activeProduct.prices.plain;
-      document.getElementById("price-printing-markup").textContent = `Rs. ${markup}`;
-      document.getElementById("price-total").textContent = `Rs. ${activeProduct.prices.printed}`;
-      
-      const mobTotal = document.getElementById("mobile-price-total");
-      if (mobTotal) mobTotal.textContent = `Rs. ${activeProduct.prices.printed}`;
-
+      recalculatePrice();
       if (window.lucide) lucide.createIcons();
     }
 
+    // Dynamic Price Calculation
+    function recalculatePrice() {
+      if (!activeProduct) return;
+      const basePlain = activeProduct.prices.plain;
+      const basePrinted = activeProduct.prices.printed;
+      const basePrintMarkup = basePrinted - basePlain;
 
+      // Calculate placement counts
+      let totalExtraSurcharge = 0;
+      const activeSidesWithLayers = Object.keys(placementStore).filter(side => placementStore[side].length > 0);
+      
+      // If user designs on more than 1 placement, add extra placement surcharge (Rs 150 per side)
+      if (activeSidesWithLayers.length > 1) {
+        totalExtraSurcharge = (activeSidesWithLayers.length - 1) * 150;
+      }
+
+      const totalFinalPrice = basePrinted + totalExtraSurcharge;
+
+      document.getElementById("price-base").textContent = `Rs. ${basePlain}`;
+      document.getElementById("price-extra-placements").textContent = `+Rs. ${totalExtraSurcharge}`;
+      document.getElementById("price-total").textContent = `Rs. ${totalFinalPrice}`;
+
+      const mobTotal = document.getElementById("mobile-price-total");
+      if (mobTotal) mobTotal.textContent = `Rs. ${totalFinalPrice}`;
+    }
+
+    // Update Workspace Background Image
     function updateGarmentWorkspaceImage() {
       if (!activeProduct) return;
       const matchingColor = activeProduct.colors.find(c => c.name === selectedColor);
       const imgPath = matchingColor ? matchingColor.image : activeProduct.cover_image;
-      
-      // Draw background of workspace
       document.getElementById("canvas-workspace").style.backgroundImage = `url('${imgPath}')`;
     }
 
-    function changePlacement(place) {
-      activePlacement = place;
-      document.querySelectorAll("[id^='btn-place-']").forEach(btn => {
-        btn.className = "p-2.5 rounded-lg bg-gray-900 border border-gray-800 hover:border-gray-600 transition";
-      });
-      document.getElementById(`btn-place-${place}`).className = "p-2.5 rounded-lg bg-blue-600 text-white border border-blue-500 font-bold transition";
-      showToast(`Swapped to ${place} print view`, "success");
+    // Switch Left Sidebar Tabs
+    function switchStudioTab(tabId) {
+      document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
+      document.querySelectorAll(".tab-pane").forEach(pane => pane.classList.add("hidden"));
+
+      const targetBtn = document.getElementById(`tab-btn-${tabId}`);
+      const targetPane = document.getElementById(`tab-content-${tabId}`);
+
+      if (targetBtn) targetBtn.classList.add("active");
+      if (targetPane) targetPane.classList.remove("hidden");
+
+      if (tabId === 'layers') renderLayersManagerList();
     }
 
-    // Handles graphics uploading
-    function handleImageUpload(e) {
+    // Switch Active Print Placement Side
+    function setPlacementSide(side) {
+      activePlacement = side;
+      document.querySelectorAll("[id^='place-btn-']").forEach(btn => {
+        btn.className = "p-3 rounded-xl bg-gray-900 border border-gray-800 hover:border-gray-700 text-gray-300 font-semibold transition flex items-center justify-between";
+      });
+
+      const activeBtn = document.getElementById(`place-btn-${side}`);
+      if (activeBtn) {
+        activeBtn.className = "p-3 rounded-xl bg-blue-600 text-white border border-blue-500 font-bold transition flex items-center justify-between shadow-lg shadow-blue-600/20";
+      }
+
+      document.getElementById("placement-side-badge").textContent = `${side.toUpperCase()} PRINT`;
+      document.getElementById("layers-list-side-name").textContent = side.toUpperCase();
+
+      const sideLayers = placementStore[side];
+      activeLayerId = sideLayers.length > 0 ? sideLayers[sideLayers.length - 1].id : null;
+
+      renderCanvasLayers();
+      updateLayersCountBadges();
+      recalculatePrice();
+      showToast(`Switched workspace to ${side.toUpperCase()} view`, "success");
+    }
+
+    // Render All Layers on Canvas
+    function renderCanvasLayers() {
+      const container = document.getElementById("layers-render-target");
+      if (!container) return;
+      container.innerHTML = "";
+
+      const layers = placementStore[activePlacement];
+
+      layers.forEach(layer => {
+        if (!layer.visible) return;
+
+        const wrapper = document.createElement("div");
+        wrapper.id = `layer-node-${layer.id}`;
+        wrapper.className = `layer-overlay ${layer.id === activeLayerId ? "active-selected" : ""}`;
+        wrapper.style.left = `${layer.x}%`;
+        wrapper.style.top = `${layer.y}%`;
+        wrapper.style.width = `${layer.width}px`;
+        wrapper.style.height = `${layer.height}px`;
+        wrapper.style.transform = `translate(-50%, -50%) rotate(${layer.rotation}deg)`;
+        wrapper.style.opacity = layer.opacity;
+
+        // Element Content
+        if (layer.type === 'text') {
+          const textSpan = document.createElement("span");
+          textSpan.className = "text-node-span";
+          textSpan.textContent = layer.text;
+          textSpan.style.fontFamily = layer.fontFamily;
+          textSpan.style.fontSize = `${layer.fontSize}px`;
+          textSpan.style.fontWeight = layer.fontWeight;
+          textSpan.style.fontStyle = layer.fontStyle;
+          textSpan.style.color = layer.color;
+          textSpan.style.letterSpacing = `${layer.letterSpacing}px`;
+
+          if (layer.strokeWidth > 0) {
+            textSpan.style.webkitTextStroke = `${layer.strokeWidth}px ${layer.strokeColor}`;
+          }
+          if (layer.shadow) {
+            textSpan.style.textShadow = `2px 4px 8px rgba(0,0,0,0.8), 0 0 12px ${layer.color}66`;
+          }
+          if (layer.arc !== 0) {
+            textSpan.style.transform = `rotate(${layer.arc * 0.1}deg)`;
+          }
+
+          wrapper.appendChild(textSpan);
+        } else if (layer.type === 'image' || layer.type === 'clipart') {
+          if (layer.src.startsWith('<svg')) {
+            wrapper.innerHTML = layer.src;
+            const svgEl = wrapper.querySelector('svg');
+            if (svgEl) {
+              svgEl.style.width = '100%';
+              svgEl.style.height = '100%';
+              svgEl.style.fill = layer.color || 'currentColor';
+            }
+          } else {
+            const img = document.createElement("img");
+            img.src = layer.src;
+            img.alt = "Layer Graphic";
+            img.className = "w-full h-full object-contain pointer-events-none";
+            if (layer.flipX || layer.flipY) {
+              img.style.transform = `scale(${layer.flipX ? -1 : 1}, ${layer.flipY ? -1 : 1})`;
+            }
+            wrapper.appendChild(img);
+          }
+        }
+
+        // Bounding Action Handles if Active Layer
+        if (layer.id === activeLayerId && !isPreviewMode) {
+          const btnDel = document.createElement("div");
+          btnDel.className = "layer-handle handle-tl";
+          btnDel.innerHTML = `<i data-lucide="x" class="w-3.5 h-3.5 pointer-events-none"></i>`;
+          btnDel.title = "Delete Layer";
+          const handleDelete = (e) => {
+            if (e) {
+              e.stopPropagation();
+              e.preventDefault();
+            }
+            deleteActiveLayer();
+          };
+          btnDel.addEventListener("mousedown", handleDelete);
+          btnDel.addEventListener("touchstart", handleDelete, { passive: false });
+          btnDel.onclick = handleDelete;
+
+          const btnRot = document.createElement("div");
+          btnRot.className = "layer-handle handle-tr";
+          btnRot.innerHTML = `<i data-lucide="rotate-cw" class="w-3.5 h-3.5 pointer-events-none"></i>`;
+          btnRot.title = "Rotate Layer";
+          initRotateHandle(btnRot, layer, wrapper);
+
+          const btnDup = document.createElement("div");
+          btnDup.className = "layer-handle handle-bl";
+          btnDup.innerHTML = `<i data-lucide="copy" class="w-3.5 h-3.5 pointer-events-none"></i>`;
+          btnDup.title = "Duplicate Layer";
+          const handleDup = (e) => {
+            if (e) {
+              e.stopPropagation();
+              e.preventDefault();
+            }
+            duplicateActiveLayer();
+          };
+          btnDup.addEventListener("mousedown", handleDup);
+          btnDup.addEventListener("touchstart", handleDup, { passive: false });
+          btnDup.onclick = handleDup;
+
+          const btnResize = document.createElement("div");
+          btnResize.className = "layer-handle handle-br";
+          btnResize.innerHTML = `<i data-lucide="arrow-down-right" class="w-3.5 h-3.5 pointer-events-none"></i>`;
+          btnResize.title = "Resize Layer";
+          initResizeHandle(btnResize, layer, wrapper);
+
+          wrapper.appendChild(btnDel);
+          wrapper.appendChild(btnRot);
+          wrapper.appendChild(btnDup);
+          wrapper.appendChild(btnResize);
+        }
+
+        // Click & Drag Events
+        wrapper.addEventListener("mousedown", (e) => onLayerMouseDown(e, layer));
+        wrapper.addEventListener("touchstart", (e) => onLayerTouchStart(e, layer), { passive: true });
+
+        container.appendChild(wrapper);
+      });
+
+      if (window.lucide) lucide.createIcons();
+    }
+
+    // Select Layer Action
+    function selectLayer(layerId) {
+      activeLayerId = layerId;
+      renderCanvasLayers();
+      syncTextControlsUI();
+      syncImageControlsUI();
+    }
+
+    // Add New Text Box
+    function addNewTextLayer() {
+      const newLayer = {
+        id: 'layer_' + Date.now(),
+        type: 'text',
+        text: 'Custom Text',
+        fontFamily: 'Outfit',
+        fontSize: 28,
+        fontWeight: 'bold',
+        fontStyle: 'normal',
+        color: '#FFFFFF',
+        strokeColor: '#000000',
+        strokeWidth: 0,
+        letterSpacing: 0,
+        arc: 0,
+        shadow: false,
+        x: 50,
+        y: 50,
+        width: 180,
+        height: 50,
+        rotation: 0,
+        opacity: 1,
+        locked: false,
+        visible: true
+      };
+
+      placementStore[activePlacement].push(newLayer);
+      activeLayerId = newLayer.id;
+      renderCanvasLayers();
+      updateLayersCountBadges();
+      syncTextControlsUI();
+      switchStudioTab('text');
+      showToast("Added new text layer", "success");
+    }
+
+    // Update Active Text Properties
+    function updateActiveTextLayer() {
+      const layer = getActiveLayer();
+      if (!layer || layer.type !== 'text') return;
+
+      const textVal = document.getElementById("input-text-content").value;
+      const font = document.getElementById("select-font-family").value;
+      const fontSize = parseInt(document.getElementById("range-font-size").value);
+      const color = document.getElementById("picker-text-color").value;
+      const strokeColor = document.getElementById("picker-stroke-color").value;
+      const strokeWidth = parseInt(document.getElementById("range-stroke-width").value);
+      const arc = parseInt(document.getElementById("range-text-arc").value);
+      const spacing = parseInt(document.getElementById("range-letter-spacing").value);
+
+      layer.text = textVal;
+      layer.fontFamily = font;
+      layer.fontSize = fontSize;
+      layer.color = color;
+      layer.strokeColor = strokeColor;
+      layer.strokeWidth = strokeWidth;
+      layer.arc = arc;
+      layer.letterSpacing = spacing;
+
+      document.getElementById("hex-text-color").value = color.toUpperCase();
+      document.getElementById("hex-stroke-color").value = strokeColor.toUpperCase();
+      document.getElementById("val-font-size").textContent = `${fontSize}px`;
+      document.getElementById("val-stroke-width").textContent = `${strokeWidth}px`;
+      document.getElementById("val-text-arc").textContent = `${arc}°`;
+      document.getElementById("val-letter-spacing").textContent = `${spacing}px`;
+
+      renderCanvasLayers();
+    }
+
+    // Sync Text Control UI with Active Layer
+    function syncTextControlsUI() {
+      const layer = getActiveLayer();
+      if (!layer || layer.type !== 'text') return;
+
+      document.getElementById("input-text-content").value = layer.text;
+      document.getElementById("select-font-family").value = layer.fontFamily;
+      document.getElementById("range-font-size").value = layer.fontSize;
+      document.getElementById("picker-text-color").value = layer.color;
+      document.getElementById("hex-text-color").value = layer.color.toUpperCase();
+      document.getElementById("picker-stroke-color").value = layer.strokeColor;
+      document.getElementById("hex-stroke-color").value = layer.strokeColor.toUpperCase();
+      document.getElementById("range-stroke-width").value = layer.strokeWidth;
+      document.getElementById("range-text-arc").value = layer.arc;
+      document.getElementById("range-letter-spacing").value = layer.letterSpacing;
+
+      document.getElementById("val-font-size").textContent = `${layer.fontSize}px`;
+      document.getElementById("val-stroke-width").textContent = `${layer.strokeWidth}px`;
+      document.getElementById("val-text-arc").textContent = `${layer.arc}°`;
+      document.getElementById("val-letter-spacing").textContent = `${layer.letterSpacing}px`;
+    }
+
+    // Handle Custom Graphic Upload
+    function handleGraphicUpload(e) {
       const file = e.target.files[0];
       if (!file) return;
 
       const reader = new FileReader();
       reader.onload = function(evt) {
-        const imageLayer = document.getElementById("image-layer");
-        const elementNode = document.getElementById("image-element");
-        elementNode.innerHTML = `<img src="${evt.target.result}" alt="Custom graphic">`;
-        
-        imageLayer.classList.remove("hidden");
-        
-        // Reset overlay size to default
-        imageState.width = 120;
-        imageState.height = 120;
-        imageLayer.style.width = "120px";
-        imageLayer.style.height = "120px";
-        
-        setActiveLayer("image");
+        const newLayer = {
+          id: 'layer_' + Date.now(),
+          type: 'image',
+          src: evt.target.result,
+          x: 50,
+          y: 40,
+          width: 140,
+          height: 140,
+          rotation: 0,
+          opacity: 1,
+          flipX: false,
+          flipY: false,
+          locked: false,
+          visible: true
+        };
+
+        placementStore[activePlacement].push(newLayer);
+        activeLayerId = newLayer.id;
+        renderCanvasLayers();
+        updateLayersCountBadges();
+        switchStudioTab('graphics');
+        showToast("Uploaded custom graphic", "success");
       };
       reader.readAsDataURL(file);
     }
 
-    // Add/Update text elements
-    function updateTextElement() {
-      const val = document.getElementById("custom-text-input").value;
-      const font = document.getElementById("font-select").value;
-      const color = document.getElementById("text-color-picker").value;
+    // Render Clipart Grid
+    function renderClipartLibrary() {
+      const grid = document.getElementById("clipart-library-grid");
+      if (!grid) return;
+      grid.innerHTML = "";
 
-      document.getElementById("text-color-hex").value = color.toUpperCase();
-
-      const elementNode = document.getElementById("text-element");
-      const textVal = val.trim() || "Your Text";
-      elementNode.innerHTML = `<span id="text-element-node" style="font-family: '${font}'; color: ${color};" class="text-base">${textVal}</span>`;
-      
-      setActiveLayer("text");
+      CLIPART_ITEMS.forEach(c => {
+        const card = document.createElement("button");
+        card.className = "clipart-card p-2.5 rounded-xl bg-gray-950 border border-gray-800 hover:border-blue-500/50 flex flex-col items-center justify-center gap-1.5 transition text-gray-300 hover:text-white";
+        card.innerHTML = `
+          <div class="w-10 h-10 text-blue-400">${c.svg}</div>
+          <span class="text-[9px] font-bold truncate max-w-full">${c.title}</span>
+        `;
+        card.addEventListener("click", () => {
+          const newLayer = {
+            id: 'layer_' + Date.now(),
+            type: 'clipart',
+            src: c.svg,
+            color: '#ffffff',
+            x: 50,
+            y: 50,
+            width: 120,
+            height: 120,
+            rotation: 0,
+            opacity: 1,
+            locked: false,
+            visible: true
+          };
+          placementStore[activePlacement].push(newLayer);
+          activeLayerId = newLayer.id;
+          renderCanvasLayers();
+          updateLayersCountBadges();
+          showToast(`Added ${c.title} clipart`, "success");
+        });
+        grid.appendChild(card);
+      });
     }
 
-    function rotateDesign(val) {
-      const layer = document.getElementById(`${activeLayer}-layer`);
+    // Update Image Opacity & Flips
+    function updateActiveImageLayer() {
+      const layer = getActiveLayer();
+      if (!layer || (layer.type !== 'image' && layer.type !== 'clipart')) return;
+
+      const op = parseInt(document.getElementById("range-image-opacity").value);
+      layer.opacity = op / 100;
+      document.getElementById("val-image-opacity").textContent = `${op}%`;
+      renderCanvasLayers();
+    }
+
+    function syncImageControlsUI() {
+      const layer = getActiveLayer();
+      if (!layer || (layer.type !== 'image' && layer.type !== 'clipart')) return;
+      const op = Math.round(layer.opacity * 100);
+      document.getElementById("range-image-opacity").value = op;
+      document.getElementById("val-image-opacity").textContent = `${op}%`;
+    }
+
+    function flipActiveImage(axis) {
+      const layer = getActiveLayer();
+      if (!layer) return;
+      if (axis === 'x') layer.flipX = !layer.flipX;
+      if (axis === 'y') layer.flipY = !layer.flipY;
+      renderCanvasLayers();
+    }
+
+    // Render Layers Manager Pane List
+    function renderLayersManagerList() {
+      const container = document.getElementById("layers-list-container");
+      if (!container) return;
+      container.innerHTML = "";
+
+      const layers = placementStore[activePlacement];
+
+      if (layers.length === 0) {
+        container.innerHTML = `<div class="text-center py-8 text-xs text-gray-500">No layers on ${activePlacement} print side yet.</div>`;
+        return;
+      }
+
+      layers.slice().reverse().forEach((layer, idx) => {
+        const card = document.createElement("div");
+        card.className = `p-2.5 rounded-xl border flex items-center justify-between gap-2 text-xs transition ${
+          layer.id === activeLayerId ? "border-blue-500 bg-blue-600/10 text-white" : "border-gray-800 bg-gray-950/60 text-gray-300"
+        }`;
+        
+        const typeIcon = layer.type === 'text' ? 'type' : 'image';
+        const labelText = layer.type === 'text' ? `"${layer.text}"` : (layer.type === 'clipart' ? 'Clipart Vector' : 'Custom Graphic');
+
+        card.innerHTML = `
+          <div class="flex items-center gap-2 min-w-0 cursor-pointer flex-1" onclick="selectLayer('${layer.id}')">
+            <i data-lucide="${typeIcon}" class="w-4 h-4 text-blue-400 shrink-0"></i>
+            <span class="truncate font-semibold">${labelText}</span>
+          </div>
+          <div class="flex items-center gap-1 shrink-0">
+            <button onclick="toggleLayerVisibility('${layer.id}')" class="p-1 rounded hover:bg-gray-800 text-gray-400 hover:text-white">
+              <i data-lucide="${layer.visible ? 'eye' : 'eye-off'}" class="w-3.5 h-3.5"></i>
+            </button>
+            <button onclick="deleteLayerById('${layer.id}')" class="p-1 rounded hover:bg-red-900/50 text-red-400">
+              <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+
+      if (window.lucide) lucide.createIcons();
+    }
+
+    // Toggle Layer Visibility
+    function toggleLayerVisibility(id) {
+      const layer = getLayerById(id);
       if (layer) {
-        layer.style.transform = `rotate(${val}deg)`;
-        if (activeLayer === "text") {
-          textState.rotation = parseInt(val);
-        } else {
-          imageState.rotation = parseInt(val);
-        }
+        layer.visible = !layer.visible;
+        renderCanvasLayers();
+        renderLayersManagerList();
       }
     }
 
-    // Drag, Scale / Positioning Logic
-    function initDragging() {
-      setupLayerDragging("text");
-      setupLayerDragging("image");
+    // Delete Layer by ID
+    function deleteLayerById(id) {
+      const layers = placementStore[activePlacement];
+      placementStore[activePlacement] = layers.filter(l => l.id !== id);
+      if (activeLayerId === id) {
+        const remaining = placementStore[activePlacement];
+        activeLayerId = remaining.length > 0 ? remaining[remaining.length - 1].id : null;
+      }
+      renderCanvasLayers();
+      renderLayersManagerList();
+      updateLayersCountBadges();
+      recalculatePrice();
+      showToast("Layer deleted", "info");
     }
 
-    function setupLayerDragging(layerId) {
-      const layer = document.getElementById(`${layerId}-layer`);
+    // Layer Dragging Engine
+    function onLayerMouseDown(e, layer) {
+      if (isPreviewMode || layer.locked) return;
+      if (e.target && (e.target.classList.contains("layer-handle") || e.target.closest(".layer-handle"))) {
+        return;
+      }
+      selectLayer(layer.id);
+      
       const workspace = document.getElementById("canvas-workspace");
-      const resizeHandle = document.getElementById(`${layerId}-resize-handle`);
-      const state = layerId === "text" ? textState : imageState;
+      const rect = workspace.getBoundingClientRect();
+      let startX = e.clientX;
+      let startY = e.clientY;
 
-      let isDragging = false;
-      let isResizing = false;
-      let startX, startY;
-      let startWidth, startHeight;
+      const snapX = document.getElementById("snap-guideline-x");
+      const snapY = document.getElementById("snap-guideline-y");
 
-      // Mouse drag start
-      layer.addEventListener("mousedown", (e) => {
-        if (e.target === resizeHandle) return;
-        setActiveLayer(layerId);
-        isDragging = true;
-        startX = e.clientX;
-        startY = e.clientY;
-      });
+      function onMouseMove(me) {
+        const dx = me.clientX - startX;
+        const dy = me.clientY - startY;
 
-      // Touch start
-      layer.addEventListener("touchstart", (e) => {
-        if (e.target === resizeHandle) return;
-        setActiveLayer(layerId);
-        isDragging = true;
-        startX = e.touches[0].clientX;
-        startY = e.touches[0].clientY;
-      }, { passive: true });
+        let newX = layer.x + (dx / rect.width) * 100;
+        let newY = layer.y + (dy / rect.height) * 100;
 
-      // Resize handle start
-      resizeHandle.addEventListener("mousedown", (e) => {
-        setActiveLayer(layerId);
-        isResizing = true;
-        startX = e.clientX;
-        startY = e.clientY;
-        startWidth = parseInt(document.defaultView.getComputedStyle(layer).width, 10);
-        startHeight = parseInt(document.defaultView.getComputedStyle(layer).height, 10);
-        e.preventDefault();
-      });
-
-      resizeHandle.addEventListener("touchstart", (e) => {
-        setActiveLayer(layerId);
-        isResizing = true;
-        startX = e.touches[0].clientX;
-        startY = e.touches[0].clientY;
-        startWidth = parseInt(document.defaultView.getComputedStyle(layer).width, 10);
-        startHeight = parseInt(document.defaultView.getComputedStyle(layer).height, 10);
-        e.preventDefault();
-      }, { passive: false });
-
-      // Move listener
-      document.addEventListener("mousemove", (e) => {
-        if (!isDragging && !isResizing) return;
-        const workspaceRect = workspace.getBoundingClientRect();
-        
-        if (isDragging) {
-          const dx = e.clientX - startX;
-          const dy = e.clientY - startY;
-          
-          const percentX = (dx / workspaceRect.width) * 100;
-          const percentY = (dy / workspaceRect.height) * 100;
-          
-          state.left = Math.min(Math.max(0, state.left + percentX), 80);
-          state.top = Math.min(Math.max(0, state.top + percentY), 80);
-          
-          layer.style.left = `${state.left}%`;
-          layer.style.top = `${state.top}%`;
-          
-          startX = e.clientX;
-          startY = e.clientY;
-        } else if (isResizing) {
-          const dx = e.clientX - startX;
-          const dy = e.clientY - startY;
-          
-          state.width = Math.min(Math.max(40, startWidth + dx), 200);
-          state.height = Math.min(Math.max(40, startHeight + dy), 200);
-          
-          layer.style.width = `${state.width}px`;
-          layer.style.height = `${state.height}px`;
+        // Snapping to center
+        if (Math.abs(newX - 50) < 3) {
+          newX = 50;
+          if (snapX) snapX.style.display = "block";
+        } else {
+          if (snapX) snapX.style.display = "none";
         }
-      });
 
-      document.addEventListener("touchmove", (e) => {
-        if (!isDragging && !isResizing) return;
-        e.preventDefault();
-        const workspaceRect = workspace.getBoundingClientRect();
-        const clientX = e.touches[0].clientX;
-        const clientY = e.touches[0].clientY;
-        
-        if (isDragging) {
-          const dx = clientX - startX;
-          const dy = clientY - startY;
-          
-          const percentX = (dx / workspaceRect.width) * 100;
-          const percentY = (dy / workspaceRect.height) * 100;
-          
-          state.left = Math.min(Math.max(0, state.left + percentX), 80);
-          state.top = Math.min(Math.max(0, state.top + percentY), 80);
-          
-          layer.style.left = `${state.left}%`;
-          layer.style.top = `${state.top}%`;
-          
-          startX = clientX;
-          startY = clientY;
-        } else if (isResizing) {
-          const dx = clientX - startX;
-          const dy = clientY - startY;
-          
-          state.width = Math.min(Math.max(40, startWidth + dx), 200);
-          state.height = Math.min(Math.max(40, startHeight + dy), 200);
-          
-          layer.style.width = `${state.width}px`;
-          layer.style.height = `${state.height}px`;
+        if (Math.abs(newY - 50) < 3) {
+          newY = 50;
+          if (snapY) snapY.style.display = "block";
+        } else {
+          if (snapY) snapY.style.display = "none";
         }
-      }, { passive: false });
 
-      // Stop
-      const stopHandler = () => {
-        isDragging = false;
-        isResizing = false;
+        layer.x = Math.min(Math.max(10, newX), 90);
+        layer.y = Math.min(Math.max(10, newY), 90);
+
+        startX = me.clientX;
+        startY = me.clientY;
+
+        const node = document.getElementById(`layer-node-${layer.id}`);
+        if (node) {
+          node.style.left = `${layer.x}%`;
+          node.style.top = `${layer.y}%`;
+        }
+      }
+
+      function onMouseUp() {
+        document.removeEventListener("mousemove", onMouseMove);
+        document.removeEventListener("mouseup", onMouseUp);
+        if (snapX) snapX.style.display = "none";
+        if (snapY) snapY.style.display = "none";
+      }
+
+      document.addEventListener("mousemove", onMouseMove);
+      document.addEventListener("mouseup", onMouseUp);
+    }
+
+    function onLayerTouchStart(e, layer) {
+      if (isPreviewMode || layer.locked) return;
+      if (e.target && (e.target.classList.contains("layer-handle") || e.target.closest(".layer-handle"))) {
+        return;
+      }
+      selectLayer(layer.id);
+      const touch = e.touches[0];
+      const workspace = document.getElementById("canvas-workspace");
+      const rect = workspace.getBoundingClientRect();
+      let startX = touch.clientX;
+      let startY = touch.clientY;
+
+      function onTouchMove(te) {
+        const t = te.touches[0];
+        const dx = t.clientX - startX;
+        const dy = t.clientY - startY;
+
+        layer.x = Math.min(Math.max(10, layer.x + (dx / rect.width) * 100), 90);
+        layer.y = Math.min(Math.max(10, layer.y + (dy / rect.height) * 100), 90);
+
+        startX = t.clientX;
+        startY = t.clientY;
+
+        const node = document.getElementById(`layer-node-${layer.id}`);
+        if (node) {
+          node.style.left = `${layer.x}%`;
+          node.style.top = `${layer.y}%`;
+        }
+      }
+
+      function onTouchEnd() {
+        document.removeEventListener("touchmove", onTouchMove);
+        document.removeEventListener("touchend", onTouchEnd);
+      }
+
+      document.addEventListener("touchmove", onTouchMove, { passive: false });
+      document.addEventListener("touchend", onTouchEnd);
+    }
+
+    // Resize Handle Logic
+    function initResizeHandle(handleEl, layer, wrapperEl) {
+      const startResize = (clientX, clientY, e) => {
+        e.stopPropagation();
+        if (e.preventDefault) e.preventDefault();
+        let startX = clientX;
+        let startWidth = layer.width;
+        let startHeight = layer.height;
+
+        function onMove(currX) {
+          const dx = currX - startX;
+          layer.width = Math.max(40, startWidth + dx);
+          layer.height = Math.max(20, startHeight + dx);
+          wrapperEl.style.width = `${layer.width}px`;
+          wrapperEl.style.height = `${layer.height}px`;
+        }
+
+        const onMouseMove = (me) => onMove(me.clientX);
+        const onTouchMove = (te) => onMove(te.touches[0].clientX);
+
+        const onEnd = () => {
+          document.removeEventListener("mousemove", onMouseMove);
+          document.removeEventListener("mouseup", onEnd);
+          document.removeEventListener("touchmove", onTouchMove);
+          document.removeEventListener("touchend", onEnd);
+        };
+
+        document.addEventListener("mousemove", onMouseMove);
+        document.addEventListener("mouseup", onEnd);
+        document.addEventListener("touchmove", onTouchMove, { passive: false });
+        document.addEventListener("touchend", onEnd);
       };
-      document.addEventListener("mouseup", stopHandler);
-      document.addEventListener("touchend", stopHandler);
+
+      handleEl.addEventListener("mousedown", (e) => startResize(e.clientX, e.clientY, e));
+      handleEl.addEventListener("touchstart", (e) => startResize(e.touches[0].clientX, e.touches[0].clientY, e), { passive: false });
+    }
+
+    // Rotate Handle Logic
+    function initRotateHandle(handleEl, layer, wrapperEl) {
+      const startRotate = (e) => {
+        e.stopPropagation();
+        if (e.preventDefault) e.preventDefault();
+        const rect = wrapperEl.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+
+        function onRotateMove(clientX, clientY) {
+          const rad = Math.atan2(clientY - centerY, clientX - centerX);
+          let deg = Math.round(rad * (180 / Math.PI)) + 90;
+          if (deg < 0) deg += 360;
+          layer.rotation = deg;
+          wrapperEl.style.transform = `translate(-50%, -50%) rotate(${deg}deg)`;
+        }
+
+        const onMouseMove = (me) => onRotateMove(me.clientX, me.clientY);
+        const onTouchMove = (te) => onRotateMove(te.touches[0].clientX, te.touches[0].clientY);
+
+        const onEnd = () => {
+          document.removeEventListener("mousemove", onMouseMove);
+          document.removeEventListener("mouseup", onEnd);
+          document.removeEventListener("touchmove", onTouchMove);
+          document.removeEventListener("touchend", onEnd);
+        };
+
+        document.addEventListener("mousemove", onMouseMove);
+        document.addEventListener("mouseup", onEnd);
+        document.addEventListener("touchmove", onTouchMove, { passive: false });
+        document.addEventListener("touchend", onEnd);
+      };
+
+      handleEl.addEventListener("mousedown", startRotate);
+      handleEl.addEventListener("touchstart", startRotate, { passive: false });
+    }
+
+    // Studio Quick Actions
+    function rotateActiveLayer(deg) {
+      const layer = getActiveLayer();
+      if (!layer) return;
+      layer.rotation = (layer.rotation + deg) % 360;
+      if (layer.rotation < 0) layer.rotation += 360;
+      renderCanvasLayers();
+    }
+
+    function centerActiveLayer(axis) {
+      const layer = getActiveLayer();
+      if (!layer) return;
+      if (axis === 'x') layer.x = 50;
+      if (axis === 'y') layer.y = 50;
+      renderCanvasLayers();
+    }
+
+    function duplicateActiveLayer() {
+      const layer = getActiveLayer();
+      if (!layer) return;
+      const dup = JSON.parse(JSON.stringify(layer));
+      dup.id = 'layer_' + Date.now();
+      dup.x = Math.min(dup.x + 5, 85);
+      dup.y = Math.min(dup.y + 5, 85);
+      placementStore[activePlacement].push(dup);
+      activeLayerId = dup.id;
+      renderCanvasLayers();
+      updateLayersCountBadges();
+      showToast("Duplicated layer", "success");
+    }
+
+    function deleteActiveLayer() {
+      if (activeLayerId) deleteLayerById(activeLayerId);
+    }
+
+    function clearCurrentPlacement() {
+      placementStore[activePlacement] = [];
+      activeLayerId = null;
+      renderCanvasLayers();
+      updateLayersCountBadges();
+      recalculatePrice();
+      showToast(`Cleared all items on ${activePlacement} view`, "info");
+    }
+
+    function togglePreviewMode() {
+      isPreviewMode = !isPreviewMode;
+      const card = document.getElementById("studio-canvas-card");
+      const btn = document.getElementById("btn-toggle-preview");
+      if (isPreviewMode) {
+        card.classList.add("preview-mode");
+        if (btn) btn.classList.add("border-purple-500", "bg-purple-600/20", "text-purple-300");
+        showToast("Preview Mode: Selection handles hidden", "info");
+      } else {
+        card.classList.remove("preview-mode");
+        if (btn) btn.classList.remove("border-purple-500", "bg-purple-600/20", "text-purple-300");
+      }
+      renderCanvasLayers();
+    }
+
+    function toggleSafeZone() {
+      showSafeZone = !showSafeZone;
+      const zone = document.getElementById("safe-print-zone");
+      if (zone) zone.style.opacity = showSafeZone ? "1" : "0";
+    }
+
+    // Helper Functions
+    function getActiveLayer() {
+      if (!activeLayerId) return null;
+      return placementStore[activePlacement].find(l => l.id === activeLayerId) || null;
+    }
+
+    function getLayerById(id) {
+      return placementStore[activePlacement].find(l => l.id === id) || null;
+    }
+
+    function updateLayersCountBadges() {
+      ['front', 'back', 'left', 'right'].forEach(side => {
+        const count = placementStore[side].length;
+        const badge = document.getElementById(`badge-${side}-count`);
+        if (badge) badge.textContent = count;
+      });
+
+      const totalLayers = Object.values(placementStore).reduce((sum, arr) => sum + arr.length, 0);
+      const tabBadge = document.getElementById("badge-layers-count");
+      if (tabBadge) {
+        tabBadge.textContent = totalLayers;
+        if (totalLayers > 0) tabBadge.classList.remove("hidden");
+        else tabBadge.classList.add("hidden");
+      }
+    }
+
+    // Apply Quick Preset
+    function applyTextPreset(preset) {
+      let textVal = "VINTAGE";
+      let font = "Playfair Display";
+      let color = "#f59e0b";
+      let stroke = "#000000";
+
+      if (preset === 'neon') {
+        textVal = "CYBER 2077";
+        font = "Orbitron";
+        color = "#06b6d4";
+        stroke = "#000000";
+      } else if (preset === 'street') {
+        textVal = "RAW HEAVY";
+        font = "Impact";
+        color = "#ffffff";
+        stroke = "#000000";
+      } else if (preset === 'luxury') {
+        textVal = "Custom Paris";
+        font = "Playfair Display";
+        color = "#fbbf24";
+        stroke = "#000000";
+      }
+
+      const newLayer = {
+        id: 'layer_' + Date.now(),
+        type: 'text',
+        text: textVal,
+        fontFamily: font,
+        fontSize: 32,
+        fontWeight: 'bold',
+        fontStyle: preset === 'luxury' ? 'italic' : 'normal',
+        color: color,
+        strokeColor: stroke,
+        strokeWidth: preset === 'street' ? 1 : 0,
+        letterSpacing: 2,
+        arc: 0,
+        shadow: preset === 'neon',
+        x: 50,
+        y: 45,
+        width: 220,
+        height: 60,
+        rotation: 0,
+        opacity: 1,
+        locked: false,
+        visible: true
+      };
+
+      placementStore[activePlacement].push(newLayer);
+      activeLayerId = newLayer.id;
+      renderCanvasLayers();
+      updateLayersCountBadges();
+      syncTextControlsUI();
+      showToast(`Applied ${preset.toUpperCase()} preset`, "success");
+    }
+
+    function toggleTextStyle(style) {
+      const layer = getActiveLayer();
+      if (!layer || layer.type !== 'text') return;
+      if (style === 'bold') {
+        layer.fontWeight = layer.fontWeight === 'bold' ? 'normal' : 'bold';
+      }
+      if (style === 'italic') {
+        layer.fontStyle = layer.fontStyle === 'italic' ? 'normal' : 'italic';
+      }
+      renderCanvasLayers();
+    }
+
+    function toggleTextShadow() {
+      const layer = getActiveLayer();
+      if (!layer || layer.type !== 'text') return;
+      layer.shadow = !layer.shadow;
+      renderCanvasLayers();
+    }
+
+    // Export Mockup PNG
+    function exportMockupImage() {
+      showToast("Generating high-res mockup preview...", "info");
+      
+      const workspace = document.getElementById("canvas-workspace");
+      const canvas = document.createElement("canvas");
+      canvas.width = 800;
+      canvas.height = 800;
+      const ctx = canvas.getContext("2d");
+
+      const bgImg = new Image();
+      bgImg.crossOrigin = "anonymous";
+      
+      const matchingColor = activeProduct.colors.find(c => c.name === selectedColor);
+      bgImg.src = matchingColor ? matchingColor.image : activeProduct.cover_image;
+
+      bgImg.onload = function() {
+        ctx.drawImage(bgImg, 0, 0, 800, 800);
+        
+        // Draw watermarked studio branding
+        ctx.font = "bold 14px Outfit, sans-serif";
+        ctx.fillStyle = "rgba(255,255,255,0.7)";
+        ctx.fillText("CUSTOM WEAR DESIGN STUDIO", 30, 770);
+
+        const link = document.createElement("a");
+        link.download = `custom_wear_mockup_${activePlacement}.png`;
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+        showToast("Mockup PNG downloaded!", "success");
+      };
+      bgImg.onerror = function() {
+        showToast("Error downloading mockup background image", "error");
+      };
+    }
+
+    // Add Customized Item to Cart
+    function addCustomProductToCart() {
+      if (!activeProduct) return;
+
+      const activeSides = Object.keys(placementStore).filter(side => placementStore[side].length > 0);
+      
+      if (activeSides.length === 0) {
+        showToast("Please add at least one text or graphic design layer before adding to cart!", "warning");
+        return;
+      }
+
+      let extraMarkup = activeSides.length > 1 ? (activeSides.length - 1) * 150 : 0;
+      const finalPrice = activeProduct.prices.printed + extraMarkup;
+
+      // Generate composite mockup image thumbnail
+      const canvas = document.createElement("canvas");
+      canvas.width = 600;
+      canvas.height = 600;
+      const ctx = canvas.getContext("2d");
+      const bgImg = new Image();
+      bgImg.crossOrigin = "anonymous";
+      const matchingColor = activeProduct.colors.find(c => c.name === selectedColor);
+      bgImg.src = matchingColor ? matchingColor.image : activeProduct.cover_image;
+
+      const processAddToCart = (mockupDataUrl) => {
+        const cartItem = {
+          product_id: activeProduct.id,
+          name: `${activeProduct.name} (Custom Design)`,
+          price: finalPrice,
+          quantity: 1,
+          size: selectedSize,
+          color: selectedColor,
+          print_style: "custom_printed",
+          image: activeProduct.colors.find(c => c.name === selectedColor)?.image || activeProduct.cover_image,
+          customization: {
+            mockup_image: mockupDataUrl,
+            active_placements: activeSides,
+            layers_breakdown: placementStore,
+            garment_color: selectedColor,
+            size: selectedSize
+          }
+        };
+
+        addToCart(cartItem);
+        showToast("Added custom design clothing to cart!", "success");
+
+        setTimeout(() => {
+          window.location.href = "cart.html";
+        }, 1000);
+      };
+
+      bgImg.onload = function() {
+        ctx.drawImage(bgImg, 0, 0, 600, 600);
+        ctx.font = "bold 12px Outfit, sans-serif";
+        ctx.fillStyle = "rgba(255,255,255,0.7)";
+        ctx.fillText(`CUSTOM WEAR — ${activePlacement.toUpperCase()} DESIGN`, 20, 580);
+        processAddToCart(canvas.toDataURL("image/png"));
+      };
+
+      bgImg.onerror = function() {
+        processAddToCart(null);
+      };
     }
 
     function toggleMobileMenu() {
@@ -809,55 +1793,6 @@
         icon.setAttribute("data-lucide", isHidden ? "menu" : "x");
         if (window.lucide) lucide.createIcons();
       }
-    }
-
-    function addCustomProductToCart() {
-      if (!activeProduct) return;
-      
-      const price = activeProduct.prices.printed;
-      const textVal = document.getElementById("custom-text-input").value;
-      const hasText = textVal.trim() !== "";
-      const hasImage = !document.getElementById("image-layer").classList.contains("hidden");
-      
-      let designTypeSummary = "none";
-      if (hasText && hasImage) {
-        designTypeSummary = "text & image";
-      } else if (hasText) {
-        designTypeSummary = "text";
-      } else if (hasImage) {
-        designTypeSummary = "image";
-      }
-      
-      const customDesignMeta = {
-        placement: activePlacement,
-        type: designTypeSummary,
-        text: hasText ? textVal : "",
-        image_uploaded: hasImage ? "Yes (Custom Graphic)" : "No",
-        text_rotation: textState.rotation,
-        image_rotation: imageState.rotation,
-        size: selectedSize,
-        color: selectedColor
-      };
-
-      const cartItem = {
-        product_id: activeProduct.id,
-        name: `${activeProduct.name} (Custom Design)`,
-        price: price,
-        quantity: 1,
-        size: selectedSize,
-        color: selectedColor,
-        print_style: "printed",
-        image: activeProduct.colors.find(c => c.name === selectedColor)?.image || activeProduct.cover_image,
-        customization: customDesignMeta
-      };
-
-      addToCart(cartItem);
-      showToast("Added custom design clothing to cart!", "success");
-      
-      // Redirect to cart
-      setTimeout(() => {
-        window.location.href = "cart.html";
-      }, 1000);
     }
   </script>
 </body>

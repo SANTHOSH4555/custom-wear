@@ -43,6 +43,26 @@ def create_order():
         item["quantity"] = qty
         subtotal += item_price * qty
         
+        # Save custom design image if attached
+        cust = item.get("customization")
+        if cust and isinstance(cust, dict):
+            mockup_data = cust.get("mockup_image")
+            if mockup_data and isinstance(mockup_data, str) and mockup_data.startswith("data:image"):
+                try:
+                    import base64
+                    import uuid
+                    from backend.config import Config
+                    header, encoded = mockup_data.split(",", 1)
+                    img_bytes = base64.b64decode(encoded)
+                    filename = f"custom_design_{uuid.uuid4().hex[:10]}.png"
+                    filepath = os.path.join(Config.UPLOAD_FOLDER, filename)
+                    with open(filepath, "wb") as f:
+                        f.write(img_bytes)
+                    cust["mockup_image_url"] = f"/static/uploads/{filename}"
+                    print(f"[Orders] Saved custom design image file to {filepath}")
+                except Exception as e:
+                    print(f"[Orders] Could not save custom image file: {e}")
+        
     # Apply coupon discount
     discount = 0.0
     if coupon_code:
@@ -78,6 +98,19 @@ def create_order():
     }
     
     order = db_manager.create_order(order_data)
+
+    # Check if order contains custom designs and notify owner
+    has_custom = any(it.get("customization") for it in cart_items)
+    if has_custom:
+        try:
+            db_manager.create_message({
+                "name": f"Custom Design Order #{order['id']}",
+                "email": user["email"],
+                "subject": f"Custom Printing Asset for Order #{order['id']}",
+                "message": f"New custom apparel order #{order['id']} placed by {user['name']}. Custom print assets are automatically attached in Admin Orders Desk."
+            })
+        except Exception as e:
+            print(f"[Orders] Owner notification creation error: {e}")
     
     # Clear user cart upon successful checkout creation
     db_manager.save_user_cart(user["id"], [])
