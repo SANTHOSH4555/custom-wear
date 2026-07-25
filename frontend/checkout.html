@@ -587,12 +587,35 @@
       order.items.forEach((item, idx) => {
         msg += `\n${idx + 1}. *${item.name}*\n`;
         msg += `   Qty: ${item.quantity} | Size: ${item.size} | Color: ${item.color}\n`;
-        if (item.print_style) msg += `   Print: ${item.print_style}\n`;
+        if (item.print_style) msg += `   Print Style: ${item.print_style}\n`;
         if (item.gsm) msg += `   GSM: ${item.gsm}\n`;
         if (item.customization) {
-          msg += `   🎨 Custom Type: ${item.customization.type}\n`;
-          if (item.customization.text) msg += `   Custom Text: "${item.customization.text}"\n`;
-          if (item.customization.image_uploaded === "Yes (Custom Graphic)") msg += `   Custom Graphic: ✅ Uploaded\n`;
+          const cust = item.customization;
+          msg += `   🎨 *CUSTOM PRINT DESIGN DETAILS:*\n`;
+          if (cust.active_placements) {
+            msg += `   • Placements: ${cust.active_placements.join(', ').toUpperCase()}\n`;
+          }
+          if (cust.mockup_image_url) {
+            const fullImgUrl = cust.mockup_image_url.startsWith("http") 
+              ? cust.mockup_image_url 
+              : (window.location.origin + cust.mockup_image_url);
+            msg += `   🖼️ *Design Image Link:* ${fullImgUrl}\n`;
+          }
+          if (cust.layers_breakdown) {
+            Object.keys(cust.layers_breakdown).forEach(side => {
+              const layers = cust.layers_breakdown[side];
+              if (layers && layers.length > 0) {
+                msg += `   • ${side.toUpperCase()} Side: ${layers.length} item(s)\n`;
+                layers.forEach(l => {
+                  if (l.type === 'text') {
+                    msg += `     - Text: "${l.text}" (Font: ${l.fontFamily}, Color: ${l.color})\n`;
+                  } else if (l.type === 'image' || l.type === 'clipart') {
+                    msg += `     - Graphic: ${l.type === 'clipart' ? 'Clipart Vector' : 'User Artwork Upload'}\n`;
+                  }
+                });
+              }
+            });
+          }
         }
         msg += `   💰 Price: Rs. ${(item.price * item.quantity).toFixed(2)}\n`;
       });
@@ -604,7 +627,7 @@
       msg += `✅ *Total Paid: Rs. ${order.pricing.grand_total.toFixed(2)}*\n`;
       msg += `💳 Payment: UPI | Status: *PAID*\n`;
       msg += `━━━━━━━━━━━━━━━━━━━━━\n`;
-      msg += `Please confirm and process this order. Thank you! 🙏`;
+      msg += `Please confirm and process this order with custom print assets. Thank you! 🙏`;
 
       return msg;
     }

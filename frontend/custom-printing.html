@@ -287,6 +287,10 @@
         <button onclick="exportMockupImage()" class="px-4 py-2 rounded-xl bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white font-bold flex items-center gap-1.5 shadow-lg shadow-purple-600/20 transition">
           <i data-lucide="download" class="w-4 h-4"></i> Download Mockup
         </button>
+        <button onclick="shareDesignToOwnerWhatsApp()" class="px-4 py-2 rounded-xl text-white font-bold flex items-center gap-1.5 shadow-lg transition hover:scale-105" style="background: linear-gradient(135deg, #25d366, #128c7e); box-shadow: 0 4px 14px rgba(37,211,102,0.35);">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          WhatsApp Owner
+        </button>
       </div>
     </div>
   </header>
@@ -570,6 +574,13 @@
         <div class="mt-4 flex flex-wrap items-center justify-center gap-2 p-2 rounded-2xl bg-gray-900/80 border border-gray-800/80 backdrop-blur-md shadow-xl text-xs">
           <button onclick="togglePreviewMode()" id="btn-toggle-preview" class="px-3 py-2 rounded-xl bg-gray-950 border border-gray-800 hover:border-gray-700 text-gray-300 font-semibold flex items-center gap-1.5 transition">
             <i data-lucide="eye" class="w-4 h-4 text-purple-400"></i> Preview
+          </button>
+          <div class="h-4 w-[1px] bg-gray-800"></div>
+          <button onclick="adjustActiveLayerScale(1.15)" title="Maximize Text/Graphic (Size +)" class="px-2.5 py-1.5 rounded-xl bg-gray-950 border border-gray-800 hover:border-blue-500/50 text-blue-400 font-bold flex items-center gap-1 transition">
+            <i data-lucide="zoom-in" class="w-3.5 h-3.5"></i> Size +
+          </button>
+          <button onclick="adjustActiveLayerScale(0.85)" title="Minimize Text/Graphic (Size -)" class="px-2.5 py-1.5 rounded-xl bg-gray-950 border border-gray-800 hover:border-blue-500/50 text-blue-400 font-bold flex items-center gap-1 transition">
+            <i data-lucide="zoom-out" class="w-3.5 h-3.5"></i> Size -
           </button>
           <div class="h-4 w-[1px] bg-gray-800"></div>
           <button onclick="centerActiveLayer('x')" title="Center Horizontally" class="p-2 rounded-xl bg-gray-950 border border-gray-800 hover:border-gray-700 text-gray-300 hover:text-white transition">
@@ -1453,13 +1464,32 @@
         let startX = clientX;
         let startWidth = layer.width;
         let startHeight = layer.height;
+        let startFontSize = layer.fontSize || 28;
 
         function onMove(currX) {
           const dx = currX - startX;
-          layer.width = Math.max(40, startWidth + dx);
-          layer.height = Math.max(20, startHeight + dx);
-          wrapperEl.style.width = `${layer.width}px`;
-          wrapperEl.style.height = `${layer.height}px`;
+          const newWidth = Math.max(40, startWidth + dx);
+          const newHeight = Math.max(20, startHeight + dx);
+          layer.width = newWidth;
+          layer.height = newHeight;
+
+          if (layer.type === 'text') {
+            const fontScale = newWidth / startWidth;
+            const newFontSize = Math.min(Math.max(12, Math.round(startFontSize * fontScale)), 120);
+            layer.fontSize = newFontSize;
+
+            const textSpan = wrapperEl.querySelector(".text-node-span");
+            if (textSpan) {
+              textSpan.style.fontSize = `${newFontSize}px`;
+            }
+            const fontSizeInput = document.getElementById("range-font-size");
+            if (fontSizeInput) fontSizeInput.value = newFontSize;
+            const valFontSize = document.getElementById("val-font-size");
+            if (valFontSize) valFontSize.textContent = `${newFontSize}px`;
+          }
+
+          wrapperEl.style.width = `${newWidth}px`;
+          wrapperEl.style.height = `${newHeight}px`;
         }
 
         const onMouseMove = (me) => onMove(me.clientX);
@@ -1480,6 +1510,29 @@
 
       handleEl.addEventListener("mousedown", (e) => startResize(e.clientX, e.clientY, e));
       handleEl.addEventListener("touchstart", (e) => startResize(e.touches[0].clientX, e.touches[0].clientY, e), { passive: false });
+    }
+
+    // Quick Maximize / Minimize Scale Action
+    function adjustActiveLayerScale(factor) {
+      const layer = getActiveLayer();
+      if (!layer) return;
+
+      if (layer.type === 'text') {
+        const newSize = Math.min(Math.max(12, Math.round(layer.fontSize * factor)), 120);
+        layer.fontSize = newSize;
+        layer.width = Math.min(Math.max(40, Math.round(layer.width * factor)), 360);
+        layer.height = Math.min(Math.max(20, Math.round(layer.height * factor)), 160);
+        
+        const fontSizeInput = document.getElementById("range-font-size");
+        if (fontSizeInput) fontSizeInput.value = newSize;
+        const valFontSize = document.getElementById("val-font-size");
+        if (valFontSize) valFontSize.textContent = `${newSize}px`;
+      } else {
+        layer.width = Math.min(Math.max(40, Math.round(layer.width * factor)), 360);
+        layer.height = Math.min(Math.max(40, Math.round(layer.height * factor)), 360);
+      }
+
+      renderCanvasLayers();
     }
 
     // Rotate Handle Logic
@@ -1685,39 +1738,181 @@
       renderCanvasLayers();
     }
 
-    // Export Mockup PNG
+    // Export High-Res Mockup PNG
     function exportMockupImage() {
-      showToast("Generating high-res mockup preview...", "info");
-      
-      const workspace = document.getElementById("canvas-workspace");
+      if (!activeProduct) {
+        showToast("No active product selected", "error");
+        return;
+      }
+      showToast("Rendering high-res mockup preview...", "info");
+
       const canvas = document.createElement("canvas");
       canvas.width = 800;
       canvas.height = 800;
       const ctx = canvas.getContext("2d");
 
+      const matchingColor = activeProduct.colors ? activeProduct.colors.find(c => c.name === selectedColor) : null;
+      const bgPath = matchingColor ? matchingColor.image : (activeProduct.cover_image || 'assets/images/brand_logo.jpeg');
+
       const bgImg = new Image();
-      bgImg.crossOrigin = "anonymous";
-      
-      const matchingColor = activeProduct.colors.find(c => c.name === selectedColor);
-      bgImg.src = matchingColor ? matchingColor.image : activeProduct.cover_image;
+      if (bgPath.startsWith("http://") || bgPath.startsWith("https://")) {
+        bgImg.crossOrigin = "anonymous";
+      }
 
-      bgImg.onload = function() {
+      bgImg.onload = async function() {
         ctx.drawImage(bgImg, 0, 0, 800, 800);
-        
-        // Draw watermarked studio branding
-        ctx.font = "bold 14px Outfit, sans-serif";
-        ctx.fillStyle = "rgba(255,255,255,0.7)";
-        ctx.fillText("CUSTOM WEAR DESIGN STUDIO", 30, 770);
 
+        // Render all visible layers on current placement side
+        const layers = placementStore[activePlacement] || [];
+        
+        for (const layer of layers) {
+          if (!layer.visible) continue;
+
+          ctx.save();
+
+          // Calculate layer position on 800x800 canvas
+          const cx = (layer.x / 100) * 800;
+          const cy = (layer.y / 100) * 800;
+
+          ctx.translate(cx, cy);
+          ctx.rotate((layer.rotation * Math.PI) / 180);
+          ctx.globalAlpha = layer.opacity !== undefined ? layer.opacity : 1;
+
+          if (layer.type === 'text') {
+            const fontStyle = layer.fontStyle || 'normal';
+            const fontWeight = layer.fontWeight || 'bold';
+            const fontSize = Math.round((layer.fontSize || 28) * 1.5);
+            const fontFamily = layer.fontFamily || 'Outfit';
+
+            ctx.font = `${fontStyle} ${fontWeight} ${fontSize}px '${fontFamily}', sans-serif`;
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+
+            if (layer.shadow) {
+              ctx.shadowColor = "rgba(0,0,0,0.8)";
+              ctx.shadowBlur = 10;
+              ctx.shadowOffsetX = 3;
+              ctx.shadowOffsetY = 3;
+            }
+
+            if (layer.strokeWidth && layer.strokeWidth > 0) {
+              ctx.strokeStyle = layer.strokeColor || "#000000";
+              ctx.lineWidth = layer.strokeWidth * 1.5;
+              ctx.strokeText(layer.text, 0, 0);
+            }
+
+            ctx.fillStyle = layer.color || "#FFFFFF";
+            ctx.fillText(layer.text, 0, 0);
+          } else if (layer.type === 'image' || layer.type === 'clipart') {
+            const drawW = (layer.width || 120) * 1.6;
+            const drawH = (layer.height || 120) * 1.6;
+
+            if (layer.src && layer.src.startsWith('<svg')) {
+              const svgBlob = new Blob([layer.src], { type: 'image/svg+xml;charset=utf-8' });
+              const URL = window.URL || window.webkitURL || window;
+              const svgUrl = URL.createObjectURL(svgBlob);
+              
+              await new Promise((resolve) => {
+                const svgImg = new Image();
+                svgImg.onload = () => {
+                  ctx.drawImage(svgImg, -drawW / 2, -drawH / 2, drawW, drawH);
+                  URL.revokeObjectURL(svgUrl);
+                  resolve();
+                };
+                svgImg.onerror = () => resolve();
+                svgImg.src = svgUrl;
+              });
+            } else if (layer.src) {
+              await new Promise((resolve) => {
+                const img = new Image();
+                if (layer.src.startsWith("http")) img.crossOrigin = "anonymous";
+                img.onload = () => {
+                  if (layer.flipX || layer.flipY) {
+                    ctx.scale(layer.flipX ? -1 : 1, layer.flipY ? -1 : 1);
+                  }
+                  ctx.drawImage(img, -drawW / 2, -drawH / 2, drawW, drawH);
+                  resolve();
+                };
+                img.onerror = () => resolve();
+                img.src = layer.src;
+              });
+            }
+          }
+
+          ctx.restore();
+        }
+
+        // Draw studio watermark & placement badge
+        ctx.save();
+        ctx.font = "bold 14px Outfit, sans-serif";
+        ctx.fillStyle = "rgba(255, 255, 255, 0.85)";
+        ctx.fillText(`CUSTOM WEAR STUDIO — ${activePlacement.toUpperCase()} VIEW`, 30, 770);
+        ctx.restore();
+
+        // Trigger PNG Download
+        try {
+          const dataUrl = canvas.toDataURL("image/png");
+          const link = document.createElement("a");
+          link.download = `custom_wear_${activeProduct.id}_${activePlacement}.png`;
+          link.href = dataUrl;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          showToast("Mockup PNG downloaded successfully! 🎨", "success");
+        } catch (err) {
+          console.error("Canvas export error:", err);
+          showToast("Error generating PNG download", "error");
+        }
+      };
+
+      bgImg.onerror = function() {
+        showToast("Notice: Export fallback triggered", "info");
+        ctx.fillStyle = "#0f172a";
+        ctx.fillRect(0, 0, 800, 800);
+        const dataUrl = canvas.toDataURL("image/png");
         const link = document.createElement("a");
-        link.download = `custom_wear_mockup_${activePlacement}.png`;
-        link.href = canvas.toDataURL("image/png");
+        link.download = `custom_wear_design_${activePlacement}.png`;
+        link.href = dataUrl;
+        document.body.appendChild(link);
         link.click();
+        document.body.removeChild(link);
         showToast("Mockup PNG downloaded!", "success");
       };
-      bgImg.onerror = function() {
-        showToast("Error downloading mockup background image", "error");
-      };
+
+      bgImg.src = bgPath;
+    }
+
+    // Share Design via WhatsApp to Store Owner
+    function shareDesignToOwnerWhatsApp() {
+      const activeSides = Object.keys(placementStore).filter(side => placementStore[side].length > 0);
+      if (activeSides.length === 0) {
+        showToast("Please add at least one text or graphic design element before sharing!", "warning");
+        return;
+      }
+
+      const ownerPhone = "917708374473";
+      let msg = `🎨 *CUSTOM WEAR — DESIGN INQUIRY & MOCKUP*\n`;
+      msg += `━━━━━━━━━━━━━━━━━━━━━\n`;
+      msg += `📦 Garment: ${activeProduct ? activeProduct.name : 'Custom Item'}\n`;
+      msg += `🎨 Color: ${selectedColor} | Size: ${selectedSize}\n`;
+      msg += `📍 Print Placements: ${activeSides.join(', ').toUpperCase()}\n\n`;
+      msg += `📝 *DESIGN LAYERS BREAKDOWN:*\n`;
+
+      activeSides.forEach(side => {
+        msg += `• *${side.toUpperCase()} SIDE:*\n`;
+        placementStore[side].forEach(l => {
+          if (l.type === 'text') {
+            msg += `   - Text: "${l.text}" (Font: ${l.fontFamily}, Color: ${l.color})\n`;
+          } else {
+            msg += `   - Graphic: ${l.type === 'clipart' ? 'Clipart Vector' : 'User Custom Graphic Upload'}\n`;
+          }
+        });
+      });
+
+      msg += `\nPlease confirm custom printing feasibility and quote. Thank you! 🙏`;
+      const waUrl = `https://wa.me/${ownerPhone}?text=${encodeURIComponent(msg)}`;
+      window.open(waUrl, "_blank");
+      showToast("Opening WhatsApp to notify store owner... ✅", "success");
     }
 
     // Add Customized Item to Cart
