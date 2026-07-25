@@ -40,6 +40,78 @@
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
 
   <style>
+    /* ============================================================
+       MOBILE-FIRST FIXES & UX IMPROVEMENTS
+    ============================================================ */
+
+    /* Prevent pull-to-refresh / page scroll while dragging on canvas */
+    #canvas-workspace {
+      touch-action: none;
+    }
+
+    /* Scrollable floating toolbar on narrow screens */
+    #floating-toolbar {
+      overflow-x: auto;
+      scrollbar-width: none; /* Firefox */
+    }
+    #floating-toolbar::-webkit-scrollbar { display: none; }
+    #floating-toolbar-inner {
+      min-width: max-content;
+    }
+
+    /* Bigger touch handles on touch devices */
+    @media (pointer: coarse) {
+      .layer-handle {
+        width: 28px;
+        height: 28px;
+        font-size: 12px;
+      }
+      .handle-tl { top: -14px; left: -14px; }
+      .handle-tr { top: -14px; right: -14px; }
+      .handle-bl { bottom: -14px; left: -14px; }
+      .handle-br { bottom: -14px; right: -14px; }
+    }
+
+    /* Canvas card full-width on mobile */
+    @media (max-width: 767px) {
+      #studio-canvas-card {
+        max-width: 100% !important;
+        padding: 8px !important;
+        border-radius: 16px !important;
+      }
+    }
+
+    /* Mobile placement switcher */
+    #mobile-placement-bar {
+      display: none;
+    }
+    @media (max-width: 1023px) {
+      #mobile-placement-bar {
+        display: flex;
+      }
+    }
+
+    /* Pill button for mobile placement bar */
+    .mob-place-btn {
+      flex-shrink: 0;
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 800;
+      border: 1.5px solid #374151;
+      color: #9ca3af;
+      background: #0b0f19;
+      transition: all 0.2s;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .mob-place-btn.active {
+      border-color: #3b82f6;
+      color: #fff;
+      background: linear-gradient(135deg, #2563eb, #7c3aed);
+      box-shadow: 0 3px 12px rgba(37, 99, 235, 0.4);
+    }
+
     /* Custom Scrollbars */
     .custom-scroll::-webkit-scrollbar {
       width: 5px;
@@ -203,7 +275,7 @@
     }
   </style>
 </head>
-<body class="bg-gray-950 text-gray-100 min-h-screen pt-20 custom-scroll font-['Outfit',sans-serif]">
+<body class="bg-gray-950 text-gray-100 min-h-screen pt-20 pb-[72px] lg:pb-0 custom-scroll font-['Outfit',sans-serif]">
 
   <!-- Page Loader -->
   <div id="page-loader" class="fixed inset-0 bg-gray-950/90 backdrop-blur-md z-[100] flex items-center justify-center transition-opacity duration-500">
@@ -277,19 +349,20 @@
           <p class="text-xs text-gray-400">Create multi-side custom apparel with live graphics, custom fonts & cliparts.</p>
         </div>
       </div>
-      <div class="flex items-center gap-2 flex-wrap text-xs">
-        <button onclick="toggleSafeZone()" id="btn-safezone-toggle" class="px-3 py-2 rounded-xl bg-gray-900 border border-gray-800 hover:border-gray-700 font-semibold text-gray-300 flex items-center gap-1.5 transition">
-          <i data-lucide="square-dashed" class="w-4 h-4 text-blue-400"></i> Safe Print Area
+      <!-- Header action buttons: icon-only on mobile, full text on md+ -->
+      <div class="flex items-center gap-2 text-xs">
+        <button onclick="toggleSafeZone()" id="btn-safezone-toggle" title="Toggle Safe Print Area" class="p-2 md:px-3 md:py-2 rounded-xl bg-gray-900 border border-gray-800 hover:border-gray-700 font-semibold text-gray-300 flex items-center gap-1.5 transition">
+          <i data-lucide="square-dashed" class="w-4 h-4 text-blue-400"></i> <span class="hidden md:inline">Safe Zone</span>
         </button>
-        <button onclick="clearCurrentPlacement()" class="px-3 py-2 rounded-xl bg-gray-900 border border-gray-800 hover:border-red-900/60 font-semibold text-red-400 hover:bg-red-950/30 flex items-center gap-1.5 transition">
-          <i data-lucide="trash-2" class="w-4 h-4"></i> Clear Placement
+        <button onclick="clearCurrentPlacement()" title="Clear Current Placement" class="p-2 md:px-3 md:py-2 rounded-xl bg-gray-900 border border-gray-800 hover:border-red-900/60 font-semibold text-red-400 hover:bg-red-950/30 flex items-center gap-1.5 transition">
+          <i data-lucide="trash-2" class="w-4 h-4"></i> <span class="hidden md:inline">Clear</span>
         </button>
-        <button onclick="exportMockupImage()" class="px-4 py-2 rounded-xl bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white font-bold flex items-center gap-1.5 shadow-lg shadow-purple-600/20 transition">
-          <i data-lucide="download" class="w-4 h-4"></i> Download Mockup
+        <button onclick="exportMockupImage()" title="Download Mockup PNG" class="p-2 md:px-4 md:py-2 rounded-xl bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white font-bold flex items-center gap-1.5 shadow-lg shadow-purple-600/20 transition">
+          <i data-lucide="download" class="w-4 h-4"></i> <span class="hidden md:inline">Download</span>
         </button>
-        <button onclick="shareDesignToOwnerWhatsApp()" class="px-4 py-2 rounded-xl text-white font-bold flex items-center gap-1.5 shadow-lg transition hover:scale-105" style="background: linear-gradient(135deg, #25d366, #128c7e); box-shadow: 0 4px 14px rgba(37,211,102,0.35);">
+        <button onclick="shareDesignToOwnerWhatsApp()" title="Share to Owner via WhatsApp" class="p-2 md:px-4 md:py-2 rounded-xl text-white font-bold flex items-center gap-1.5 shadow-lg transition hover:scale-105" style="background: linear-gradient(135deg, #25d366, #128c7e); box-shadow: 0 4px 14px rgba(37,211,102,0.35);">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-          WhatsApp Owner
+          <span class="hidden md:inline">WhatsApp</span>
         </button>
       </div>
     </div>
@@ -552,7 +625,16 @@
 
       <!-- MIDDLE CANVAS STUDIO WORKSPACE (5 Cols on LG) -->
       <section class="lg:col-span-5 flex flex-col items-center order-1 lg:order-2">
-        <div class="w-full max-w-md aspect-square border border-gray-800/80 rounded-3xl relative overflow-hidden bg-gray-900/40 p-4 sm:p-6 shadow-2xl flex items-center justify-center backdrop-blur-md" id="studio-canvas-card">
+
+        <!-- Mobile Placement Quick-Switch Bar (visible on mobile/tablet only) -->
+        <div id="mobile-placement-bar" class="w-full items-center gap-2 overflow-x-auto pb-2 mb-3" style="scrollbar-width: none;">
+          <button onclick="mobilePlacement('front')" id="mob-btn-front" class="mob-place-btn active">🖼 Front</button>
+          <button onclick="mobilePlacement('back')" id="mob-btn-back" class="mob-place-btn">↩ Back</button>
+          <button onclick="mobilePlacement('left')" id="mob-btn-left" class="mob-place-btn">◀ Left Sleeve</button>
+          <button onclick="mobilePlacement('right')" id="mob-btn-right" class="mob-place-btn">▶ Right Sleeve</button>
+        </div>
+
+        <div class="w-full aspect-square border border-gray-800/80 rounded-3xl relative overflow-hidden bg-gray-900/40 p-2 sm:p-4 shadow-2xl flex items-center justify-center backdrop-blur-md" id="studio-canvas-card">
           
           <!-- Canvas Workspace Wrapper -->
           <div id="canvas-workspace" class="w-full h-full relative">
@@ -570,8 +652,9 @@
           </div>
         </div>
 
-        <!-- Floating Studio Quick Control Bar -->
-        <div class="mt-4 flex flex-wrap items-center justify-center gap-2 p-2 rounded-2xl bg-gray-900/80 border border-gray-800/80 backdrop-blur-md shadow-xl text-xs">
+        <!-- Floating Studio Quick Control Bar (horizontally scrollable on mobile) -->
+        <div id="floating-toolbar" class="mt-3 w-full rounded-2xl bg-gray-900/80 border border-gray-800/80 backdrop-blur-md shadow-xl text-xs">
+        <div id="floating-toolbar-inner" class="flex items-center gap-2 p-2">
           <button onclick="togglePreviewMode()" id="btn-toggle-preview" class="px-3 py-2 rounded-xl bg-gray-950 border border-gray-800 hover:border-gray-700 text-gray-300 font-semibold flex items-center gap-1.5 transition">
             <i data-lucide="eye" class="w-4 h-4 text-purple-400"></i> Preview
           </button>
@@ -604,8 +687,9 @@
             <i data-lucide="trash-2" class="w-4 h-4"></i>
           </button>
         </div>
+        </div>
 
-        <p class="text-[11px] text-gray-500 mt-3 font-semibold flex items-center gap-1.5">
+        <p class="text-[11px] text-gray-500 mt-2 font-semibold flex items-center gap-1.5">  
           <i data-lucide="info" class="w-3.5 h-3.5 text-blue-400 shrink-0"></i> Drag handles on elements to position, scale & rotate. Blue guidelines mark center alignment.
         </p>
       </section>
@@ -684,15 +768,22 @@
     </div>
   </main>
 
-  <!-- Mobile Sticky CTA Bar -->
-  <div class="lg:hidden fixed bottom-0 left-0 w-full z-40 bg-gray-950/95 backdrop-blur-xl border-t border-gray-800 p-3 flex items-center justify-between gap-3 shadow-2xl">
-    <div>
-      <div class="text-[9px] text-gray-400 uppercase font-black tracking-widest">Total Estimated</div>
-      <div id="mobile-price-total" class="text-base font-black text-blue-400 font-mono">Rs. 0</div>
+  <!-- Mobile Sticky CTA Bar (with safe area padding for phones with home bar) -->
+  <div class="lg:hidden fixed bottom-0 left-0 w-full z-40 bg-gray-950/98 backdrop-blur-xl border-t border-gray-800 shadow-2xl" style="padding-bottom: env(safe-area-inset-bottom, 8px);">
+    <div class="flex items-center justify-between gap-3 px-4 py-3">
+      <div>
+        <div class="text-[9px] text-gray-400 uppercase font-black tracking-widest">Design Price</div>
+        <div id="mobile-price-total" class="text-base font-black text-blue-400 font-mono">Rs. 0</div>
+      </div>
+      <div class="flex items-center gap-2">
+        <button onclick="exportMockupImage()" title="Download PNG" class="p-2.5 rounded-xl border border-gray-700 bg-gray-900 text-gray-300 transition">
+          <i data-lucide="download" class="w-4 h-4"></i>
+        </button>
+        <button onclick="addCustomProductToCart()" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 text-white font-black text-xs uppercase tracking-wider flex items-center gap-2 shadow-lg shadow-blue-600/30">
+          <i data-lucide="shopping-bag" class="w-4 h-4"></i> Add To Cart
+        </button>
+      </div>
     </div>
-    <button onclick="addCustomProductToCart()" class="px-6 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 text-white font-black text-xs uppercase tracking-wider flex items-center gap-2 shadow-lg shadow-blue-600/30">
-      <i data-lucide="shopping-bag" class="w-4 h-4"></i> Add To Cart
-    </button>
   </div>
 
   <!-- Footer -->
@@ -1989,6 +2080,28 @@
         if (window.lucide) lucide.createIcons();
       }
     }
+
+    // Mobile Placement Quick Switch — syncs mobile pill buttons + sidebar buttons
+    function mobilePlacement(side) {
+      // Update sidebar button highlight too
+      setPlacementSide(side);
+
+      // Update mobile pill button active state
+      document.querySelectorAll(".mob-place-btn").forEach(btn => btn.classList.remove("active"));
+      const activeBtn = document.getElementById(`mob-btn-${side}`);
+      if (activeBtn) activeBtn.classList.add("active");
+    }
+
+    // Sync mobile pill bar when sidebar placement buttons are used
+    const _origSetPlacement = setPlacementSide;
+    // Override setPlacementSide to also update mobile bar
+    const __setPlacementSide = setPlacementSide;
+    window.setPlacementSide = function(side) {
+      __setPlacementSide(side);
+      document.querySelectorAll(".mob-place-btn").forEach(btn => btn.classList.remove("active"));
+      const mbtn = document.getElementById(`mob-btn-${side}`);
+      if (mbtn) mbtn.classList.add("active");
+    };
   </script>
 </body>
 </html>
