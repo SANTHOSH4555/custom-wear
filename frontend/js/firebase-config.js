@@ -1,4 +1,4 @@
-// ============================================================
+﻿// ============================================================
 //  CUSTOM WEAR & CRADANCE — Firebase Web Client Configuration
 //  Project: project-00cb5ede-0325-438b-947
 // ============================================================
@@ -31,11 +31,17 @@ if (typeof firebase !== 'undefined') {
     // ── Persist auth state across page loads ──
     firebase.auth().onAuthStateChanged(function(user) {
       if (user) {
-        // Firebase session is active: refresh backend JWT silently
-        user.getIdToken().then(function(idToken) {
-          // Only refresh if we don't already have a local JWT
-          const existing = localStorage.getItem("auth_token");
-          if (!existing) {
+        // Delay check to allow saveSession() to finish writing after login
+        setTimeout(function() {
+          // Use getAuthToken() which validates the token string properly
+          const existing = (typeof getAuthToken === "function") ? getAuthToken() : localStorage.getItem("auth_token");
+          if (existing && existing !== "undefined" && existing !== "null" && existing.trim() !== "") {
+            // Valid local JWT already present — no need to re-authenticate
+            console.log("[Firebase] ↺ Session already valid for:", user.email);
+            return;
+          }
+          // No valid local JWT — restore session via backend silently
+          user.getIdToken().then(function(idToken) {
             apiRequest("/api/auth/google-login", "POST", {
               email: user.email,
               name: user.displayName || user.email.split("@")[0]
@@ -44,12 +50,11 @@ if (typeof firebase !== 'undefined') {
                 localStorage.setItem("auth_token", data.token);
                 localStorage.setItem("user", JSON.stringify(data.user));
                 console.log("[Firebase] ↺ Session restored for:", user.email);
-                // Trigger navbar re-render if available
                 if (typeof syncNavbarAuth === "function") syncNavbarAuth();
               }
             }).catch(() => {});
-          }
-        });
+          });
+        }, 800);
       }
     });
 
