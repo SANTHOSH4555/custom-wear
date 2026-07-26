@@ -52,10 +52,17 @@
       -ms-user-select: none;
       user-select: none;
       overscroll-behavior: contain;
+      /* Allow child elements to receive pointer events */
+      pointer-events: auto;
     }
     
     #canvas-workspace * {
       touch-action: none;
+    }
+    
+    /* Garment background image should not block touches */
+    #garment-bg-img {
+      pointer-events: none !important;
     }
 
     /* Scrollable floating toolbar on narrow screens */
@@ -154,6 +161,18 @@
       background-repeat: no-repeat;
       transition: background-image 0.3s ease-in-out;
       user-select: none;
+      /* Improve touch responsiveness */
+      -webkit-user-drag: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    
+    /* Ensure layers render target allows touch events */
+    #layers-render-target {
+      pointer-events: none;
+    }
+    
+    #layers-render-target > * {
+      pointer-events: auto;
     }
 
     /* Safe Print Zone Overlay */
@@ -221,12 +240,18 @@
       transition: border-color 0.15s ease;
       overflow: visible;
       -webkit-tap-highlight-color: transparent;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
+      /* Ensure layer captures all pointer events */
+      pointer-events: auto !important;
     }
     
     .layer-overlay.dragging {
       border-color: #3b82f6 !important;
       box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.4) !important;
       z-index: 999;
+      cursor: grabbing;
+      -webkit-cursor: grabbing;
     }
 
     .layer-overlay.active-selected {
@@ -262,8 +287,13 @@
       cursor: pointer;
       box-shadow: 0 2px 6px rgba(0,0,0,0.5);
       transition: transform 0.15s, background-color 0.15s;
+      pointer-events: auto !important;
+      touch-action: none;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      -webkit-user-select: none;
     }
-    .layer-handle:hover {
+    .layer-handle:hover, .layer-handle:active {
       transform: scale(1.15);
       background: #2563eb;
     }
@@ -279,6 +309,24 @@
       white-space: nowrap;
       text-shadow: var(--ts-shadow, none);
       -webkit-text-stroke: var(--ts-stroke, none);
+      pointer-events: none;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
+    }
+    
+    .layer-overlay img {
+      pointer-events: none;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
+    }
+    
+    .layer-overlay svg {
+      pointer-events: none;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
     }
 
     /* Clipart library items */
@@ -1190,10 +1238,9 @@
           wrapper.appendChild(btnResize);
         }
 
-        // Click & Drag Events
+        // Click & Drag Events - Make sure child elements don't block touch events
         wrapper.addEventListener("mousedown", (e) => onLayerMouseDown(e, layer));
         wrapper.addEventListener("touchstart", (e) => onLayerTouchStart(e, layer), { passive: false });
-        wrapper.addEventListener("touchmove", (e) => e.preventDefault(), { passive: false });
 
         container.appendChild(wrapper);
       });
@@ -1528,81 +1575,125 @@
 
     function onLayerTouchStart(e, layer) {
       if (isPreviewMode || layer.locked) return;
+      
+      // Check if we clicked on a handle button
       if (e.target && (e.target.classList.contains("layer-handle") || e.target.closest(".layer-handle"))) {
         return;
       }
+      
+      // Prevent default browser behavior
       e.preventDefault();
       e.stopPropagation();
+      
+      // Select this layer
       selectLayer(layer.id);
       
+      if (!e.touches || e.touches.length === 0) return;
       const touch = e.touches[0];
+      
       const workspace = document.getElementById("canvas-workspace");
+      if (!workspace) return;
+      
       const rect = workspace.getBoundingClientRect();
-      let startX = touch.clientX;
-      let startY = touch.clientY;
-      let lastX = startX;
-      let lastY = startY;
-
+      const node = document.getElementById(`layer-node-${layer.id}`);
+      
+      // Store initial touch position
+      let lastTouchX = touch.clientX;
+      let lastTouchY = touch.clientY;
+      let hasMoved = false;
+      
+      // Get snap guidelines
       const snapX = document.getElementById("snap-guideline-x");
       const snapY = document.getElementById("snap-guideline-y");
-      const node = document.getElementById(`layer-node-${layer.id}`);
       
       // Add dragging visual feedback
       if (node) node.classList.add('dragging');
+      
+      // Disable body scroll on mobile
+      const originalOverflow = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      document.documentElement.style.overflow = 'hidden';
 
-      function onTouchMove(te) {
+      function handleTouchMove(te) {
         te.preventDefault();
         te.stopPropagation();
         
         if (!te.touches || te.touches.length === 0) return;
-        const t = te.touches[0];
         
-        const dx = t.clientX - lastX;
-        const dy = t.clientY - lastY;
-
-        let newX = layer.x + (dx / rect.width) * 100;
-        let newY = layer.y + (dy / rect.height) * 100;
-
-        // Snapping to center with visual feedback
-        if (Math.abs(newX - 50) < 3) {
+        hasMoved = true;
+        const currentTouch = te.touches[0];
+        
+        // Calculate movement delta
+        const deltaX = currentTouch.clientX - lastTouchX;
+        const deltaY = currentTouch.clientY - lastTouchY;
+        
+        // Convert pixel delta to percentage of workspace
+        const percentDeltaX = (deltaX / rect.width) * 100;
+        const percentDeltaY = (deltaY / rect.height) * 100;
+        
+        // Update layer position
+        let newX = layer.x + percentDeltaX;
+        let newY = layer.y + percentDeltaY;
+        
+        // Snap to center with 3% tolerance
+        const snapTolerance = 3;
+        if (Math.abs(newX - 50) < snapTolerance) {
           newX = 50;
           if (snapX) snapX.style.display = "block";
         } else {
           if (snapX) snapX.style.display = "none";
         }
-
-        if (Math.abs(newY - 50) < 3) {
+        
+        if (Math.abs(newY - 50) < snapTolerance) {
           newY = 50;
           if (snapY) snapY.style.display = "block";
         } else {
           if (snapY) snapY.style.display = "none";
         }
-
-        layer.x = Math.min(Math.max(10, newX), 90);
-        layer.y = Math.min(Math.max(10, newY), 90);
-
-        lastX = t.clientX;
-        lastY = t.clientY;
-
+        
+        // Constrain to canvas boundaries (10% margin)
+        layer.x = Math.max(10, Math.min(90, newX));
+        layer.y = Math.max(10, Math.min(90, newY));
+        
+        // Update DOM immediately for smooth dragging
         if (node) {
           node.style.left = `${layer.x}%`;
           node.style.top = `${layer.y}%`;
         }
+        
+        // Update last touch position
+        lastTouchX = currentTouch.clientX;
+        lastTouchY = currentTouch.clientY;
       }
 
-      function onTouchEnd(te) {
+      function handleTouchEnd(te) {
+        // Clean up
         if (snapX) snapX.style.display = "none";
         if (snapY) snapY.style.display = "none";
         if (node) node.classList.remove('dragging');
         
-        document.removeEventListener("touchmove", onTouchMove);
-        document.removeEventListener("touchend", onTouchEnd);
-        document.removeEventListener("touchcancel", onTouchEnd);
+        // Re-enable body scroll
+        document.body.style.overflow = originalOverflow;
+        document.documentElement.style.overflow = '';
+        
+        // Remove event listeners
+        document.removeEventListener("touchmove", handleTouchMove, { capture: true });
+        document.removeEventListener("touchend", handleTouchEnd, { capture: true });
+        document.removeEventListener("touchcancel", handleTouchEnd, { capture: true });
+        
+        // Show success feedback if moved
+        if (hasMoved) {
+          // Small haptic feedback if available
+          if (window.navigator && window.navigator.vibrate) {
+            window.navigator.vibrate(10);
+          }
+        }
       }
 
-      document.addEventListener("touchmove", onTouchMove, { passive: false });
-      document.addEventListener("touchend", onTouchEnd);
-      document.addEventListener("touchcancel", onTouchEnd);
+      // Attach event listeners with capture phase for better control
+      document.addEventListener("touchmove", handleTouchMove, { passive: false, capture: true });
+      document.addEventListener("touchend", handleTouchEnd, { passive: false, capture: true });
+      document.addEventListener("touchcancel", handleTouchEnd, { passive: false, capture: true });
     }
 
     // Resize Handle Logic
