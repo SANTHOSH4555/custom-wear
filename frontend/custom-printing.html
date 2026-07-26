@@ -47,6 +47,15 @@
     /* Prevent pull-to-refresh / page scroll while dragging on canvas */
     #canvas-workspace {
       touch-action: none;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+      overscroll-behavior: contain;
+    }
+    
+    #canvas-workspace * {
+      touch-action: none;
     }
 
     /* Scrollable floating toolbar on narrow screens */
@@ -62,14 +71,14 @@
     /* Bigger touch handles on touch devices */
     @media (pointer: coarse) {
       .layer-handle {
-        width: 28px;
-        height: 28px;
-        font-size: 12px;
+        width: 36px;
+        height: 36px;
+        font-size: 14px;
       }
-      .handle-tl { top: -14px; left: -14px; }
-      .handle-tr { top: -14px; right: -14px; }
-      .handle-bl { bottom: -14px; left: -14px; }
-      .handle-br { bottom: -14px; right: -14px; }
+      .handle-tl { top: -18px; left: -18px; }
+      .handle-tr { top: -18px; right: -18px; }
+      .handle-bl { bottom: -18px; left: -18px; }
+      .handle-br { bottom: -18px; right: -18px; }
     }
 
     /* Canvas card full-width on mobile */
@@ -211,6 +220,13 @@
       border: 1px dashed transparent;
       transition: border-color 0.15s ease;
       overflow: visible;
+      -webkit-tap-highlight-color: transparent;
+    }
+    
+    .layer-overlay.dragging {
+      border-color: #3b82f6 !important;
+      box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.4) !important;
+      z-index: 999;
     }
 
     .layer-overlay.active-selected {
@@ -1518,37 +1534,75 @@
       e.preventDefault();
       e.stopPropagation();
       selectLayer(layer.id);
+      
       const touch = e.touches[0];
       const workspace = document.getElementById("canvas-workspace");
       const rect = workspace.getBoundingClientRect();
       let startX = touch.clientX;
       let startY = touch.clientY;
+      let lastX = startX;
+      let lastY = startY;
+
+      const snapX = document.getElementById("snap-guideline-x");
+      const snapY = document.getElementById("snap-guideline-y");
+      const node = document.getElementById(`layer-node-${layer.id}`);
+      
+      // Add dragging visual feedback
+      if (node) node.classList.add('dragging');
 
       function onTouchMove(te) {
+        te.preventDefault();
+        te.stopPropagation();
+        
+        if (!te.touches || te.touches.length === 0) return;
         const t = te.touches[0];
-        const dx = t.clientX - startX;
-        const dy = t.clientY - startY;
+        
+        const dx = t.clientX - lastX;
+        const dy = t.clientY - lastY;
 
-        layer.x = Math.min(Math.max(10, layer.x + (dx / rect.width) * 100), 90);
-        layer.y = Math.min(Math.max(10, layer.y + (dy / rect.height) * 100), 90);
+        let newX = layer.x + (dx / rect.width) * 100;
+        let newY = layer.y + (dy / rect.height) * 100;
 
-        startX = t.clientX;
-        startY = t.clientY;
+        // Snapping to center with visual feedback
+        if (Math.abs(newX - 50) < 3) {
+          newX = 50;
+          if (snapX) snapX.style.display = "block";
+        } else {
+          if (snapX) snapX.style.display = "none";
+        }
 
-        const node = document.getElementById(`layer-node-${layer.id}`);
+        if (Math.abs(newY - 50) < 3) {
+          newY = 50;
+          if (snapY) snapY.style.display = "block";
+        } else {
+          if (snapY) snapY.style.display = "none";
+        }
+
+        layer.x = Math.min(Math.max(10, newX), 90);
+        layer.y = Math.min(Math.max(10, newY), 90);
+
+        lastX = t.clientX;
+        lastY = t.clientY;
+
         if (node) {
           node.style.left = `${layer.x}%`;
           node.style.top = `${layer.y}%`;
         }
       }
 
-      function onTouchEnd() {
+      function onTouchEnd(te) {
+        if (snapX) snapX.style.display = "none";
+        if (snapY) snapY.style.display = "none";
+        if (node) node.classList.remove('dragging');
+        
         document.removeEventListener("touchmove", onTouchMove);
         document.removeEventListener("touchend", onTouchEnd);
+        document.removeEventListener("touchcancel", onTouchEnd);
       }
 
       document.addEventListener("touchmove", onTouchMove, { passive: false });
       document.addEventListener("touchend", onTouchEnd);
+      document.addEventListener("touchcancel", onTouchEnd);
     }
 
     // Resize Handle Logic
@@ -1556,15 +1610,17 @@
       const startResize = (clientX, clientY, e) => {
         e.stopPropagation();
         if (e.preventDefault) e.preventDefault();
+        
         let startX = clientX;
+        let lastX = clientX;
         let startWidth = layer.width;
         let startHeight = layer.height;
         let startFontSize = layer.fontSize || 28;
 
-        function onMove(currX) {
-          const dx = currX - startX;
-          const newWidth = Math.max(40, startWidth + dx);
-          const newHeight = Math.max(20, startHeight + dx);
+        function onMove(currX, currY) {
+          const dx = currX - lastX;
+          const newWidth = Math.max(40, startWidth + (currX - startX));
+          const newHeight = Math.max(20, startHeight + (currX - startX));
           layer.width = newWidth;
           layer.height = newHeight;
 
@@ -1585,26 +1641,50 @@
 
           wrapperEl.style.width = `${newWidth}px`;
           wrapperEl.style.height = `${newHeight}px`;
+          
+          lastX = currX;
         }
 
-        const onMouseMove = (me) => onMove(me.clientX);
-        const onTouchMove = (te) => onMove(te.touches[0].clientX);
+        const onMouseMove = (me) => {
+          me.preventDefault();
+          onMove(me.clientX, me.clientY);
+        };
+        
+        const onTouchMove = (te) => {
+          te.preventDefault();
+          te.stopPropagation();
+          if (te.touches && te.touches.length > 0) {
+            onMove(te.touches[0].clientX, te.touches[0].clientY);
+          }
+        };
 
         const onEnd = () => {
           document.removeEventListener("mousemove", onMouseMove);
           document.removeEventListener("mouseup", onEnd);
           document.removeEventListener("touchmove", onTouchMove);
           document.removeEventListener("touchend", onEnd);
+          document.removeEventListener("touchcancel", onEnd);
         };
 
         document.addEventListener("mousemove", onMouseMove);
         document.addEventListener("mouseup", onEnd);
         document.addEventListener("touchmove", onTouchMove, { passive: false });
         document.addEventListener("touchend", onEnd);
+        document.addEventListener("touchcancel", onEnd);
       };
 
-      handleEl.addEventListener("mousedown", (e) => startResize(e.clientX, e.clientY, e));
-      handleEl.addEventListener("touchstart", (e) => startResize(e.touches[0].clientX, e.touches[0].clientY, e), { passive: false });
+      handleEl.addEventListener("mousedown", (e) => {
+        e.preventDefault();
+        startResize(e.clientX, e.clientY, e);
+      });
+      
+      handleEl.addEventListener("touchstart", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (e.touches && e.touches.length > 0) {
+          startResize(e.touches[0].clientX, e.touches[0].clientY, e);
+        }
+      }, { passive: false });
     }
 
     // Quick Maximize / Minimize Scale Action
@@ -1635,6 +1715,7 @@
       const startRotate = (e) => {
         e.stopPropagation();
         if (e.preventDefault) e.preventDefault();
+        
         const rect = wrapperEl.getBoundingClientRect();
         const centerX = rect.left + rect.width / 2;
         const centerY = rect.top + rect.height / 2;
@@ -1647,24 +1728,40 @@
           wrapperEl.style.transform = `translate(-50%, -50%) rotate(${deg}deg)`;
         }
 
-        const onMouseMove = (me) => onRotateMove(me.clientX, me.clientY);
-        const onTouchMove = (te) => onRotateMove(te.touches[0].clientX, te.touches[0].clientY);
+        const onMouseMove = (me) => {
+          me.preventDefault();
+          onRotateMove(me.clientX, me.clientY);
+        };
+        
+        const onTouchMove = (te) => {
+          te.preventDefault();
+          te.stopPropagation();
+          if (te.touches && te.touches.length > 0) {
+            onRotateMove(te.touches[0].clientX, te.touches[0].clientY);
+          }
+        };
 
         const onEnd = () => {
           document.removeEventListener("mousemove", onMouseMove);
           document.removeEventListener("mouseup", onEnd);
           document.removeEventListener("touchmove", onTouchMove);
           document.removeEventListener("touchend", onEnd);
+          document.removeEventListener("touchcancel", onEnd);
         };
 
         document.addEventListener("mousemove", onMouseMove);
         document.addEventListener("mouseup", onEnd);
         document.addEventListener("touchmove", onTouchMove, { passive: false });
         document.addEventListener("touchend", onEnd);
+        document.addEventListener("touchcancel", onEnd);
       };
 
       handleEl.addEventListener("mousedown", startRotate);
-      handleEl.addEventListener("touchstart", startRotate, { passive: false });
+      handleEl.addEventListener("touchstart", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        startRotate(e);
+      }, { passive: false });
     }
 
     // Studio Quick Actions
