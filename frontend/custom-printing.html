@@ -2,7 +2,7 @@
 <html lang="en" class="dark">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Custom Printing Design Studio | CUSTOM WEAR</title>
 
   <!-- Tailwind CSS -->
@@ -75,17 +75,18 @@
       min-width: max-content;
     }
 
-    /* Bigger touch handles on touch devices */
-    @media (pointer: coarse) {
+    /* Bigger touch handles on touch devices & mobile */
+    @media (pointer: coarse), (max-width: 768px) {
       .layer-handle {
-        width: 36px;
-        height: 36px;
+        width: 38px;
+        height: 38px;
         font-size: 14px;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.6);
       }
-      .handle-tl { top: -18px; left: -18px; }
-      .handle-tr { top: -18px; right: -18px; }
-      .handle-bl { bottom: -18px; left: -18px; }
-      .handle-br { bottom: -18px; right: -18px; }
+      .handle-tl { top: -19px; left: -19px; }
+      .handle-tr { top: -19px; right: -19px; }
+      .handle-bl { bottom: -19px; left: -19px; }
+      .handle-br { bottom: -19px; right: -19px; }
     }
 
     /* Canvas card full-width on mobile */
@@ -164,11 +165,13 @@
       /* Improve touch responsiveness */
       -webkit-user-drag: none;
       -webkit-tap-highlight-color: transparent;
+      touch-action: none;
     }
     
     /* Ensure layers render target allows touch events */
     #layers-render-target {
-      pointer-events: none;
+      pointer-events: auto;
+      touch-action: none;
     }
     
     #layers-render-target > * {
@@ -699,10 +702,10 @@
           <button onclick="mobilePlacement('right')" id="mob-btn-right" class="mob-place-btn">▶ Right Sleeve</button>
         </div>
 
-        <div class="w-full aspect-square border border-gray-800/80 rounded-3xl relative overflow-hidden bg-gray-900/40 p-2 sm:p-4 shadow-2xl flex items-center justify-center backdrop-blur-md" id="studio-canvas-card">
+        <div class="w-full aspect-square border border-gray-800/80 rounded-3xl relative bg-gray-900/40 p-2 sm:p-4 shadow-2xl flex items-center justify-center backdrop-blur-md" id="studio-canvas-card" style="overflow: visible;">
           
           <!-- Canvas Workspace Wrapper -->
-          <div id="canvas-workspace" class="w-full h-full relative">
+          <div id="canvas-workspace" class="w-full h-full relative" style="overflow: visible;">
             
             <!-- Safe Printable Boundary -->
             <div id="safe-print-zone" class="print-safe-zone"></div>
@@ -712,13 +715,13 @@
             <div id="snap-guideline-y" class="snap-line-y"></div>
 
             <!-- Dynamic Layers Container (Injected by JS) -->
-            <div id="layers-render-target" class="w-full h-full relative overflow-hidden rounded-xl"></div>
+            <div id="layers-render-target" class="w-full h-full relative rounded-xl" style="overflow: visible;"></div>
 
           </div>
         </div>
 
         <!-- Floating Studio Quick Control Bar (horizontally scrollable on mobile) -->
-        <div id="floating-toolbar" class="mt-3 w-full rounded-2xl bg-gray-900/80 border border-gray-800/80 backdrop-blur-md shadow-xl text-xs">
+        <div id="floating-toolbar" class="mt-5 w-full rounded-2xl bg-gray-900/80 border border-gray-800/80 backdrop-blur-md shadow-xl text-xs">
         <div id="floating-toolbar-inner" class="flex items-center gap-2 p-2">
           <button onclick="togglePreviewMode()" id="btn-toggle-preview" class="px-3 py-2 rounded-xl bg-gray-950 border border-gray-800 hover:border-gray-700 text-gray-300 font-semibold flex items-center gap-1.5 transition">
             <i data-lucide="eye" class="w-4 h-4 text-purple-400"></i> Preview
@@ -754,15 +757,55 @@
         </div>
         </div>
 
-        <p class="text-[11px] text-gray-500 mt-2 font-semibold flex items-center gap-1.5">  
-          <i data-lucide="info" class="w-3.5 h-3.5 text-blue-400 shrink-0"></i> Drag handles on elements to position, scale & rotate. Blue guidelines mark center alignment.
-        </p>
+        <!-- Mobile-Only Studio Quick Actions (Text / Upload Art shortcuts) -->
+        <div class="lg:hidden mt-3 w-full grid grid-cols-2 gap-2 text-xs">
+          <button id="mob-btn-add-text" onclick="addNewTextLayer();" class="flex items-center justify-center gap-2 py-3 rounded-2xl bg-gradient-to-r from-blue-600/20 to-blue-600/10 border border-blue-500/30 text-blue-400 font-bold hover:border-blue-500/60 transition active:scale-95">
+            <i data-lucide="type" class="w-4 h-4"></i> Add Text
+          </button>
+          <button id="mob-btn-upload-art" onclick="document.getElementById('input-graphic-upload').click()" class="flex items-center justify-center gap-2 py-3 rounded-2xl bg-gradient-to-r from-purple-600/20 to-purple-600/10 border border-purple-500/30 text-purple-400 font-bold hover:border-purple-500/60 transition active:scale-95">
+            <i data-lucide="image-plus" class="w-4 h-4"></i> Upload Art
+          </button>
+        </div>
+
+        <!-- Mobile-Only Text Controls Panel (shows when text layer is active on mobile) -->
+        <div id="mob-text-panel" class="lg:hidden mt-3 w-full hidden">
+          <div class="glass-card rounded-2xl border border-blue-500/30 bg-gray-900/60 p-4 shadow-xl">
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-xs font-black text-blue-400 uppercase tracking-wider flex items-center gap-1.5"><i data-lucide="type" class="w-3.5 h-3.5"></i> Text Editor</span>
+              <button onclick="document.getElementById('mob-text-panel').classList.add('hidden')" class="text-gray-500 hover:text-white p-1 rounded-lg hover:bg-gray-800 transition">
+                <i data-lucide="x" class="w-4 h-4"></i>
+              </button>
+            </div>
+            <input type="text" id="mob-input-text" placeholder="Type your text..." class="w-full px-3 py-2.5 rounded-xl bg-gray-950 border border-gray-700 focus:border-blue-500 focus:outline-none text-white text-sm font-semibold mb-3" oninput="mobileUpdateText(this.value)">
+            <div class="grid grid-cols-2 gap-2 mb-3">
+              <div>
+                <label class="text-[10px] text-gray-400 uppercase font-black tracking-widest block mb-1">Font Size</label>
+                <div class="flex items-center gap-2">
+                  <button onclick="mobileAdjustFontSize(-2)" class="w-8 h-8 rounded-lg bg-gray-950 border border-gray-700 text-gray-300 flex items-center justify-center font-bold text-lg hover:border-blue-500 transition">−</button>
+                  <span id="mob-font-size-val" class="flex-1 text-center text-sm font-black text-blue-400">28px</span>
+                  <button onclick="mobileAdjustFontSize(2)" class="w-8 h-8 rounded-lg bg-gray-950 border border-gray-700 text-gray-300 flex items-center justify-center font-bold text-lg hover:border-blue-500 transition">+</button>
+                </div>
+              </div>
+              <div>
+                <label class="text-[10px] text-gray-400 uppercase font-black tracking-widest block mb-1">Text Color</label>
+                <input type="color" id="mob-text-color" value="#ffffff" class="w-full h-9 rounded-xl border-0 bg-transparent cursor-pointer" oninput="mobileUpdateTextColor(this.value)">
+              </div>
+            </div>
+            <div class="grid grid-cols-4 gap-1.5">
+              <button onclick="mobileApplyFont('Outfit')" class="py-1.5 px-2 rounded-lg bg-gray-950 border border-gray-700 text-gray-300 text-[10px] font-bold hover:border-blue-500 transition" style="font-family: Outfit;">Modern</button>
+              <button onclick="mobileApplyFont('Impact')" class="py-1.5 px-2 rounded-lg bg-gray-950 border border-gray-700 text-gray-300 text-[10px] font-bold hover:border-blue-500 transition" style="font-family: Impact;">HEAVY</button>
+              <button onclick="mobileApplyFont('Pacifico')" class="py-1.5 px-2 rounded-lg bg-gray-950 border border-gray-700 text-gray-300 text-[10px] font-bold hover:border-blue-500 transition" style="font-family: Pacifico;">Cursive</button>
+              <button onclick="mobileApplyFont('Orbitron')" class="py-1.5 px-2 rounded-lg bg-gray-950 border border-gray-700 text-gray-300 text-[10px] font-bold hover:border-blue-500 transition" style="font-family: Orbitron;">CYBER</button>
+            </div>
+          </div>
+        </div>
       </section>
 
       <!-- RIGHT SIDEBAR: BASE GARMENT & ORDER SUMMARY (3 Cols on LG) -->
       <aside class="lg:col-span-3 flex flex-col gap-4 order-3 lg:order-3">
-        
-        <!-- Base Garment Picker Card -->
+        <p class="text-[11px] text-gray-500 mt-2 font-semibold flex items-center gap-1.5">  
+          <i data-lucide="info" class="w-3.5 h-3.5 text-blue-400 shrink-0"></i> Drag handles on elements to position, scale & rotate. Blue guidelines mark center alignment.
+        </p>
         <div class="glass-card p-4 rounded-2xl border border-gray-800/80 bg-gray-900/40 shadow-xl">
           <h3 class="font-extrabold text-xs tracking-wider uppercase mb-3 pb-2 border-b border-gray-800/80 text-gray-400">BASE GARMENT</h3>
           
@@ -1123,6 +1166,54 @@
       showToast(`Switched workspace to ${side.toUpperCase()} view`, "success");
     }
 
+    // Attach Action Handles to Selected Layer Wrapper
+    function attachLayerHandles(wrapper, layer) {
+      wrapper.querySelectorAll(".layer-handle").forEach(h => h.remove());
+
+      const btnDel = document.createElement("div");
+      btnDel.className = "layer-handle handle-tl";
+      btnDel.innerHTML = `<i data-lucide="x" class="w-3.5 h-3.5 pointer-events-none"></i>`;
+      btnDel.title = "Delete Layer";
+      const handleDelete = (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        deleteActiveLayer();
+      };
+      btnDel.addEventListener("touchstart", handleDelete, { passive: false });
+      btnDel.addEventListener("mousedown", handleDelete);
+
+      const btnRot = document.createElement("div");
+      btnRot.className = "layer-handle handle-tr";
+      btnRot.innerHTML = `<i data-lucide="rotate-cw" class="w-3.5 h-3.5 pointer-events-none"></i>`;
+      btnRot.title = "Rotate Layer";
+      initRotateHandle(btnRot, layer, wrapper);
+
+      const btnDup = document.createElement("div");
+      btnDup.className = "layer-handle handle-bl";
+      btnDup.innerHTML = `<i data-lucide="copy" class="w-3.5 h-3.5 pointer-events-none"></i>`;
+      btnDup.title = "Duplicate Layer";
+      const handleDup = (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        duplicateActiveLayer();
+      };
+      btnDup.addEventListener("touchstart", handleDup, { passive: false });
+      btnDup.addEventListener("mousedown", handleDup);
+
+      const btnResize = document.createElement("div");
+      btnResize.className = "layer-handle handle-br";
+      btnResize.innerHTML = `<i data-lucide="arrow-down-right" class="w-3.5 h-3.5 pointer-events-none"></i>`;
+      btnResize.title = "Resize Layer";
+      initResizeHandle(btnResize, layer, wrapper);
+
+      wrapper.appendChild(btnDel);
+      wrapper.appendChild(btnRot);
+      wrapper.appendChild(btnDup);
+      wrapper.appendChild(btnResize);
+
+      if (window.lucide) lucide.createIcons();
+    }
+
     // Render All Layers on Canvas
     function renderCanvasLayers() {
       const container = document.getElementById("layers-render-target");
@@ -1190,52 +1281,7 @@
 
         // Bounding Action Handles if Active Layer
         if (layer.id === activeLayerId && !isPreviewMode) {
-          const btnDel = document.createElement("div");
-          btnDel.className = "layer-handle handle-tl";
-          btnDel.innerHTML = `<i data-lucide="x" class="w-3.5 h-3.5 pointer-events-none"></i>`;
-          btnDel.title = "Delete Layer";
-          const handleDelete = (e) => {
-            if (e) {
-              e.stopPropagation();
-              e.preventDefault();
-            }
-            deleteActiveLayer();
-          };
-          btnDel.addEventListener("mousedown", handleDelete);
-          btnDel.addEventListener("touchstart", handleDelete, { passive: false });
-          btnDel.onclick = handleDelete;
-
-          const btnRot = document.createElement("div");
-          btnRot.className = "layer-handle handle-tr";
-          btnRot.innerHTML = `<i data-lucide="rotate-cw" class="w-3.5 h-3.5 pointer-events-none"></i>`;
-          btnRot.title = "Rotate Layer";
-          initRotateHandle(btnRot, layer, wrapper);
-
-          const btnDup = document.createElement("div");
-          btnDup.className = "layer-handle handle-bl";
-          btnDup.innerHTML = `<i data-lucide="copy" class="w-3.5 h-3.5 pointer-events-none"></i>`;
-          btnDup.title = "Duplicate Layer";
-          const handleDup = (e) => {
-            if (e) {
-              e.stopPropagation();
-              e.preventDefault();
-            }
-            duplicateActiveLayer();
-          };
-          btnDup.addEventListener("mousedown", handleDup);
-          btnDup.addEventListener("touchstart", handleDup, { passive: false });
-          btnDup.onclick = handleDup;
-
-          const btnResize = document.createElement("div");
-          btnResize.className = "layer-handle handle-br";
-          btnResize.innerHTML = `<i data-lucide="arrow-down-right" class="w-3.5 h-3.5 pointer-events-none"></i>`;
-          btnResize.title = "Resize Layer";
-          initResizeHandle(btnResize, layer, wrapper);
-
-          wrapper.appendChild(btnDel);
-          wrapper.appendChild(btnRot);
-          wrapper.appendChild(btnDup);
-          wrapper.appendChild(btnResize);
+          attachLayerHandles(wrapper, layer);
         }
 
         // Click & Drag Events - Make sure child elements don't block touch events
@@ -1248,12 +1294,49 @@
       if (window.lucide) lucide.createIcons();
     }
 
-    // Select Layer Action
+    // Select Layer Action (Updates active handles & selection without destroying DOM nodes)
     function selectLayer(layerId) {
+      if (activeLayerId === layerId) {
+        syncTextControlsUI();
+        syncImageControlsUI();
+        return;
+      }
+
+      const prevActiveId = activeLayerId;
       activeLayerId = layerId;
-      renderCanvasLayers();
-      syncTextControlsUI();
-      syncImageControlsUI();
+
+      const layers = placementStore[activePlacement];
+
+      layers.forEach(l => {
+        const node = document.getElementById(`layer-node-${l.id}`);
+        if (!node) return;
+
+        if (l.id === activeLayerId) {
+          node.classList.add("active-selected");
+          if (!node.querySelector(".layer-handle") && !isPreviewMode) {
+            attachLayerHandles(node, l);
+          }
+        } else {
+          node.classList.remove("active-selected");
+          node.querySelectorAll(".layer-handle").forEach(h => h.remove());
+        }
+      });
+
+      const layer = getActiveLayer();
+      if (layer) {
+        if (layer.type === 'text') {
+          syncTextControlsUI();
+          if (window.innerWidth <= 1024) switchStudioTab('text');
+        } else if (layer.type === 'image' || layer.type === 'clipart') {
+          syncImageControlsUI();
+          if (window.innerWidth <= 1024) switchStudioTab('graphics');
+        }
+      }
+
+      // Show/hide mobile text panel
+      if (typeof syncMobileTextPanel === 'function') syncMobileTextPanel();
+
+      renderLayersManagerList();
     }
 
     // Add New Text Box
@@ -1321,7 +1404,24 @@
       document.getElementById("val-text-arc").textContent = `${arc}°`;
       document.getElementById("val-letter-spacing").textContent = `${spacing}px`;
 
-      renderCanvasLayers();
+      // Update text layer DOM node directly if present to prevent focus loss or full re-render flickering
+      const wrapper = document.getElementById(`layer-node-${layer.id}`);
+      if (wrapper) {
+        const textSpan = wrapper.querySelector(".text-node-span");
+        if (textSpan) {
+          textSpan.textContent = layer.text;
+          textSpan.style.fontFamily = layer.fontFamily;
+          textSpan.style.fontSize = `${layer.fontSize}px`;
+          textSpan.style.color = layer.color;
+          textSpan.style.letterSpacing = `${layer.letterSpacing}px`;
+          textSpan.style.webkitTextStroke = strokeWidth > 0 ? `${strokeWidth}px ${strokeColor}` : 'none';
+          textSpan.style.transform = arc !== 0 ? `rotate(${arc * 0.1}deg)` : 'none';
+        } else {
+          renderCanvasLayers();
+        }
+      } else {
+        renderCanvasLayers();
+      }
     }
 
     // Sync Text Control UI with Active Layer
@@ -1581,15 +1681,18 @@
         return;
       }
       
-      // Prevent default browser behavior
+      // Select layer without destroying touched DOM node
+      selectLayer(layer.id);
+
+      if (!e.touches || e.touches.length === 0) return;
+      
       e.preventDefault();
       e.stopPropagation();
       
-      // Select this layer
-      selectLayer(layer.id);
-      
-      if (!e.touches || e.touches.length === 0) return;
-      const touch = e.touches[0];
+      const touchId = e.touches[0].identifier;
+      let lastTouchX = e.touches[0].clientX;
+      let lastTouchY = e.touches[0].clientY;
+      let hasMoved = false;
       
       const workspace = document.getElementById("canvas-workspace");
       if (!workspace) return;
@@ -1597,45 +1700,37 @@
       const rect = workspace.getBoundingClientRect();
       const node = document.getElementById(`layer-node-${layer.id}`);
       
-      // Store initial touch position
-      let lastTouchX = touch.clientX;
-      let lastTouchY = touch.clientY;
-      let hasMoved = false;
-      
-      // Get snap guidelines
       const snapX = document.getElementById("snap-guideline-x");
       const snapY = document.getElementById("snap-guideline-y");
       
-      // Add dragging visual feedback
       if (node) node.classList.add('dragging');
-      
-      // Disable body scroll on mobile
-      const originalOverflow = document.body.style.overflow;
-      document.body.style.overflow = 'hidden';
-      document.documentElement.style.overflow = 'hidden';
 
       function handleTouchMove(te) {
+        let currentTouch = null;
+        if (te.touches) {
+          for (let i = 0; i < te.touches.length; i++) {
+            if (te.touches[i].identifier === touchId) {
+              currentTouch = te.touches[i];
+              break;
+            }
+          }
+        }
+        if (!currentTouch) return;
+
         te.preventDefault();
         te.stopPropagation();
         
-        if (!te.touches || te.touches.length === 0) return;
-        
         hasMoved = true;
-        const currentTouch = te.touches[0];
         
-        // Calculate movement delta
         const deltaX = currentTouch.clientX - lastTouchX;
         const deltaY = currentTouch.clientY - lastTouchY;
         
-        // Convert pixel delta to percentage of workspace
         const percentDeltaX = (deltaX / rect.width) * 100;
         const percentDeltaY = (deltaY / rect.height) * 100;
         
-        // Update layer position
         let newX = layer.x + percentDeltaX;
         let newY = layer.y + percentDeltaY;
         
-        // Snap to center with 3% tolerance
         const snapTolerance = 3;
         if (Math.abs(newX - 50) < snapTolerance) {
           newX = 50;
@@ -1651,73 +1746,69 @@
           if (snapY) snapY.style.display = "none";
         }
         
-        // Constrain to canvas boundaries (10% margin)
-        layer.x = Math.max(10, Math.min(90, newX));
-        layer.y = Math.max(10, Math.min(90, newY));
+        layer.x = Math.max(5, Math.min(95, newX));
+        layer.y = Math.max(5, Math.min(95, newY));
         
-        // Update DOM immediately for smooth dragging
         if (node) {
           node.style.left = `${layer.x}%`;
           node.style.top = `${layer.y}%`;
         }
         
-        // Update last touch position
         lastTouchX = currentTouch.clientX;
         lastTouchY = currentTouch.clientY;
       }
 
       function handleTouchEnd(te) {
-        // Clean up
+        let stillActive = false;
+        if (te.touches) {
+          for (let i = 0; i < te.touches.length; i++) {
+            if (te.touches[i].identifier === touchId) {
+              stillActive = true;
+              break;
+            }
+          }
+        }
+        if (stillActive) return;
+
         if (snapX) snapX.style.display = "none";
         if (snapY) snapY.style.display = "none";
         if (node) node.classList.remove('dragging');
         
-        // Re-enable body scroll
-        document.body.style.overflow = originalOverflow;
-        document.documentElement.style.overflow = '';
+        document.removeEventListener("touchmove", handleTouchMove, { passive: false });
+        document.removeEventListener("touchend", handleTouchEnd, { passive: false });
+        document.removeEventListener("touchcancel", handleTouchEnd, { passive: false });
         
-        // Remove event listeners
-        document.removeEventListener("touchmove", handleTouchMove, { capture: true });
-        document.removeEventListener("touchend", handleTouchEnd, { capture: true });
-        document.removeEventListener("touchcancel", handleTouchEnd, { capture: true });
-        
-        // Show success feedback if moved
-        if (hasMoved) {
-          // Small haptic feedback if available
-          if (window.navigator && window.navigator.vibrate) {
-            window.navigator.vibrate(10);
-          }
+        if (hasMoved && window.navigator && window.navigator.vibrate) {
+          window.navigator.vibrate(10);
         }
       }
 
-      // Attach event listeners with capture phase for better control
-      document.addEventListener("touchmove", handleTouchMove, { passive: false, capture: true });
-      document.addEventListener("touchend", handleTouchEnd, { passive: false, capture: true });
-      document.addEventListener("touchcancel", handleTouchEnd, { passive: false, capture: true });
+      document.addEventListener("touchmove", handleTouchMove, { passive: false });
+      document.addEventListener("touchend", handleTouchEnd, { passive: false });
+      document.addEventListener("touchcancel", handleTouchEnd, { passive: false });
     }
 
     // Resize Handle Logic
     function initResizeHandle(handleEl, layer, wrapperEl) {
-      const startResize = (clientX, clientY, e) => {
+      const startResize = (clientX, clientY, e, touchId = null) => {
         e.stopPropagation();
         if (e.preventDefault) e.preventDefault();
         
         let startX = clientX;
-        let lastX = clientX;
         let startWidth = layer.width;
         let startHeight = layer.height;
         let startFontSize = layer.fontSize || 28;
 
         function onMove(currX, currY) {
-          const dx = currX - lastX;
-          const newWidth = Math.max(40, startWidth + (currX - startX));
-          const newHeight = Math.max(20, startHeight + (currX - startX));
+          const dx = currX - startX;
+          const newWidth = Math.max(30, startWidth + dx);
+          const newHeight = Math.max(15, startHeight + dx);
           layer.width = newWidth;
           layer.height = newHeight;
 
           if (layer.type === 'text') {
             const fontScale = newWidth / startWidth;
-            const newFontSize = Math.min(Math.max(12, Math.round(startFontSize * fontScale)), 120);
+            const newFontSize = Math.min(Math.max(10, Math.round(startFontSize * fontScale)), 140);
             layer.fontSize = newFontSize;
 
             const textSpan = wrapperEl.querySelector(".text-node-span");
@@ -1732,8 +1823,6 @@
 
           wrapperEl.style.width = `${newWidth}px`;
           wrapperEl.style.height = `${newHeight}px`;
-          
-          lastX = currX;
         }
 
         const onMouseMove = (me) => {
@@ -1744,15 +1833,31 @@
         const onTouchMove = (te) => {
           te.preventDefault();
           te.stopPropagation();
-          if (te.touches && te.touches.length > 0) {
-            onMove(te.touches[0].clientX, te.touches[0].clientY);
+          let currentTouch = null;
+          if (touchId !== null && te.touches) {
+            for (let i = 0; i < te.touches.length; i++) {
+              if (te.touches[i].identifier === touchId) {
+                currentTouch = te.touches[i];
+                break;
+              }
+            }
+          } else if (te.touches && te.touches.length > 0) {
+            currentTouch = te.touches[0];
+          }
+          if (currentTouch) {
+            onMove(currentTouch.clientX, currentTouch.clientY);
           }
         };
 
-        const onEnd = () => {
+        const onEnd = (te) => {
+          if (te && te.touches && touchId !== null) {
+            for (let i = 0; i < te.touches.length; i++) {
+              if (te.touches[i].identifier === touchId) return;
+            }
+          }
           document.removeEventListener("mousemove", onMouseMove);
           document.removeEventListener("mouseup", onEnd);
-          document.removeEventListener("touchmove", onTouchMove);
+          document.removeEventListener("touchmove", onTouchMove, { passive: false });
           document.removeEventListener("touchend", onEnd);
           document.removeEventListener("touchcancel", onEnd);
         };
@@ -1773,7 +1878,7 @@
         e.preventDefault();
         e.stopPropagation();
         if (e.touches && e.touches.length > 0) {
-          startResize(e.touches[0].clientX, e.touches[0].clientY, e);
+          startResize(e.touches[0].clientX, e.touches[0].clientY, e, e.touches[0].identifier);
         }
       }, { passive: false });
     }
@@ -1807,6 +1912,8 @@
         e.stopPropagation();
         if (e.preventDefault) e.preventDefault();
         
+        const touchId = (e.touches && e.touches.length > 0) ? e.touches[0].identifier : null;
+
         const rect = wrapperEl.getBoundingClientRect();
         const centerX = rect.left + rect.width / 2;
         const centerY = rect.top + rect.height / 2;
@@ -1827,15 +1934,31 @@
         const onTouchMove = (te) => {
           te.preventDefault();
           te.stopPropagation();
-          if (te.touches && te.touches.length > 0) {
-            onRotateMove(te.touches[0].clientX, te.touches[0].clientY);
+          let currentTouch = null;
+          if (touchId !== null && te.touches) {
+            for (let i = 0; i < te.touches.length; i++) {
+              if (te.touches[i].identifier === touchId) {
+                currentTouch = te.touches[i];
+                break;
+              }
+            }
+          } else if (te.touches && te.touches.length > 0) {
+            currentTouch = te.touches[0];
+          }
+          if (currentTouch) {
+            onRotateMove(currentTouch.clientX, currentTouch.clientY);
           }
         };
 
-        const onEnd = () => {
+        const onEnd = (te) => {
+          if (te && te.touches && touchId !== null) {
+            for (let i = 0; i < te.touches.length; i++) {
+              if (te.touches[i].identifier === touchId) return;
+            }
+          }
           document.removeEventListener("mousemove", onMouseMove);
           document.removeEventListener("mouseup", onEnd);
-          document.removeEventListener("touchmove", onTouchMove);
+          document.removeEventListener("touchmove", onTouchMove, { passive: false });
           document.removeEventListener("touchend", onEnd);
           document.removeEventListener("touchcancel", onEnd);
         };
@@ -2280,6 +2403,97 @@
     // Sync mobile pill bar when sidebar placement buttons are used
     // mobilePlacement() already calls setPlacementSide() and then syncs mobile buttons
     // so no override is needed — the pill bar is synced directly in mobilePlacement().
+
+    // =============================================
+    // MOBILE TEXT EDITOR PANEL HELPERS
+    // =============================================
+
+    // Show/hide mobile text panel based on active layer type
+    function syncMobileTextPanel() {
+      const panel = document.getElementById("mob-text-panel");
+      if (!panel) return;
+      const layer = getActiveLayer();
+      if (layer && layer.type === 'text' && window.innerWidth < 1024) {
+        panel.classList.remove("hidden");
+        const mobInput = document.getElementById("mob-input-text");
+        if (mobInput) mobInput.value = layer.text;
+        const mobFontSize = document.getElementById("mob-font-size-val");
+        if (mobFontSize) mobFontSize.textContent = `${layer.fontSize}px`;
+        const mobColor = document.getElementById("mob-text-color");
+        if (mobColor) mobColor.value = layer.color;
+      } else {
+        panel.classList.add("hidden");
+      }
+    }
+
+    function mobileUpdateText(val) {
+      const layer = getActiveLayer();
+      if (!layer || layer.type !== 'text') return;
+      layer.text = val;
+      // Update DOM without full re-render
+      const wrapper = document.getElementById(`layer-node-${layer.id}`);
+      if (wrapper) {
+        const span = wrapper.querySelector(".text-node-span");
+        if (span) span.textContent = val;
+      }
+      // Also sync desktop control
+      const desktopInput = document.getElementById("input-text-content");
+      if (desktopInput) desktopInput.value = val;
+    }
+
+    function mobileAdjustFontSize(delta) {
+      const layer = getActiveLayer();
+      if (!layer || layer.type !== 'text') return;
+      const newSize = Math.min(Math.max(10, layer.fontSize + delta), 140);
+      layer.fontSize = newSize;
+      layer.width = Math.max(60, Math.round(newSize * 6.5));
+      // Update DOM node directly
+      const wrapper = document.getElementById(`layer-node-${layer.id}`);
+      if (wrapper) {
+        const span = wrapper.querySelector(".text-node-span");
+        if (span) span.style.fontSize = `${newSize}px`;
+        wrapper.style.width = `${layer.width}px`;
+      }
+      // Sync display values
+      const mobFontSize = document.getElementById("mob-font-size-val");
+      if (mobFontSize) mobFontSize.textContent = `${newSize}px`;
+      const desktopRange = document.getElementById("range-font-size");
+      if (desktopRange) desktopRange.value = newSize;
+      const desktopVal = document.getElementById("val-font-size");
+      if (desktopVal) desktopVal.textContent = `${newSize}px`;
+    }
+
+    function mobileApplyFont(fontFamily) {
+      const layer = getActiveLayer();
+      if (!layer || layer.type !== 'text') return;
+      layer.fontFamily = fontFamily;
+      // Update DOM node directly
+      const wrapper = document.getElementById(`layer-node-${layer.id}`);
+      if (wrapper) {
+        const span = wrapper.querySelector(".text-node-span");
+        if (span) span.style.fontFamily = fontFamily;
+      }
+      // Sync desktop control
+      const desktopSelect = document.getElementById("select-font-family");
+      if (desktopSelect) desktopSelect.value = fontFamily;
+    }
+
+    function mobileUpdateTextColor(color) {
+      const layer = getActiveLayer();
+      if (!layer || layer.type !== 'text') return;
+      layer.color = color;
+      // Update DOM node directly
+      const wrapper = document.getElementById(`layer-node-${layer.id}`);
+      if (wrapper) {
+        const span = wrapper.querySelector(".text-node-span");
+        if (span) span.style.color = color;
+      }
+      // Sync desktop control
+      const desktopPicker = document.getElementById("picker-text-color");
+      if (desktopPicker) desktopPicker.value = color;
+      const desktopHex = document.getElementById("hex-text-color");
+      if (desktopHex) desktopHex.value = color.toUpperCase();
+    }
   </script>
 </body>
 </html>
