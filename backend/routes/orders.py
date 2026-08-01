@@ -71,9 +71,9 @@ def create_order():
             discount_percent = coupons[coupon_code].get("discount_percent", 0)
             discount = (subtotal * discount_percent) / 100.0
             
-    # Calculate tax (GST 0%) & shipping
+    # Calculate tax (GST 0%) & shipping (Free Shipping on all orders)
     gst = 0.0
-    shipping = 50.0 if (subtotal - discount) < 1000.0 else 0.0 # Free shipping above 1000
+    shipping = 0.0
     
     grand_total = (subtotal - discount) + gst + shipping
     

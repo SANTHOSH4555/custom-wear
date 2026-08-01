@@ -50,7 +50,7 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex items-center justify-between h-20">
         <a href="index.html" class="flex items-center gap-3">
-          <img src="assets/images/brand_logo.jpeg" alt="Logo" class="h-10 w-10 rounded-full border border-blue-500">
+          <img decoding="async" src="assets/images/brand_logo.webp" alt="Logo" class="h-10 w-10 rounded-full border border-blue-500">
           <span class="font-extrabold text-xl tracking-wider text-blue-500">CW & CRADANCE</span>
         </a>
         <div class="hidden md:flex items-center space-x-6 text-sm font-medium">
@@ -478,7 +478,7 @@
 
         card.innerHTML = `
           <div onclick="window.location.href='product-details.html?id=${p.id}'" class="zoom-wrapper rounded-xl aspect-[3/4] relative bg-gray-950/40 mb-4 flex items-center justify-center overflow-hidden cursor-pointer">
-            <img src="${p.cover_image || 'assets/images/brand_logo.jpeg'}" alt="${p.name}" class="w-full h-full object-cover">
+            <img decoding="async" src="${p.cover_image || 'assets/images/brand_logo.jpeg'}" alt="${p.name}" class="w-full h-full object-cover">
             <span class="absolute top-2 left-2 text-[9px] uppercase font-black px-2 py-1 rounded bg-blue-600 text-white tracking-widest">${p.brand}</span>
           </div>
           <div>

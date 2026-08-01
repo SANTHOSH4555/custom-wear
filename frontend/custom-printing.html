@@ -359,7 +359,7 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex items-center justify-between h-20">
         <a href="index.html" class="flex items-center gap-3">
-          <img src="assets/images/brand_logo.jpeg" alt="Logo" class="h-10 w-10 rounded-full border border-blue-500/50 shadow-md">
+          <img decoding="async" src="assets/images/brand_logo.webp" alt="Logo" class="h-10 w-10 rounded-full border border-blue-500/50 shadow-md">
           <div class="flex flex-col">
             <span class="font-black text-xl tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-300 to-purple-400">CUSTOM WEAR</span>
             <span class="text-[9px] font-bold tracking-widest text-gray-400 -mt-1 uppercase">Printing Studio Pro</span>
@@ -1059,7 +1059,7 @@
         btn.style.width = "40px";
         btn.style.height = "52px";
         btn.title = c.name;
-        btn.innerHTML = `<img src="${c.image}" alt="${c.name}" class="w-full h-full object-cover" onerror="this.src='assets/images/brand_logo.jpeg'">`;
+        btn.innerHTML = `<img decoding="async" src="${c.image}" alt="${c.name}" class="w-full h-full object-cover" onerror="this.src="assets/images/brand_logo.webp"">`;
         btn.addEventListener("click", () => {
           selectedColor = c.name;
           document.querySelectorAll(".color-swatch-sm").forEach(b => {
@@ -1120,9 +1120,25 @@
       if (mobTotal) mobTotal.textContent = `Rs. ${totalFinalPrice}`;
     }
 
+    // Preload Garment Color Images for Smooth Switching
+    function preloadGarmentImages(product) {
+      if (!product || !product.colors) return;
+      product.colors.forEach(c => {
+        if (c.image) {
+          const img = new Image();
+          img.src = c.image;
+        }
+      });
+      if (product.cover_image) {
+        const img = new Image();
+        img.src = product.cover_image;
+      }
+    }
+
     // Update Workspace Background Image
     function updateGarmentWorkspaceImage() {
       if (!activeProduct) return;
+      preloadGarmentImages(activeProduct);
       const matchingColor = activeProduct.colors.find(c => c.name === selectedColor);
       const imgPath = matchingColor ? matchingColor.image : activeProduct.cover_image;
       document.getElementById("canvas-workspace").style.backgroundImage = `url('${imgPath}')`;

@@ -39,7 +39,7 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex items-center justify-between h-20">
         <a href="index.html" class="flex items-center gap-3">
-          <img src="assets/images/brand_logo.jpeg" alt="Logo" class="h-10 w-10 rounded-full border border-blue-500">
+          <img decoding="async" src="assets/images/brand_logo.webp" alt="Logo" class="h-10 w-10 rounded-full border border-blue-500">
           <span class="font-extrabold text-xl tracking-wider text-blue-500">CW & CRADANCE</span>
         </a>
         <div class="hidden md:flex items-center space-x-6 text-sm font-medium">
@@ -212,7 +212,7 @@
 
         card.innerHTML = `
           <div class="flex items-center gap-4 w-full sm:w-auto">
-            <img src="${itemImg}" alt="${item.name}" class="h-16 w-16 object-cover rounded-xl border border-gray-800 shrink-0" onerror="this.onerror=null; this.src='assets/images/brand_logo.jpeg';">
+            <img decoding="async" src="${itemImg}" alt="${item.name}" class="h-16 w-16 object-cover rounded-xl border border-gray-800 shrink-0" onerror="this.onerror=null; this.src="assets/images/brand_logo.webp";">
             <div>
               <h4 class="font-bold text-sm text-white">${item.name}</h4>
               <p class="text-[10px] text-gray-500 mt-1 uppercase font-semibold">
@@ -269,11 +269,8 @@
       const discount = (subtotal * couponDiscountPercent) / 100.0;
       const gst = 0.0;
       
-      // Free shipping above Rs. 1000, otherwise flat Rs. 50
-      let shipping = 0;
-      if (subtotal > 0) {
-        shipping = (subtotal - discount) < 1000 ? 50 : 0;
-      }
+      // Free shipping on all orders
+      const shipping = 0;
       
       const grandTotal = (subtotal - discount) + gst + shipping;
 

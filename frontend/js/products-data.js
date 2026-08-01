@@ -13,23 +13,23 @@ const PRODUCTS_DATA = [
     "colors": [
       {
         "name": "Beige",
-        "image": "assets/images/cw-m-3-4th-oversized-t-shirts_beige.jpeg"
+        "image": "assets/images/cw-m-3-4th-oversized-t-shirts_beige.webp"
       },
       {
         "name": "Lavender",
-        "image": "assets/images/cw-m-3-4th-oversized-t-shirts_lavender.jpeg"
+        "image": "assets/images/cw-m-3-4th-oversized-t-shirts_lavender.webp"
       },
       {
         "name": "Off-White",
-        "image": "assets/images/cw-m-3-4th-oversized-t-shirts_off-white.jpeg"
+        "image": "assets/images/cw-m-3-4th-oversized-t-shirts_off-white.webp"
       },
       {
         "name": "Olive Green",
-        "image": "assets/images/cw-m-3-4th-oversized-t-shirts_olive-green.jpeg"
+        "image": "assets/images/cw-m-3-4th-oversized-t-shirts_olive-green.webp"
       },
       {
         "name": "Black",
-        "image": "assets/images/cw-m-3-4th-oversized-t-shirts_black.jpeg"
+        "image": "assets/images/cw-m-3-4th-oversized-t-shirts_black.webp"
       }
     ],
     "sizes": [
@@ -41,7 +41,7 @@ const PRODUCTS_DATA = [
       "2XL"
     ],
     "images": {},
-    "cover_image": "assets/images/cw-m-3-4th-oversized-t-shirts_cover.jpeg",
+    "cover_image": "assets/images/cw-m-3-4th-oversized-t-shirts_cover.webp",
     "specifications": {
       "Material": "100% Super-Combed Premium Cotton",
       "GSM": "180",
@@ -71,15 +71,15 @@ const PRODUCTS_DATA = [
     "colors": [
       {
         "name": "Army Green",
-        "image": "assets/images/cw-m-bomber-jackets_army-green.jpeg"
+        "image": "assets/images/cw-m-bomber-jackets_army-green.webp"
       },
       {
         "name": "Navy Blue",
-        "image": "assets/images/cw-m-bomber-jackets_details.jpeg"
+        "image": "assets/images/cw-m-bomber-jackets_details.webp"
       },
       {
         "name": "Black",
-        "image": "assets/images/cw-m-bomber-jackets_black.jpeg"
+        "image": "assets/images/cw-m-bomber-jackets_black.webp"
       }
     ],
     "sizes": [
@@ -91,7 +91,7 @@ const PRODUCTS_DATA = [
       "2XL"
     ],
     "images": {},
-    "cover_image": "assets/images/cw-m-bomber-jackets_cover.jpeg",
+    "cover_image": "assets/images/cw-m-bomber-jackets_cover.webp",
     "specifications": {
       "Material": "Premium Water-Resistant Nylon Polyester",
       "GSM": "340",
@@ -121,19 +121,19 @@ const PRODUCTS_DATA = [
     "colors": [
       {
         "name": "Navy Blue",
-        "image": "assets/images/cw-m-mens-long-sleevet-t-shirt_navy-blue.jpeg"
+        "image": "assets/images/cw-m-mens-long-sleevet-t-shirt_navy-blue.webp"
       },
       {
         "name": "Red",
-        "image": "assets/images/cw-m-mens-long-sleevet-t-shirt_red.jpeg"
+        "image": "assets/images/cw-m-mens-long-sleevet-t-shirt_red.webp"
       },
       {
         "name": "White",
-        "image": "assets/images/cw-m-mens-long-sleevet-t-shirt_white.jpeg"
+        "image": "assets/images/cw-m-mens-long-sleevet-t-shirt_white.webp"
       },
       {
         "name": "Black",
-        "image": "assets/images/cw-m-mens-long-sleevet-t-shirt_black.jpeg"
+        "image": "assets/images/cw-m-mens-long-sleevet-t-shirt_black.webp"
       }
     ],
     "sizes": [
@@ -145,7 +145,7 @@ const PRODUCTS_DATA = [
       "2XL"
     ],
     "images": {},
-    "cover_image": "assets/images/cw-m-mens-long-sleevet-t-shirt_cover.jpeg",
+    "cover_image": "assets/images/cw-m-mens-long-sleevet-t-shirt_cover.webp",
     "specifications": {
       "Material": "100% Super-Combed Premium Cotton",
       "GSM": "180",
@@ -190,23 +190,23 @@ const PRODUCTS_DATA = [
     "colors": [
       {
         "name": "Crimson Red",
-        "image": "assets/images/cw-m-mens-round-neck-t-shirt_crimson-red.jpeg"
+        "image": "assets/images/cw-m-mens-round-neck-t-shirt_crimson-red.webp"
       },
       {
         "name": "Grey",
-        "image": "assets/images/cw-m-mens-round-neck-t-shirt_grey.jpeg"
+        "image": "assets/images/cw-m-mens-round-neck-t-shirt_grey.webp"
       },
       {
         "name": "Navy Blue",
-        "image": "assets/images/cw-m-mens-round-neck-t-shirt_navy-blue.png"
+        "image": "assets/images/cw-m-mens-round-neck-t-shirt_navy-blue.webp"
       },
       {
         "name": "White",
-        "image": "assets/images/cw-m-mens-round-neck-t-shirt_white.png"
+        "image": "assets/images/cw-m-mens-round-neck-t-shirt_white.webp"
       },
       {
         "name": "Black",
-        "image": "assets/images/cw-m-mens-round-neck-t-shirt_black.jpeg"
+        "image": "assets/images/cw-m-mens-round-neck-t-shirt_black.webp"
       }
     ],
     "sizes": [
@@ -218,7 +218,7 @@ const PRODUCTS_DATA = [
       "2XL"
     ],
     "images": {},
-    "cover_image": "assets/images/cw-m-mens-round-neck-t-shirt_cover.jpeg",
+    "cover_image": "assets/images/cw-m-mens-round-neck-t-shirt_cover.webp",
     "specifications": {
       "Material": "100% Super-Combed Premium Cotton",
       "GSM": "180 & 220 Options Available",
@@ -248,23 +248,23 @@ const PRODUCTS_DATA = [
     "colors": [
       {
         "name": "Burgundy",
-        "image": "assets/images/cw-m-normal-hoodie_burgundy.jpeg"
+        "image": "assets/images/cw-m-normal-hoodie_burgundy.webp"
       },
       {
         "name": "Charcoal Gray",
-        "image": "assets/images/cw-m-normal-hoodie_charcoal-gray.jpeg"
+        "image": "assets/images/cw-m-normal-hoodie_charcoal-gray.webp"
       },
       {
         "name": "Navy Blue",
-        "image": "assets/images/cw-m-normal-hoodie_navy-blue.jpeg"
+        "image": "assets/images/cw-m-normal-hoodie_navy-blue.webp"
       },
       {
         "name": "Olive Green",
-        "image": "assets/images/cw-m-normal-hoodie_olive-green.jpeg"
+        "image": "assets/images/cw-m-normal-hoodie_olive-green.webp"
       },
       {
         "name": "Black",
-        "image": "assets/images/cw-m-normal-hoodie_black.jpeg"
+        "image": "assets/images/cw-m-normal-hoodie_black.webp"
       }
     ],
     "sizes": [
@@ -276,7 +276,7 @@ const PRODUCTS_DATA = [
       "2XL"
     ],
     "images": {},
-    "cover_image": "assets/images/cw-m-normal-hoodie_cover.jpeg",
+    "cover_image": "assets/images/cw-m-normal-hoodie_cover.webp",
     "specifications": {
       "Material": "Premium Cotton Fleece Blend",
       "GSM": "320",
@@ -306,23 +306,23 @@ const PRODUCTS_DATA = [
     "colors": [
       {
         "name": "Charcoal Grey",
-        "image": "assets/images/cw-m-oversized-hoodies_charcoal-grey.jpeg"
+        "image": "assets/images/cw-m-oversized-hoodies_charcoal-grey.webp"
       },
       {
         "name": "Dusty Pink",
-        "image": "assets/images/cw-m-oversized-hoodies_dusty-pink.jpeg"
+        "image": "assets/images/cw-m-oversized-hoodies_dusty-pink.webp"
       },
       {
         "name": "Sage Green",
-        "image": "assets/images/cw-m-oversized-hoodies_sage-green.jpeg"
+        "image": "assets/images/cw-m-oversized-hoodies_sage-green.webp"
       },
       {
         "name": "White",
-        "image": "assets/images/cw-m-oversized-hoodies_white.jpeg"
+        "image": "assets/images/cw-m-oversized-hoodies_white.webp"
       },
       {
         "name": "Black",
-        "image": "assets/images/cw-m-oversized-hoodies_black.jpeg"
+        "image": "assets/images/cw-m-oversized-hoodies_black.webp"
       }
     ],
     "sizes": [
@@ -334,7 +334,7 @@ const PRODUCTS_DATA = [
       "2XL"
     ],
     "images": {},
-    "cover_image": "assets/images/cw-m-oversized-hoodies_cover.jpeg",
+    "cover_image": "assets/images/cw-m-oversized-hoodies_cover.webp",
     "specifications": {
       "Material": "Premium Cotton Fleece Blend",
       "GSM": "320",
@@ -364,19 +364,19 @@ const PRODUCTS_DATA = [
     "colors": [
       {
         "name": "Forest Green",
-        "image": "assets/images/cw-m-sweat-shirt_forest-green.jpeg"
+        "image": "assets/images/cw-m-sweat-shirt_forest-green.webp"
       },
       {
         "name": "Grey Melange",
-        "image": "assets/images/cw-m-sweat-shirt_grey-melange.jpeg"
+        "image": "assets/images/cw-m-sweat-shirt_grey-melange.webp"
       },
       {
         "name": "Navy Blue",
-        "image": "assets/images/cw-m-sweat-shirt_navy-blue.jpeg"
+        "image": "assets/images/cw-m-sweat-shirt_navy-blue.webp"
       },
       {
         "name": "Black",
-        "image": "assets/images/cw-m-sweat-shirt_black.jpeg"
+        "image": "assets/images/cw-m-sweat-shirt_black.webp"
       }
     ],
     "sizes": [
@@ -388,7 +388,7 @@ const PRODUCTS_DATA = [
       "2XL"
     ],
     "images": {},
-    "cover_image": "assets/images/cw-m-sweat-shirt_cover.jpeg",
+    "cover_image": "assets/images/cw-m-sweat-shirt_cover.webp",
     "specifications": {
       "Material": "Premium Cotton Blend Fleece",
       "GSM": "300",
@@ -418,7 +418,7 @@ const PRODUCTS_DATA = [
     "colors": [
       {
         "name": "Standard",
-        "image": "assets/images/cw-w-pants_cover.jpeg"
+        "image": "assets/images/cw-w-pants_cover.webp"
       }
     ],
     "sizes": [
@@ -430,7 +430,7 @@ const PRODUCTS_DATA = [
       "2XL"
     ],
     "images": {},
-    "cover_image": "assets/images/cw-w-pants_cover.jpeg",
+    "cover_image": "assets/images/cw-w-pants_cover.webp",
     "specifications": {
       "Material": "Premium Cotton Terry Blend",
       "GSM": "260",
@@ -460,19 +460,19 @@ const PRODUCTS_DATA = [
     "colors": [
       {
         "name": "Dusty Pink",
-        "image": "assets/images/cw-w-woman-crop-hoodies_dusty-pink.jpeg"
+        "image": "assets/images/cw-w-woman-crop-hoodies_dusty-pink.webp"
       },
       {
         "name": "Lilac",
-        "image": "assets/images/cw-w-woman-crop-hoodies_lilac.jpeg"
+        "image": "assets/images/cw-w-woman-crop-hoodies_lilac.webp"
       },
       {
         "name": "Sage Green",
-        "image": "assets/images/cw-w-woman-crop-hoodies_sage-green.jpeg"
+        "image": "assets/images/cw-w-woman-crop-hoodies_sage-green.webp"
       },
       {
         "name": "White",
-        "image": "assets/images/cw-w-woman-crop-hoodies_white.jpeg"
+        "image": "assets/images/cw-w-woman-crop-hoodies_white.webp"
       }
     ],
     "sizes": [
@@ -484,7 +484,7 @@ const PRODUCTS_DATA = [
       "2XL"
     ],
     "images": {},
-    "cover_image": "assets/images/cw-w-woman-crop-hoodies_cover.jpeg",
+    "cover_image": "assets/images/cw-w-woman-crop-hoodies_cover.webp",
     "specifications": {
       "Material": "Premium Cotton Fleece Blend",
       "GSM": "320",
@@ -514,19 +514,19 @@ const PRODUCTS_DATA = [
     "colors": [
       {
         "name": "Baby Pink",
-        "image": "assets/images/cw-w-women-crop-tops_baby-pink.jpeg"
+        "image": "assets/images/cw-w-women-crop-tops_baby-pink.webp"
       },
       {
         "name": "Beige",
-        "image": "assets/images/cw-w-women-crop-tops_beige.jpeg"
+        "image": "assets/images/cw-w-women-crop-tops_beige.webp"
       },
       {
         "name": "Lavender",
-        "image": "assets/images/cw-w-women-crop-tops_lavender.jpeg"
+        "image": "assets/images/cw-w-women-crop-tops_lavender.webp"
       },
       {
         "name": "White",
-        "image": "assets/images/cw-w-women-crop-tops_white.jpeg"
+        "image": "assets/images/cw-w-women-crop-tops_white.webp"
       }
     ],
     "sizes": [
@@ -538,7 +538,7 @@ const PRODUCTS_DATA = [
       "2XL"
     ],
     "images": {},
-    "cover_image": "assets/images/cw-w-women-crop-tops_cover.jpeg",
+    "cover_image": "assets/images/cw-w-women-crop-tops_cover.webp",
     "specifications": {
       "Material": "100% Super-Combed Premium Cotton",
       "GSM": "180",
@@ -567,7 +567,7 @@ const PRODUCTS_DATA = [
     "colors": [
       {
         "name": "Off-White",
-        "image": "assets/images/crad_supima_tee.jpeg"
+        "image": "assets/images/crad_supima_tee.webp"
       }
     ],
     "sizes": [
@@ -578,7 +578,7 @@ const PRODUCTS_DATA = [
       "XL",
       "2XL"
     ],
-    "cover_image": "assets/images/crad_supima_tee.jpeg",
+    "cover_image": "assets/images/crad_supima_tee.webp",
     "specifications": {
       "Material": "100% Premium Supima Cotton",
       "GSM": "240 Heavyweight",

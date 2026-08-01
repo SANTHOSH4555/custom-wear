@@ -56,7 +56,7 @@
         
         <!-- Logo -->
         <a href="index.html" class="flex items-center gap-2 sm:gap-3 shrink-0">
-          <img src="assets/images/brand_logo.jpeg" alt="Logo" class="h-9 w-9 sm:h-10 sm:w-10 rounded-full border border-blue-500">
+          <img decoding="async" src="assets/images/brand_logo.webp" alt="Logo" class="h-9 w-9 sm:h-10 sm:w-10 rounded-full border border-blue-500">
           <span class="font-extrabold text-base sm:text-xl tracking-wider bg-clip-text text-transparent bg-gradient-to-r from-violet-400 to-purple-300">
             CW & CRADANCE
           </span>
@@ -278,7 +278,7 @@
             <div class="absolute overflow-hidden rounded-2xl shadow-xl"
                  style="top:0; left:0; width:48%; aspect-ratio:3/4; transform: rotate(-3deg);
                         border: 1px solid rgba(255,255,255,0.08);">
-              <img src="assets/images/cw-m-oversized-hoodies_cover.jpeg" alt="Oversized Hoodie"
+              <img decoding="async" src="assets/images/cw-m-oversized-hoodies_cover.webp" alt="Oversized Hoodie"
                    class="w-full h-full object-cover hover:scale-105 transition duration-500">
             </div>
 
@@ -286,7 +286,7 @@
             <div class="absolute overflow-hidden rounded-2xl shadow-xl"
                  style="top:0; right:0; width:48%; aspect-ratio:3/4; transform: rotate(2.5deg);
                         border: 1px solid rgba(255,255,255,0.08);">
-              <img src="assets/images/cw-m-mens-round-neck-t-shirt_cover.jpeg" alt="Round Neck Tee"
+              <img decoding="async" src="assets/images/cw-m-mens-round-neck-t-shirt_cover.webp" alt="Round Neck Tee"
                    class="w-full h-full object-cover hover:scale-105 transition duration-500">
             </div>
 
@@ -294,7 +294,7 @@
             <div class="absolute overflow-hidden rounded-2xl shadow-xl"
                  style="bottom:0; left:4%; width:44%; aspect-ratio:3/4; transform: rotate(2deg);
                         border: 1px solid rgba(255,255,255,0.08);">
-              <img src="assets/images/cw-w-woman-crop-hoodies_cover.jpeg" alt="Crop Hoodie"
+              <img decoding="async" src="assets/images/cw-w-woman-crop-hoodies_cover.webp" alt="Crop Hoodie"
                    class="w-full h-full object-cover hover:scale-105 transition duration-500">
             </div>
 
@@ -302,7 +302,7 @@
             <div class="absolute overflow-hidden rounded-2xl shadow-xl"
                  style="bottom:0; right:4%; width:44%; aspect-ratio:3/4; transform: rotate(-2.5deg);
                         border: 1px solid rgba(255,255,255,0.08);">
-              <img src="assets/images/cw-m-sweat-shirt_cover.jpeg" alt="Sweatshirt"
+              <img decoding="async" src="assets/images/cw-m-sweat-shirt_cover.webp" alt="Sweatshirt"
                    class="w-full h-full object-cover hover:scale-105 transition duration-500">
             </div>
 
@@ -491,7 +491,7 @@
           </div>
           <h3 class="text-xl font-bold mb-3">Eco-Friendly Shipping</h3>
           <p class="text-sm text-gray-400 leading-relaxed">
-            Sourced responsibly, stitched locally, and packed in biodegradable packets. Free shipping on all purchases above Rs. 1,000.
+            Sourced responsibly, stitched locally, and packed in biodegradable packets. Free shipping on all purchases.
           </p>
         </div>
       </div>
@@ -719,7 +719,7 @@
         
         card.innerHTML = `
           <div class="zoom-wrapper rounded-xl aspect-[3/4] relative bg-gray-950/40 mb-4 flex items-center justify-center overflow-hidden">
-            <img src="${p.cover_image || 'assets/images/brand_logo.jpeg'}" alt="${p.name}" class="w-full h-full object-cover" loading="lazy">
+            <img decoding="async" src="${p.cover_image || 'assets/images/brand_logo.jpeg'}" alt="${p.name}" class="w-full h-full object-cover" loading="lazy">
             <span class="absolute top-3 left-3 text-[9px] uppercase font-black px-2.5 py-1 rounded-md bg-blue-600/90 text-white tracking-widest backdrop-blur-md shadow-sm">${p.brand}</span>
             <div class="absolute inset-0 opacity-0 group-hover:opacity-100 flex items-center justify-center gap-2 transition duration-300 pointer-events-none">
               <span class="p-3 rounded-full bg-blue-600/90 text-white font-bold shadow-lg transform scale-90 group-hover:scale-100 transition duration-300">

@@ -45,7 +45,7 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex items-center justify-between h-20">
         <a href="index.html" class="flex items-center gap-3">
-          <img src="assets/images/brand_logo.jpeg" alt="Logo" class="h-10 w-10 rounded-full border border-gray-700">
+          <img decoding="async" src="assets/images/brand_logo.webp" alt="Logo" class="h-10 w-10 rounded-full border border-gray-700">
           <span class="font-extrabold text-xl tracking-wider text-gray-300">CRADANCE</span>
         </a>
         <div class="hidden md:flex items-center space-x-6 text-sm font-medium">
@@ -125,7 +125,7 @@
         </ul>
       </div>
       <div class="relative rounded-2xl overflow-hidden shadow-2xl border border-gray-800" data-aos="fade-left">
-        <img src="assets/images/crad_supima_tee.jpeg" alt="Supima Fabric Detail" class="w-full h-80 object-cover opacity-80 filter saturate-50 hover:saturate-100 transition duration-500">
+        <img decoding="async" src="assets/images/crad_supima_tee.webp" alt="Supima Fabric Detail" class="w-full h-80 object-cover opacity-80 filter saturate-50 hover:saturate-100 transition duration-500">
       </div>
     </div>
 
@@ -181,7 +181,7 @@
         
         card.innerHTML = `
           <div class="zoom-wrapper rounded-xl aspect-[3/4] relative bg-gray-950/40 mb-4 flex items-center justify-center overflow-hidden">
-            <img src="${p.cover_image || 'assets/images/brand_logo.jpeg'}" alt="${p.name}" class="w-full h-full object-cover">
+            <img decoding="async" src="${p.cover_image || 'assets/images/brand_logo.jpeg'}" alt="${p.name}" class="w-full h-full object-cover">
             <div class="absolute inset-0 opacity-0 group-hover:opacity-100 flex items-center justify-center gap-2 transition duration-300 pointer-events-none">
               <span class="p-3 rounded-full bg-yellow-600 text-white font-bold shadow-lg transform scale-90 group-hover:scale-100 transition duration-300">
                 <i data-lucide="eye" class="w-5 h-5"></i>

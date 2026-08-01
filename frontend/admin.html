@@ -39,7 +39,7 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex items-center justify-between h-20">
         <a href="index.html" class="flex items-center gap-3">
-          <img src="assets/images/brand_logo.jpeg" alt="Logo" class="h-10 w-10 rounded-full border border-blue-500">
+          <img decoding="async" src="assets/images/brand_logo.webp" alt="Logo" class="h-10 w-10 rounded-full border border-blue-500">
           <span class="font-extrabold text-xl tracking-wider text-red-500">CW ADMIN PANEL</span>
         </a>
         <div class="hidden md:flex items-center space-x-6 text-sm font-medium">
@@ -274,7 +274,7 @@
           itemCard.innerHTML = `
             <div class="flex flex-col items-center gap-3">
               <div class="w-full aspect-square bg-gray-900 rounded-xl overflow-hidden border border-gray-800 flex items-center justify-center p-2">
-                <img src="${imgSrc}" alt="Custom Print Design" class="w-full h-full object-contain">
+                <img decoding="async" src="${imgSrc}" alt="Custom Print Design" class="w-full h-full object-contain">
               </div>
               <a href="${imgSrc}" download="order_${orderId}_custom_design.png" target="_blank" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-purple-600/20 transition">
                 <i data-lucide="download" class="w-4 h-4"></i> Download Print File for Owner

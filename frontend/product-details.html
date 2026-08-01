@@ -39,7 +39,7 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex items-center justify-between h-20">
         <a href="index.html" class="flex items-center gap-3">
-          <img src="assets/images/brand_logo.jpeg" alt="Logo" class="h-10 w-10 rounded-full border border-blue-500">
+          <img decoding="async" src="assets/images/brand_logo.webp" alt="Logo" class="h-10 w-10 rounded-full border border-blue-500">
           <span class="font-extrabold text-xl tracking-wider text-blue-500">CW & CRADANCE</span>
         </a>
         <div class="hidden md:flex items-center space-x-6 text-sm font-medium">
@@ -87,8 +87,8 @@
       <!-- Left Column: Gallery & Zoom -->
       <div class="flex-1 flex flex-col gap-4">
         <div class="zoom-wrapper aspect-[3/4] rounded-2xl bg-gray-900 border border-gray-800 overflow-hidden relative flex items-center justify-center">
-          <img id="main-product-image" src="" alt="Main Product" class="w-full h-full object-cover" onerror="if(currentProduct && currentProduct.cover_image && this.src !== currentProduct.cover_image){ this.src=currentProduct.cover_image; } else { this.src='assets/images/brand_logo.jpeg'; }">
-          <!-- Swipe hint — only visible on touch, fades out after first swipe -->
+          <img decoding="async" fetchpriority="high" id="main-product-image" src="" alt="Main Product" class="w-full h-full object-cover" onerror="if(currentProduct && currentProduct.cover_image && this.src !== currentProduct.cover_image){ this.src=currentProduct.cover_image; } else { this.src='assets/images/brand_logo.webp'; }">
+          <!-- Swipe hint Â— only visible on touch, fades out after first swipe -->
           <div id="swipe-hint" class="absolute inset-0 flex items-center justify-between px-4 pointer-events-none lg:hidden" style="opacity:1; transition:opacity 0.4s;">
             <div class="flex items-center justify-center rounded-full" style="width:36px;height:36px;background:rgba(0,0,0,0.45);backdrop-filter:blur(6px);">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
@@ -423,9 +423,11 @@
       if (thumbContainer && currentProduct.colors) {
         thumbContainer.innerHTML = "";
         currentProduct.colors.forEach((c, idx) => {
+          // Preload color image in background for instant color switching
+          if (c.image) { const preloadImg = new Image(); preloadImg.src = c.image; }
           const thumb = document.createElement("button");
           thumb.className = `w-14 h-16 rounded-xl overflow-hidden border-2 shrink-0 transition ${c.name === selectedColor ? 'border-blue-500 ring-2 ring-blue-500/40' : 'border-gray-800 hover:border-gray-600'}`;
-          thumb.innerHTML = `<img src="${c.image}" alt="${c.name}" class="w-full h-full object-cover">`;
+          thumb.innerHTML = `<img decoding="async" loading="lazy" src="${c.image}" alt="${c.name}" class="w-full h-full object-cover">`;
           thumb.addEventListener("click", () => {
             selectedColor = c.name;
             document.getElementById("selected-color-name").textContent = selectedColor;

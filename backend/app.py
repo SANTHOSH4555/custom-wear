@@ -22,13 +22,22 @@ app.register_blueprint(products_bp, url_prefix="/api/products")
 app.register_blueprint(orders_bp, url_prefix="/api/orders")
 app.register_blueprint(admin_bp, url_prefix="/api/admin")
 
-# Security Headers Middleware
+# Security Headers & Caching Middleware
 @app.after_request
 def add_security_headers(response):
     response.headers["X-Content-Type-Options"] = "nosniff"
     response.headers["X-Frame-Options"] = "SAMEORIGIN"
     response.headers["X-XSS-Protection"] = "1; mode=block"
     response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+
+    # Set aggressive caching headers for static assets (images, fonts, CSS, JS)
+    if response.mimetype and (
+        response.mimetype.startswith("image/") or 
+        response.mimetype.startswith("font/") or 
+        response.mimetype in ("text/css", "application/javascript")
+    ):
+        response.headers["Cache-Control"] = "public, max-age=31536000, immutable"
+
     return response
 
 # Global Exception Handler
