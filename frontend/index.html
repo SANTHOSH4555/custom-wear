@@ -52,30 +52,32 @@
   <!-- Navbar -->
   <nav class="glass-nav fixed top-0 left-0 w-full z-50 transition duration-300">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex items-center justify-between h-16 sm:h-20">
+      <div class="flex items-center justify-between h-16 sm:h-20 gap-2 sm:gap-4">
         
         <!-- Logo -->
-        <a href="index.html" class="flex items-center gap-2 sm:gap-3 shrink-0">
-          <img decoding="async" src="assets/images/brand_logo.webp" alt="Logo" class="h-9 w-9 sm:h-10 sm:w-10 rounded-full border border-blue-500">
-          <span class="font-extrabold text-base sm:text-xl tracking-wider bg-clip-text text-transparent bg-gradient-to-r from-violet-400 to-purple-300">
-            CW & CRADANCE
+        <a href="index.html" class="flex items-center gap-2 sm:gap-3 shrink-0 mr-1 sm:mr-3 lg:mr-6">
+          <img decoding="async" src="assets/images/brand_logo.webp" alt="Logo" class="h-9 w-9 sm:h-10 sm:w-10 rounded-full border border-violet-500/50 shadow-md">
+          <span class="font-extrabold text-base sm:text-lg lg:text-xl tracking-wider bg-clip-text text-transparent bg-gradient-to-r from-violet-400 via-purple-300 to-indigo-300 whitespace-nowrap">
+            CW &amp; CRADANCE
           </span>
         </a>
 
         <!-- Desktop Navigation Links -->
-        <div class="hidden lg:flex items-center space-x-5 text-sm font-medium">
-          <a href="index.html" class="text-blue-500 hover:text-blue-400 transition">Home</a>
-          <a href="custom-wear.html" class="hover:text-blue-400 transition">CUSTOM WEAR</a>
-          <a href="cradance.html" class="hover:text-blue-400 transition">CRADANCE</a>
-          <a href="products.html?gender=Men" class="hover:text-blue-400 transition">Men</a>
-          <a href="products.html?gender=Women" class="hover:text-blue-400 transition">Women</a>
-          <a href="custom-printing.html" class="px-3 py-1 rounded-full bg-violet-600/20 border border-violet-500/30 text-violet-400 hover:bg-violet-600 hover:text-white transition">Custom Printing</a>
-          <a href="products.html" class="hover:text-blue-400 transition">Shop All</a>
-          <a href="track-order.html" class="hover:text-blue-400 transition">Track Order</a>
+        <div class="hidden lg:flex items-center space-x-2.5 xl:space-x-5 text-xs xl:text-sm font-semibold tracking-wide">
+          <a href="index.html" class="text-violet-400 font-bold whitespace-nowrap transition-colors">Home</a>
+          <a href="custom-wear.html" class="text-gray-300 hover:text-violet-400 whitespace-nowrap transition-colors">CUSTOM WEAR</a>
+          <a href="cradance.html" class="text-gray-300 hover:text-violet-400 whitespace-nowrap transition-colors">CRADANCE</a>
+          <a href="products.html?gender=Men" class="text-gray-300 hover:text-violet-400 whitespace-nowrap transition-colors">Men</a>
+          <a href="products.html?gender=Women" class="text-gray-300 hover:text-violet-400 whitespace-nowrap transition-colors">Women</a>
+          <a href="custom-printing.html" class="px-3.5 py-1.5 rounded-full bg-gradient-to-r from-violet-600 to-indigo-600 border border-violet-400/40 text-white font-extrabold text-xs hover:from-violet-500 hover:to-indigo-500 shadow-md hover:shadow-violet-500/30 transition-all duration-300 flex items-center gap-1.5 whitespace-nowrap shrink-0">
+            <i data-lucide="sparkles" class="w-3.5 h-3.5 text-amber-300"></i> Custom Printing
+          </a>
+          <a href="products.html" class="text-gray-300 hover:text-violet-400 whitespace-nowrap transition-colors">Shop All</a>
+          <a href="track-order.html" class="text-gray-300 hover:text-violet-400 whitespace-nowrap transition-colors">Track Order</a>
         </div>
 
         <!-- Right Action Icons + Hamburger -->
-        <div class="flex items-center flex-nowrap space-x-1 sm:space-x-3">
+        <div class="flex items-center flex-nowrap space-x-1 sm:space-x-2.5 shrink-0">
           <!-- Search -->
           <a href="products.html" class="p-2 rounded-full hover:bg-gray-800 text-gray-400 hover:text-white transition" title="Search">
             <i data-lucide="search" class="w-5 h-5"></i>
@@ -84,7 +86,7 @@
           <!-- Cart -->
           <a href="cart.html" class="p-2 rounded-full hover:bg-gray-800 text-gray-400 hover:text-white transition relative" title="Cart">
             <i data-lucide="shopping-bag" class="w-5 h-5"></i>
-            <span class="cart-count-badge absolute -top-1 -right-1 bg-blue-600 text-white rounded-full text-[10px] w-4 h-4 flex items-center justify-center font-bold hidden">0</span>
+            <span class="cart-count-badge absolute -top-1 -right-1 bg-violet-600 text-white rounded-full text-[10px] w-4 h-4 flex items-center justify-center font-bold hidden">0</span>
           </a>
 
           <!-- Wishlist (desktop only) -->
@@ -92,24 +94,23 @@
             <i data-lucide="heart" class="w-5 h-5"></i>
           </a>
 
-
-
           <!-- Profile / Login -->
           <div class="auth-guest">
-            <a href="login.html" class="hidden sm:inline-flex px-4 py-2 text-xs font-semibold tracking-wider rounded-lg bg-blue-600 hover:bg-blue-700 text-white transition">
+            <a href="login.html" class="hidden sm:inline-flex px-4 py-2 text-xs font-semibold tracking-wider rounded-lg bg-violet-600 hover:bg-violet-700 text-white transition">
               LOGIN
             </a>
             <a href="login.html" class="sm:hidden p-2 rounded-full hover:bg-gray-800 text-gray-400 hover:text-white transition inline-flex" title="Login">
               <i data-lucide="log-in" class="w-5 h-5"></i>
             </a>
           </div>
-          <div class="auth-user flex items-center flex-nowrap gap-0 sm:gap-2">
-            <a href="dashboard.html" class="p-2 rounded-full hover:bg-gray-800 text-gray-400 hover:text-white transition" title="Dashboard">
-              <i data-lucide="user" class="w-5 h-5"></i>
+
+          <div class="auth-user flex items-center flex-nowrap bg-gray-900/80 border border-gray-800 rounded-full px-2.5 py-1 gap-1.5">
+            <a href="dashboard.html" class="flex items-center gap-1.5 text-gray-300 hover:text-violet-400 transition" title="Dashboard">
+              <i data-lucide="user" class="w-4 h-4 text-violet-400"></i>
+              <span id="nav-username" class="text-xs font-semibold max-w-[90px] truncate hidden sm:inline-block">User</span>
             </a>
-            <span id="nav-username" class="text-xs font-medium max-w-[80px] truncate hidden lg:block">User</span>
-            <button id="nav-logout" class="p-2 text-red-400 hover:text-red-300 transition" title="Logout">
-              <i data-lucide="log-out" class="w-4 h-4"></i>
+            <button id="nav-logout" class="p-1 text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-full transition ml-0.5" title="Logout">
+              <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
             </button>
           </div>
 
@@ -177,27 +178,29 @@
   <!-- Large Brand Split Hero Hub -->
   <section class="brand-hub pt-16 sm:pt-20">
     <!-- Brand 1: CUSTOM WEAR -->
-    <div onclick="window.location.href='custom-wear.html'" class="brand-pane custom-wear-pane group">
+    <div onclick="window.location.href='custom-wear.html'" class="brand-pane custom-wear-pane group cursor-pointer" role="region" aria-label="Custom Wear Collection">
       <div class="brand-pane-content" data-aos="fade-right">
         <h2 class="text-4xl sm:text-6xl font-black tracking-wider uppercase mb-2 group-hover:scale-105 transition duration-500">
           CUSTOM WEAR
         </h2>
-        <p class="text-lg sm:text-2xl tracking-widest italic mb-6" style="color:#f5d07a;">"Wear Your Identity"</p>
-        <span class="px-6 py-3 rounded-full border border-amber-400/40 bg-amber-400/10 backdrop-blur text-sm font-semibold text-amber-200 hover:bg-amber-400 hover:text-black transition duration-300">
-          EXPLORE CUSTOM APPAREL
-        </span>
+        <p class="text-lg sm:text-2xl tracking-widest italic mb-8" style="color:#f5d07a;">"Wear Your Identity"</p>
+        <a href="custom-wear.html" class="btn-hero-cw" aria-label="Explore Custom Apparel">
+          <span>EXPLORE CUSTOM APPAREL</span>
+          <i data-lucide="arrow-right" class="w-5 h-5"></i>
+        </a>
       </div>
     </div>
     <!-- Brand 2: CRADANCE -->
-    <div onclick="window.location.href='cradance.html'" class="brand-pane cradance-pane group">
+    <div onclick="window.location.href='cradance.html'" class="brand-pane cradance-pane group cursor-pointer" role="region" aria-label="Cradance Collection">
       <div class="brand-pane-content" data-aos="fade-left">
         <h2 class="text-4xl sm:text-6xl font-black tracking-wider uppercase mb-2 group-hover:scale-105 transition duration-500">
           CRADANCE
         </h2>
-        <p class="text-lg sm:text-2xl text-slate-300 tracking-widest italic mb-6">"Premium Streetwear Collection"</p>
-        <span class="px-6 py-3 rounded-full border border-slate-400/30 bg-slate-800/40 backdrop-blur text-sm font-semibold text-slate-200 hover:bg-white hover:text-black transition duration-300">
-          VIEW EXCLUSIVE DROPS
-        </span>
+        <p class="text-lg sm:text-2xl text-slate-300 tracking-widest italic mb-8">"Premium Streetwear Collection"</p>
+        <a href="cradance.html" class="btn-hero-cradance" aria-label="View Exclusive Drops">
+          <span>VIEW EXCLUSIVE DROPS</span>
+          <i data-lucide="arrow-right" class="w-5 h-5"></i>
+        </a>
       </div>
     </div>
   </section>

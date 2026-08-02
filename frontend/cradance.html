@@ -43,27 +43,37 @@
   <!-- Navbar -->
   <nav class="glass-nav fixed top-0 left-0 w-full z-50 transition duration-300">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex items-center justify-between h-20">
-        <a href="index.html" class="flex items-center gap-3">
-          <img decoding="async" src="assets/images/brand_logo.webp" alt="Logo" class="h-10 w-10 rounded-full border border-gray-700">
-          <span class="font-extrabold text-xl tracking-wider text-gray-300">CRADANCE</span>
+      <div class="flex items-center justify-between h-16 sm:h-20 gap-2 sm:gap-4">
+        
+        <!-- Logo -->
+        <a href="index.html" class="flex items-center gap-2 sm:gap-3 shrink-0 mr-1 sm:mr-3 lg:mr-6">
+          <img decoding="async" src="assets/images/brand_logo.webp" alt="Logo" class="h-9 w-9 sm:h-10 sm:w-10 rounded-full border border-violet-500/50 shadow-md">
+          <span class="font-extrabold text-base sm:text-lg lg:text-xl tracking-wider bg-clip-text text-transparent bg-gradient-to-r from-violet-400 via-purple-300 to-indigo-300 whitespace-nowrap">
+            CW &amp; CRADANCE
+          </span>
         </a>
-        <div class="hidden md:flex items-center space-x-6 text-sm font-medium">
-          <a href="index.html" class="hover:text-gray-400 transition">Home</a>
-          <a href="custom-wear.html" class="hover:text-gray-400 transition">CUSTOM WEAR</a>
-          <a href="cradance.html" class="text-gray-300 hover:text-gray-400 transition font-bold">CRADANCE</a>
-          <a href="products.html?gender=Men" class="hover:text-gray-400 transition">Men</a>
-          <a href="products.html?gender=Women" class="hover:text-gray-400 transition">Women</a>
-          <a href="custom-printing.html" class="hover:text-gray-400 transition flex items-center gap-1">
-            <i data-lucide="sparkles" class="w-3.5 h-3.5 text-amber-400"></i> Custom Printing
+
+        <!-- Desktop Navigation Links -->
+        <div class="hidden lg:flex items-center space-x-2.5 xl:space-x-5 text-xs xl:text-sm font-semibold tracking-wide">
+          <a href="index.html" class="text-gray-300 hover:text-violet-400 whitespace-nowrap transition-colors">Home</a>
+          <a href="custom-wear.html" class="text-gray-300 hover:text-violet-400 whitespace-nowrap transition-colors">CUSTOM WEAR</a>
+          <a href="cradance.html" class="text-violet-400 font-bold whitespace-nowrap transition-colors">CRADANCE</a>
+          <a href="products.html?gender=Men" class="text-gray-300 hover:text-violet-400 whitespace-nowrap transition-colors">Men</a>
+          <a href="products.html?gender=Women" class="text-gray-300 hover:text-violet-400 whitespace-nowrap transition-colors">Women</a>
+          <a href="custom-printing.html" class="px-3.5 py-1.5 rounded-full bg-gradient-to-r from-violet-600 to-indigo-600 border border-violet-400/40 text-white font-extrabold text-xs hover:from-violet-500 hover:to-indigo-500 shadow-md hover:shadow-violet-500/30 transition-all duration-300 flex items-center gap-1.5 whitespace-nowrap shrink-0">
+            <i data-lucide="sparkles" class="w-3.5 h-3.5 text-amber-300"></i> Custom Printing
           </a>
+          <a href="products.html" class="text-gray-300 hover:text-violet-400 whitespace-nowrap transition-colors">Shop All</a>
+          <a href="track-order.html" class="text-gray-300 hover:text-violet-400 whitespace-nowrap transition-colors">Track Order</a>
         </div>
-        <div class="flex items-center space-x-4">
-          <a href="cart.html" class="p-2 rounded-full hover:bg-gray-800 text-gray-400 hover:text-white transition relative">
+
+        <!-- Right Action Icons + Hamburger -->
+        <div class="flex items-center flex-nowrap space-x-1 sm:space-x-2.5 shrink-0">
+          <a href="cart.html" class="p-2 rounded-full hover:bg-gray-800 text-gray-400 hover:text-white transition relative" title="Cart">
             <i data-lucide="shopping-bag" class="w-5 h-5"></i>
-            <span class="cart-count-badge absolute -top-1 -right-1 bg-yellow-600 text-white rounded-full text-[10px] w-4 h-4 flex items-center justify-center font-bold hidden">0</span>
+            <span class="cart-count-badge absolute -top-1 -right-1 bg-violet-600 text-white rounded-full text-[10px] w-4 h-4 flex items-center justify-center font-bold hidden">0</span>
           </a>
-          <a href="dashboard.html" class="p-2 rounded-full hover:bg-gray-800 text-gray-400 hover:text-white transition"><i data-lucide="user" class="w-5 h-5"></i></a>
+          <a href="dashboard.html" class="p-2 rounded-full hover:bg-gray-800 text-gray-400 hover:text-white transition" title="Profile"><i data-lucide="user" class="w-5 h-5"></i></a>
           <button id="mobile-menu-btn" onclick="toggleMobileMenu()" class="lg:hidden p-2 rounded-xl hover:bg-gray-800 text-gray-400 hover:text-white transition ml-1" aria-label="Open menu">
             <i data-lucide="menu" class="w-6 h-6" id="mobile-menu-icon"></i>
           </button>
@@ -93,8 +103,8 @@
       <h1 class="text-5xl sm:text-7xl font-black uppercase tracking-widest mb-4">CRADANCE</h1>
       <p class="text-lg sm:text-xl text-gray-400 tracking-widest italic font-light mb-8">"Premium Streetwear Collection"</p>
       <div class="flex justify-center gap-4">
-        <a href="#products-list" class="bg-white hover:bg-gray-200 text-black font-bold px-8 py-4 rounded-xl transition">
-          View Limited Drops
+        <a href="#products-list" class="btn-hero-cradance text-sm py-3.5 px-8">
+          <i data-lucide="sparkles" class="w-4 h-4"></i> View Limited Drops
         </a>
       </div>
     </div>
