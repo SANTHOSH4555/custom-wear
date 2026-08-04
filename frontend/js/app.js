@@ -6,6 +6,8 @@ const API_BASE_URL = window.location.origin.includes("localhost") || window.loca
 document.addEventListener("DOMContentLoaded", () => {
   initTheme();
   updateCartBadge();
+  syncNavbarAuth();
+  // Hide loader as fast as possible — don't wait for non-critical tasks
   hidePageLoader();
   
   // Setup global event listeners
@@ -19,8 +21,6 @@ document.addEventListener("DOMContentLoaded", () => {
     themeToggle.addEventListener("click", toggleTheme);
   }
   
-  // Render login state in navbar
-  syncNavbarAuth();
 });
 
 // Theme Management
@@ -59,14 +59,15 @@ function showPageLoader() {
 
 function hidePageLoader() {
   const loader = document.getElementById("page-loader");
-  if (loader) {
-    loader.style.opacity = "0";
-    loader.style.pointerEvents = "none";
-    setTimeout(() => {
-      loader.style.display = "none";
-    }, 500);
-  }
+  if (!loader) return;
+  loader.style.transition = "opacity 0.2s ease";
+  loader.style.opacity = "0";
+  loader.style.pointerEvents = "none";
+  setTimeout(() => { loader.style.display = "none"; }, 220);
 }
+
+// Hard safety cap — loader never shows more than 600ms
+setTimeout(() => { hidePageLoader(); }, 600);
 
 // Authentication Helpers
 function getAuthToken() {

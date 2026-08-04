@@ -120,9 +120,23 @@
         <h2 class="text-2xl sm:text-3xl font-extrabold" data-aos="fade-right">Custom Wear Catalogue</h2>
         <p class="text-gray-400 mt-1" data-aos="fade-right" data-aos-delay="50">Select a base structure, then customize with prints or wear plain.</p>
       </div>
-      <div class="flex gap-2" data-aos="fade-left">
-        <a href="products.html?brand=CUSTOM%20WEAR&gender=Men" class="px-4 py-2 rounded-lg bg-gray-900 text-xs font-semibold hover:bg-gray-800 transition">Men's</a>
-        <a href="products.html?brand=CUSTOM%20WEAR&gender=Women" class="px-4 py-2 rounded-lg bg-gray-900 text-xs font-semibold hover:bg-gray-800 transition">Women's</a>
+      <div class="flex gap-3" data-aos="fade-left">
+        <a href="products.html?brand=CUSTOM%20WEAR&gender=Men"
+           class="group flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold text-white border border-blue-500/30 transition-all duration-200"
+           style="background: linear-gradient(135deg, rgba(37,99,235,0.18) 0%, rgba(29,78,216,0.08) 100%);"
+           onmouseover="this.style.background='linear-gradient(135deg,rgba(37,99,235,0.35) 0%,rgba(29,78,216,0.2) 100%)'; this.style.borderColor='rgba(96,165,250,0.6)'; this.style.transform='translateY(-1px)';"
+           onmouseout="this.style.background='linear-gradient(135deg,rgba(37,99,235,0.18) 0%,rgba(29,78,216,0.08) 100%)'; this.style.borderColor='rgba(59,130,246,0.3)'; this.style.transform='translateY(0)';">
+          <i data-lucide="user" class="w-3.5 h-3.5 text-blue-400 transition-transform duration-200 group-hover:scale-110"></i>
+          Men's
+        </a>
+        <a href="products.html?brand=CUSTOM%20WEAR&gender=Women"
+           class="group flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold text-white border border-pink-500/30 transition-all duration-200"
+           style="background: linear-gradient(135deg, rgba(219,39,119,0.18) 0%, rgba(190,24,93,0.08) 100%);"
+           onmouseover="this.style.background='linear-gradient(135deg,rgba(219,39,119,0.35) 0%,rgba(190,24,93,0.2) 100%)'; this.style.borderColor='rgba(244,114,182,0.6)'; this.style.transform='translateY(-1px)';"
+           onmouseout="this.style.background='linear-gradient(135deg,rgba(219,39,119,0.18) 0%,rgba(190,24,93,0.08) 100%)'; this.style.borderColor='rgba(236,72,153,0.3)'; this.style.transform='translateY(0)';">
+          <i data-lucide="sparkles" class="w-3.5 h-3.5 text-pink-400 transition-transform duration-200 group-hover:scale-110"></i>
+          Women's
+        </a>
       </div>
     </div>
 
